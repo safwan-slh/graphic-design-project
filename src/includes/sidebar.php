@@ -51,11 +51,34 @@ $current_page = basename($_SERVER['PHP_SELF']); ?>
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">แดชบอร์ด</h2>
             <ul class="space-y-1">
               <li>
-                <a href="/graphic-design/src/admin/index.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'dashboard.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                <a href="/graphic-design/src/admin/index.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'index.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
                   <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                   </svg>
                   ภาพรวมระบบ
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Services Section -->
+          <div>
+            <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการบริการ</h2>
+            <ul class="space-y-1">
+              <li>
+                <a href="service_list.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'service_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                  รายการบริการ
+                </a>
+              </li>
+              <li>
+                <a href="service_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'service_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  เพิ่มบริการใหม่
                 </a>
               </li>
             </ul>
@@ -86,11 +109,6 @@ $current_page = basename($_SERVER['PHP_SELF']); ?>
         </nav>
       </div>
     </div>
-
-    <!-- Main Content -->
-    <!-- <div class="ml-64 p-8 flex-1">
-          ...
-        </div> -->
   </div>
 </body>
 
