@@ -21,13 +21,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // ส่งไปหน้าตาม role
             if ($user['role'] === 'admin') {
-                header("Location: /graphic-design/dist/admin/dashboard.php");
+                header("Location: /graphic-design/dist/admin/index.php");
                 exit();
             } else {
                 header("Location: /graphic-design/src/client/index.php");
                 exit();
             }
-            exit();
         } else {
             $error = "อ๊ะ! รหัสผ่านอาจไม่ถูกต้อง";
         }
