@@ -131,7 +131,7 @@ $result_featured = $conn->query($sql_featured);
                                             </svg>
                                             แก้ไข
                                         </a>
-                                        <a href="#"
+                                        <a href="service_delete.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-red-600 hover:text-red-800 font-medium flex items-center text-sm"
                                             onclick="return confirm('คุณแน่ใจที่จะลบบริการนี้?');">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -190,7 +190,7 @@ $result_featured = $conn->query($sql_featured);
                                             </svg>
                                             แก้ไข
                                         </a>
-                                        <a href="#"
+                                        <a href="service_delete.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-red-600 hover:text-red-800 font-medium flex items-center text-sm"
                                             onclick="return confirm('คุณแน่ใจที่จะลบบริการนี้?');">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -249,7 +249,7 @@ $result_featured = $conn->query($sql_featured);
                                             </svg>
                                             แก้ไข
                                         </a>
-                                        <a href="#"
+                                        <a href="service_delete.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-red-600 hover:text-red-800 font-medium flex items-center text-sm"
                                             onclick="return confirm('คุณแน่ใจที่จะลบบริการนี้?');">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -308,7 +308,7 @@ $result_featured = $conn->query($sql_featured);
                                             </svg>
                                             แก้ไข
                                         </a>
-                                        <a href="#"
+                                        <a href="service_delete.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-red-600 hover:text-red-800 font-medium flex items-center text-sm"
                                             onclick="return confirm('คุณแน่ใจที่จะลบบริการนี้?');">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
