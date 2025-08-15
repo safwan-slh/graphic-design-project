@@ -82,6 +82,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+    <!-- include toast component -->
+    <?php include '../includes/toast.php'; ?>
+
+    <?php if (!empty($message)): ?>
+        <script>
+            showToast(<?= json_encode($message) ?>, <?= json_encode($messageType) ?>);
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

@@ -6,6 +6,9 @@ require '../includes/db_connect.php';
 require '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
+$toastType = isset($_GET['toastType']) ? $_GET['toastType'] : '';
+$toastMessage = isset($_GET['toastMessage']) ? urldecode($_GET['toastMessage']) : '';
+
 // ดึงข้อมูลลูกค้าทั้งหมด
 $sql = "SELECT customer_id, fullname, email, phone, role, created_at FROM customers ORDER BY customer_id DESC";
 $result = $conn->query($sql);
@@ -202,6 +205,14 @@ $result = $conn->query($sql);
         </div> -->
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+    <!-- include toast component -->
+    <?php include '../includes/toast.php'; ?>
+
+    <?php if (!empty($message)): ?>
+        <script>
+            showToast(<?= json_encode($message) ?>, <?= json_encode($messageType) ?>);
+        </script>
+    <?php endif; ?>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // ตัวแปรสำหรับ Pagination

@@ -6,8 +6,6 @@ require '../includes/db_connect.php';
 require '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
-$error = '';
-$success = '';
 $isEditMode = false;
 $customer = [
     'customer_id' => '',
@@ -119,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt->execute();
 
                         if ($stmt->affected_rows > 0) {
-                            header("Location: customer_add.php?toastType=success&toastMessage=" . urlencode($isEditMode ? 'แก้ไขข้อมูลลูกค้าเรียบร้อยแล้ว' : 'เพิ่มลูกค้าเรียบร้อยแล้ว'));
+                            header("Location: customer_add.php?toastType=success&toastMessage=" . urlencode('เพิ่มลูกค้าเรียบร้อยแล้ว'));
                             exit;
                         } else {
                             $toastType = 'error';
@@ -216,9 +214,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="form-footer flex justify-between">
-                            <a href="customer_list.php" class="mb-4 text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                ย้อนกลับ
-                            </a>
+                        <a href="customer_list.php" class="mb-4 text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                            ย้อนกลับ
+                        </a>
                         <button type="submit" class="mb-4 text-white flex justify-center items-center bg-zinc-900 hover:bg-zinc-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             <?php echo $isEditMode ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล'; ?>
                         </button>
@@ -228,6 +226,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+    <!-- include toast component -->
+    <?php include '../includes/toast.php'; ?>
+
+    <?php
+    // รองรับกรณี redirect ด้วย
+    if (isset($_GET['toastType']) && isset($_GET['toastMessage'])) {
+        $toastType = $_GET['toastType'];
+        $toastMessage = $_GET['toastMessage'];
+    }
+
+    // แสดง toast ถ้ามีข้อความและประเภท
+    if (!empty($toastMessage) && !empty($toastType)) :
+    ?>
+        <script>
+            showToast(<?= json_encode($toastMessage) ?>, <?= json_encode($toastType) ?>);
+        </script>
+    <?php endif; ?>
+
 </body>
 
 </html>
