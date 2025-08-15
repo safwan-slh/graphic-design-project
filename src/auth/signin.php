@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // ส่งไปหน้าตาม role
             if ($user['role'] === 'admin') {
-                header("Location: /graphic-design/dist/admin/index.php");
+                header("Location: /graphic-design/src/admin/index.php");
                 exit();
             } else {
                 header("Location: /graphic-design/src/client/index.php");
