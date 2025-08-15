@@ -80,7 +80,7 @@ $result_featured = $conn->query($sql_featured);
             <div class="tab-pane active" id="all" role="tabpanel" aria-labelledby="all-tab">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Add New Service Card -->
-                    <a href="#" class="">
+                    <a href="service_add.php" class="">
                         <div class="border-2 border-dashed border-gray-300 rounded-xl hover:border-indigo-400 transition duration-300 flex flex-col items-center justify-center p-8 bg-gray-50">
                             <!-- กล่องไอคอนรูปวงกลมสีม่วงอ่อน -->
                             <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
@@ -124,7 +124,7 @@ $result_featured = $conn->query($sql_featured);
                                         <span class="text-sm text-gray-500"><?php echo htmlspecialchars($row['price_unit']); ?></span>
                                     </div>
                                     <div class="flex justify-between border-t pt-4">
-                                        <a href="#"
+                                        <a href="service_add.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -183,7 +183,7 @@ $result_featured = $conn->query($sql_featured);
                                         <span class="text-sm text-gray-500"><?php echo htmlspecialchars($row['price_unit']); ?></span>
                                     </div>
                                     <div class="flex justify-between border-t pt-4">
-                                        <a href="#"
+                                        <a href="service_add.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -242,7 +242,7 @@ $result_featured = $conn->query($sql_featured);
                                         <span class="text-sm text-gray-500"><?php echo htmlspecialchars($row['price_unit']); ?></span>
                                     </div>
                                     <div class="flex justify-between border-t pt-4">
-                                        <a href="#"
+                                        <a href="service_add.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -301,7 +301,7 @@ $result_featured = $conn->query($sql_featured);
                                         <span class="text-sm text-gray-500"><?php echo htmlspecialchars($row['price_unit']); ?></span>
                                     </div>
                                     <div class="flex justify-between border-t pt-4">
-                                        <a href="#"
+                                        <a href="service_add.php?id=<?php echo $row['service_id']; ?>"
                                             class="text-blue-600 hover:text-blue-800 font-medium flex items-center text-sm">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

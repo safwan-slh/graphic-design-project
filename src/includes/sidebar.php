@@ -73,6 +73,14 @@ $current_page = basename($_SERVER['PHP_SELF']); ?>
                   รายการบริการ
                 </a>
               </li>
+              <li>
+                <a href="service_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'service_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  เพิ่มบริการใหม่
+                </a>
+              </li>
             </ul>
           </div>
           <!-- Divider -->
