@@ -6,7 +6,11 @@ require '../includes/db_connect.php';
 require '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
-function createSlug($string) {
+$toastType = '';
+$toastMessage = '';
+
+function createSlug($string)
+{
     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string)));
     return $slug;
 }
@@ -28,18 +32,18 @@ $service = [
 if (isset($_GET['id'])) {
     $is_edit_mode = true;
     $id = intval($_GET['id']);
-    
+
     // ลบเงื่อนไข deleted_at ออก
     $stmt = $conn->prepare("SELECT * FROM services WHERE service_id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 0) {
         header("Location: services_list.php");
         exit();
     }
-    
+
     $service = $result->fetch_assoc();
 }
 
@@ -61,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("SELECT COUNT(*) FROM services WHERE slug = ?");
         $stmt->bind_param("s", $slug);
     }
-    
+
     $stmt->execute();
     $stmt->bind_result($count);
     $stmt->fetch();
@@ -82,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->execute()) {
             $success = $is_edit_mode ? "แก้ไขบริการเรียบร้อยแล้ว" : "เพิ่มบริการเรียบร้อยแล้ว";
-            
+
             if ($is_edit_mode) {
                 // อัปเดตข้อมูลในตัวแปร $service
                 $service['service_name'] = $name;
@@ -110,21 +114,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 }
-
-if (!empty($success)) {
-    $message = $success;
-    $messageType = 'success';
-} elseif (!empty($error)) {
-    $message = $error;
-    $messageType = 'error';
-} else {
-    $message = '';
-    $messageType = '';
+if (!empty($error)) {
+    $toastType = 'error';
+    $toastMessage = $error;
+} elseif (!empty($success)) {
+    $toastType = 'success';
+    $toastMessage = $success;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -132,9 +133,10 @@ if (!empty($success)) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
     <link href="../../dist/output.css" rel="stylesheet" />
 </head>
+
 <body class="">
     <?php include '../includes/sidebar.php'; ?>
-    
+
     <div class="ml-64 p-8">
         <div class="form-container w-max-[800px]">
             <div class="form-card bg-white p-4 rounded-xl shadow-sm ring-1 ring-gray-200">
@@ -147,7 +149,7 @@ if (!empty($success)) {
                         <?= $is_edit_mode ? 'แก้ไขบริการ' : 'เพิ่มบริการใหม่' ?>
                     </h3>
                 </div>
-                
+
                 <!-- Form -->
                 <form class="form-body" method="POST">
                     <div class="grid gap-6 mb-6 md:grid-cols-2">
@@ -156,7 +158,7 @@ if (!empty($success)) {
                             <label for="name" class="block mb-2 text-sm font-medium text-gray-700">ชื่อบริการ</label>
                             <input type="text" name="service_name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="กรอกชื่อบริการ" required value="<?= htmlspecialchars($service['service_name']) ?>">
                         </div>
-                        
+
                         <!-- Slug -->
                         <div class="col-span-2">
                             <label for="slug" class="block mb-2 text-sm font-medium text-gray-700">ชื่อภาษาอังกฤษ (Slug)</label>
@@ -168,13 +170,13 @@ if (!empty($success)) {
                             </div>
                             <p class="mt-1 text-xs text-gray-500">ชื่อสำหรับใช้ใน URL (ภาษาอังกฤษเท่านั้น)</p>
                         </div>
-                        
+
                         <!-- คำอธิบายสั้น -->
                         <div class="col-span-2">
                             <label for="short_description" class="block mb-2 text-sm font-medium text-gray-700">คำอธิบายสั้น</label>
                             <textarea id="short_description" name="short_description" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="อธิบายเกี่ยวกับบริการนี้..."><?= htmlspecialchars($service['short_description']) ?></textarea>
                         </div>
-                        
+
                         <!-- ราคา -->
                         <div>
                             <label for="price" class="block mb-2 text-sm font-medium text-gray-700">ราคาเริ่มต้น</label>
@@ -185,7 +187,7 @@ if (!empty($success)) {
                                 <input type="number" name="base_price" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-8 p-2.5" placeholder="0.00" step="0.01" min="0" required value="<?= htmlspecialchars($service['base_price']) ?>">
                             </div>
                         </div>
-                        
+
                         <!-- หน่วยราคา -->
                         <div>
                             <label for="price_unit" class="block mb-2 text-sm font-medium text-gray-700">หน่วยราคา</label>
@@ -196,7 +198,7 @@ if (!empty($success)) {
                                 <option value="แบบ" <?= $service['price_unit'] === 'แบบ' ? 'selected' : '' ?>>ต่อแบบ</option>
                             </select>
                         </div>
-                        
+
                         <!-- Checkboxes -->
                         <div class="col-span-2 space-y-3">
                             <div class="checkbox-label">
@@ -209,7 +211,7 @@ if (!empty($success)) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Footer -->
                     <div class="form-footer flex justify-between">
                         <a href="service_list.php" class="mb-4 text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
@@ -224,6 +226,15 @@ if (!empty($success)) {
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+    <!-- include toast component -->
+    <?php include '../includes/toast.php'; ?>
+
+    <?php if (!empty($toastMessage)): ?>
+        <script>
+            showToast(<?= json_encode($toastMessage) ?>, <?= json_encode($toastType) ?>);
+        </script>
+    <?php endif; ?>
+
     <script>
         // Auto-generate slug from service name
         document.getElementById('name').addEventListener('input', function() {
@@ -235,4 +246,5 @@ if (!empty($success)) {
         });
     </script>
 </body>
+
 </html>

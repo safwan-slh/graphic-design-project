@@ -6,6 +6,9 @@ require '../includes/db_connect.php';
 require '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
+$message = '';
+$messageType = ''; // success หรือ error
+
 // ดึงข้อมูลทั้งหมด
 $sql_all = "SELECT * FROM services ORDER BY created_at DESC";
 $result_all = $conn->query($sql_all);
@@ -21,6 +24,17 @@ $result_inactive = $conn->query($sql_inactive);
 // ดึงบริการแนะนำ
 $sql_featured = "SELECT * FROM services WHERE is_featured = 1 ORDER BY created_at DESC";
 $result_featured = $conn->query($sql_featured);
+
+if (!empty($success)) {
+    $message = $success;
+    $messageType = 'success';
+} elseif (!empty($error)) {
+    $message = $error;
+    $messageType = 'error';
+} else {
+    $message = '';
+    $messageType = '';
+}
 ?>
 
 <!DOCTYPE html>
@@ -331,6 +345,14 @@ $result_featured = $conn->query($sql_featured);
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+    <!-- include toast component -->
+    <?php include '../includes/toast.php'; ?>
+
+    <?php if (!empty($message)): ?>
+        <script>
+            showToast(<?= json_encode($message) ?>, <?= json_encode($messageType) ?>);
+        </script>
+    <?php endif; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ฟังก์ชันเปลี่ยนแท็บ
