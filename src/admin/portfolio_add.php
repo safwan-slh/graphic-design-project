@@ -69,16 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO portfolios 
                 (service_id, title, description, image_url, client_name, project_date, tags, is_featured, is_active) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            $stmt->bind_param("issssssii", 
-                $serviceId, 
-                $title, 
-                $description, 
-                $imageUrl, 
-                $clientName, 
-                $projectDate, 
-                $tags, 
-                $isFeatured, 
+
+            $stmt->bind_param(
+                "issssssii",
+                $serviceId,
+                $title,
+                $description,
+                $imageUrl,
+                $clientName,
+                $projectDate,
+                $tags,
+                $isFeatured,
                 $isActive
             );
         } else {
@@ -86,15 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO portfolios 
                 (service_id, title, description, image_url, client_name, tags, is_featured, is_active) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            $stmt->bind_param("isssssii", 
-                $serviceId, 
-                $title, 
-                $description, 
-                $imageUrl, 
-                $clientName, 
-                $tags, 
-                $isFeatured, 
+
+            $stmt->bind_param(
+                "isssssii",
+                $serviceId,
+                $title,
+                $description,
+                $imageUrl,
+                $clientName,
+                $tags,
+                $isFeatured,
                 $isActive
             );
         }
@@ -106,11 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             throw new Exception("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " . $conn->error);
         }
-
     } catch (Exception $e) {
         $toastType = 'error';
         $toastMessage = $e->getMessage();
-        
+
         // Debug: แสดง error ที่เกิดขึ้น
         error_log("Portfolio Add Error: " . $e->getMessage());
     }
@@ -144,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
-                        เพิ่มผลงานใหม่
+                        เพิ่มผลงานร้าน
                     </h3>
                 </div>
 
@@ -162,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block text-sm font-medium text-gray-700 mb-2">บริการ
                                 <span class="text-red-500">*</span></label>
                             <select name="service_id" required
-                                class="w-full px-3 py-2 border bg-gray-50 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 <option value="">-- เลือกบริการ --</option>
                                 <?php foreach ($services as $service): ?>
                                     <option value="<?= $service['service_id'] ?>">
@@ -171,7 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-
                         <div>
                             <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อผลงาน
                                 <span class="text-red-500">*</span></label>
@@ -179,15 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
-
                     <!-- รูปภาพหลัก -->
-                    <!-- รูปภาพหลัก -->
-                    <!-- <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">รูปภาพหลัก*</label>
-                        <input type="file" name="image_url" accept="image/*" required 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="text-sm text-gray-500 mt-1">รองรับไฟล์ JPG, PNG, WebP, GIF</p>
-                    </div> -->
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">รูปภาพหลัก <span class="text-red-500">*</span></label>
                         <div class="upload-area relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300"
@@ -225,6 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">คำอธิบาย</label>
                         <textarea name="description" rows="4"
+                            placeholder="กรุณากรอกคำอธิบายเกี่ยวกับผลงาน"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
                     </div>
 
@@ -233,6 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div>
                             <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อลูกค้า</label>
                             <input type="text" name="client_name"
+                            placeholder="กรุณากรอกชื่อของลูกค้า"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
 
@@ -250,33 +244,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" name="tags"
                             placeholder="โลโก้, Minimalist, อาหาร"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <p class="text-sm text-gray-500 mt-1">ตัวอย่าง: โลโก้,
+                        <p class="text-xs text-gray-500 mt-2">ตัวอย่าง: โลโก้,
                             Minimalist, อาหาร, สีน้ำเงิน</p>
                     </div>
 
                     <!-- การตั้งค่า -->
-                    <div class="flex space-x-6">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="is_featured"
-                                value="1" class="rounded text-blue-600">
-                            <span class="ml-2 text-sm text-gray-700">เป็นผลงานแนะนำ</span>
-                        </label>
-
-                        <label class="flex items-center">
-                            <input type="checkbox" name="is_active" value="1"
-                                checked class="rounded text-blue-600">
-                            <span class="ml-2 text-sm text-gray-700">แสดงผลในเว็บไซต์</span>
-                        </label>
+                    <div class="col-span-2 space-y-3">
+                        <div class="checkbox-label">
+                            <input type="checkbox" name="is_featured" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" value="1">
+                            <label for="is_featured" class="ml-2 text-sm font-medium text-gray-700">เป็นผลงานแนะนำ</label>
+                        </div>
+                        <div class="checkbox-label">
+                            <input type="checkbox" name="is_active" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="is_active" class="ml-2 text-sm font-medium text-gray-700">แสดงผลในเว็บไซต์</label>
+                        </div>
                     </div>
 
                     <!-- ปุ่มส่งฟอร์ม -->
-                    <div class="flex space-x-4 pt-6">
+                    <div class="flex space-x-4 pt-2">
                         <button type="submit" id="submitBtn"
-                            class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+                            class="text-white flex justify-center items-center bg-zinc-900 hover:bg-zinc-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             เพิ่มผลงาน
                         </button>
                         <a href="portfolio_list.php"
-                            class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 transition">
+                            class="text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             ยกเลิก
                         </a>
                     </div>
