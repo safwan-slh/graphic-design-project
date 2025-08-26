@@ -1,0 +1,11 @@
+# ป้องกันการเข้าถึงโดยตรง
+php_flag engine off
+
+# ป้องกันการรันไฟล์ executable
+<Files ~ "\.(php|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# ป้องกัน directory listing
+Options -Indexes
