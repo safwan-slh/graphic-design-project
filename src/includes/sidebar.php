@@ -72,7 +72,7 @@ $current_page = basename($_SERVER['PHP_SELF']); ?>
                   </svg>
                   รายการบริการ
                 </a>
-              </li>
+              </li> 
               <li>
                 <a href="service_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'service_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
                   <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
