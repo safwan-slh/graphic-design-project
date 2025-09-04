@@ -212,14 +212,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="admin" <?php echo $customer['role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
                         </select>
                     </div>
-
-                    <div class="form-footer flex justify-between">
-                        <a href="customer_list.php" class="mb-4 text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                            ย้อนกลับ
-                        </a>
-                        <button type="submit" class="mb-4 text-white flex justify-center items-center bg-zinc-900 hover:bg-zinc-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                     <!-- ปุ่มส่งฟอร์ม -->
+                    <div class="flex space-x-4 pt-2">
+                        <button type="submit" 
+                        class="text-white flex justify-center items-center bg-zinc-900 hover:bg-zinc-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             <?php echo $isEditMode ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล'; ?>
                         </button>
+                        <a href="customer_list.php" 
+                        class="text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                            ย้อนกลับ
+                        </a>
                     </div>
                 </form>
             </div>

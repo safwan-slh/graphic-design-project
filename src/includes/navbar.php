@@ -31,7 +31,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="/graphic-design/src/client/index.php" class="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'index.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
           Home
         </a>
-        <a href="#" class="flex items-center justify-center px-4 py-2 text-sm font-medium  rounded-full  transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'portfolio.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
+        <a href="/graphic-design/src/client/portfolios.php" class="flex items-center justify-center px-4 py-2 text-sm font-medium  rounded-full  transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'portfolios.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
           Portfolio
         </a>
         <a href="/graphic-design/src/client/services.php" class="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'services.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
@@ -70,7 +70,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <ul class="space-y-1 p-2">
               <?php if (isset($_SESSION['customer_id']) && $_SESSION['role'] == 'admin'): ?>
                 <li>
-                  <a href="#" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'dashboard.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <a href="/graphic-design/src/admin/index.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'dashboard.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                     </svg>
