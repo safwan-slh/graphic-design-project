@@ -23,15 +23,24 @@ $current_page = basename($_SERVER['PHP_SELF']);
       font-weight: 500;
       font-style: normal;
     }
+
+    .glassmorphism {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 
 <body>
-  <nav class=" fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out will-change-transform will-change-opacity bg-white/50 backdrop-blur-md">
-    <div class="flex justify-between items-center px-5 py-1">
+  <nav class=" fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out will-change-transform will-change-opacity glassmorphism">
+    <div class="flex justify-between items-center px-5 py-3">
       <!-- Logo/Brand -->
       <div class="">
         <a href="/graphic-design/src/client/index.php" class="flex items-center space-x-2">
+          <div class="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center">
+            <span class="text-white font-bold text-lg">G</span>
+          </div>
           <span class="text-xl font-bold text-zinc-900">Graphic-Design</span>
         </a>
       </div>
@@ -50,6 +59,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php if (isset($_SESSION['customer_id'])): ?>
           <a href="#" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'order.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
             Order
+            <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full">7</span>
           </a>
         <?php endif; ?>
         <a href="#" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'review.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
