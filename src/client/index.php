@@ -469,6 +469,82 @@ $result = $conn->query($sql); ?>
             </div>
         </div>
     </section>
+    <section class="py-5 font-thai">
+        <div class="container mx-auto px-6 my-10">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-acme-dark mb-4">
+                        รีวิวจากลูกค้า
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        สิ่งที่ลูกค้าพูดเกี่ยวกับบริการของเรา
+                    </p>
+                </div>
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Testimonial 1 -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 gap-6 mb-6">
+                        <div class="flex items-start mb-4">
+                            <div class="avatar w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-sm font-medium mr-3">
+                                ส
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-sm">สมชาย ใจดี</h4>
+                                <p class="text-gray-500 text-xs">เจ้าของร้านอาหารไทย</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">"พอได้โลโก้ใหม่จากทีมงาน ยอดขายเพิ่มขึ้นจริงๆ ลูกค้าบอกว่าเห็นแล้วน่ากิน จำง่าย"</p>
+                        <div class="star-rating text-xs">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 gap-6 mb-6">
+                        <div class="flex items-start mb-4">
+                            <div class="avatar w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-sm font-medium mr-3">
+                                ส
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-sm">สมชาย ใจดี</h4>
+                                <p class="text-gray-500 text-xs">เจ้าของร้านอาหารไทย</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">"พอได้โลโก้ใหม่จากทีมงาน ยอดขายเพิ่มขึ้นจริงๆ ลูกค้าบอกว่าเห็นแล้วน่ากิน จำง่าย"</p>
+                        <div class="star-rating text-xs">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 gap-6 mb-6">
+                        <div class="flex items-start mb-4">
+                            <div class="avatar w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-sm font-medium mr-3">
+                                ส
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-sm">สมชาย ใจดี</h4>
+                                <p class="text-gray-500 text-xs">เจ้าของร้านอาหารไทย</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">"พอได้โลโก้ใหม่จากทีมงาน ยอดขายเพิ่มขึ้นจริงๆ ลูกค้าบอกว่าเห็นแล้วน่ากิน จำง่าย"</p>
+                        <div class="star-rating text-xs">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
