@@ -240,6 +240,115 @@ $result = $conn->query($sql); ?>
             </div>
         </div>
     </section>
+    <section class="py-5 font-thai">
+        <div class="container mx-auto px-6 my-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                        🎯 ผลงานโดดเด่น
+                    </div>
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">ผลงานการออกแบบของเรา</h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">สำรวจผลงานการออกแบบกราฟิกที่เราได้สร้างให้กับลูกค้าทั้งในและต่างประเทศ ด้วยความคิดสร้างสรรค์และความเชี่ยวชาญ</p>
+                </div>
+                <!-- Portfolio Grid -->
+                <div class="grid grid-cols-3 gap-6">
+                    <?php if (
+                        $result->num_rows > 0
+                    ): ?>
+                        <?php while ($portfolio = $result->fetch_assoc()):
+                            $tags = json_decode($portfolio['tags'], true); // ตรวจสอบว่าภาพมีอยู่จริง
+                            $imagePath = __DIR__ . '/../../' . $portfolio['image_url'];
+                            $imageExists =
+                                file_exists($imagePath); ?>
+                            <div
+                                class="portfolio-item bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 relative">
+                                <div class="relative">
+                                    <div class="w-full h-64 <?= $imageExists ? '' : '' ?>">
+                                        <?php if ($imageExists): ?>
+                                            <img src="/graphic-design/<?= htmlspecialchars($portfolio['image_url']) ?>"
+                                                alt="<?= htmlspecialchars($portfolio['title']) ?>"
+                                                class="w-full h-full object-cover" />
+                                        <?php else: ?>
+                                            <div
+                                                class="w-full h-full flex items-center justify-center text-white font-bold text-2xl">
+                                                <?= htmlspecialchars(substr($portfolio['title'], 0, 1)) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <!-- Badge สถานะ -->
+                                    <div class="absolute top-2 flex space-x-2">
+                                        <?php if ($portfolio['is_featured']): ?>
+                                            <span
+                                                class="px-2 py-1 glassmorphism text-white text-xs font-bold rounded-full ml-2">
+                                                <i class="fas fa-star mr-1 text-yellow-300"></i>
+                                                แนะนำ
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <!-- แท็ก -->
+                                    <?php
+                                    // ทำความสะอาดแท็ก: trim และตัดค่าว่างออก
+                                    $cleanTags = [];
+                                    if (is_array($tags)) {
+                                        $cleanTags = array_values(array_filter(array_map('trim', $tags), function ($v) {
+                                            return $v !== '';
+                                        }));
+                                    }
+                                    ?>
+                                    <?php if (!empty($cleanTags)): ?>
+                                        <div class="absolute bottom-2 left-2 flex items-center justify-between">
+                                            <div class="flex flex-wrap gap-1">
+                                                <?php foreach (array_slice($cleanTags, 0, 4) as $tag): ?>
+                                                    <span class=" glassmorphism text-white text-xs px-3 py-1 rounded-full">
+                                                        <?= htmlspecialchars($tag) ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                                <?php if (count($cleanTags) > 4): ?>
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium glassmorphism text-white">
+                                                        +
+                                                        <?= count($cleanTags) - 4 ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="flex items-end p-6">
+                                    <div class="">
+                                        <h3 class="font-semibold text-lg text-gray-800 mb-2"><?= htmlspecialchars($portfolio['title']) ?></h3>
+                                        <p class="text-gray-500 mb-4 text-md"><?= htmlspecialchars($portfolio['description']) ?></p>
+                                        <p class="text-sm inline-flex items-center">
+                                            <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                                            บริการ: <?= htmlspecialchars($portfolio['service_name']) ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <!-- วันที่สร้าง
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-clock mr-1"></i>
+                                        <?= date('d/m/Y', strtotime($portfolio['created_at'])) ?>
+                                    </div> -->
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="col-span-full text-center py-12">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-image fa-3x"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-600 mb-2">ยังไม่มีผลงาน</h3>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="text-center mt-10">
+                    <a href="services.php" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-5 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105">
+                        ดูผลงานทั้งหมด <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
