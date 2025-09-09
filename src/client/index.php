@@ -189,7 +189,57 @@ $result = $conn->query($sql); ?>
             </a>
         </div>
     </section>
-    
+    </section>
+    <!-- services section -->
+    <section class="py-5 bg-zinc-100 font-thai" id="services">
+        <div class="container mx-auto px-6 my-10">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="text-center mb-16">
+                    <div class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                        🎯 บริการครบวงจร
+                    </div>
+                    <h2 class="text-4xl font-bold text-acme-dark mb-4">
+                        เราทำได้มากกว่าที่คุณคิด
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        จากแค่ไอเดีย เราจะช่วยให้กลายเป็นแบรนด์ที่สมบูรณ์แบบ พร้อมสร้างความประทับใจให้ลูกค้าของคุณ
+                    </p>
+                </div>
+
+                <!-- Services Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Logo Design -->
+                    <?php while ($service = $active_result->fetch_assoc()): ?>
+                        <div class="bg-white rounded-2xl p-8 border border-slate-200 hover:shadow-sm transition-all duration-300 ease-in-out hover:scale-105 ">
+                            <span class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-sm font-medium px-2.5 py-0.5 rounded-md mb-3 inline-block shadow-sm">
+                                <i class="fas fa-star mr-1"></i> บริการแนะนำ
+                            </span>
+                            <h3 class="text-xl font-semibold text-acme-dark mb-3"><?= htmlspecialchars($service['service_name']) ?></h3>
+                            <p class="text-acme-gray leading-relaxed mb-6">
+                                <?= nl2br(htmlspecialchars($service['short_description'])) ?>
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-2xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span>
+                                    <div class="text-sm text-acme-gray"><?= htmlspecialchars($service['price_unit']) ?></div>
+                                </div>
+                                <a href="service.php?id=<?= $service['slug'] ?>" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 hover:bg-zinc-800 hover:text-white">
+                                    <i class="fas fa-arrow-right text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+                <div class="text-center mt-10">
+                    <a href="services.php" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-5 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105">
+                        ดูบริการทั้งหมด <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
