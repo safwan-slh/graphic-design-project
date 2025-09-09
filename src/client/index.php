@@ -349,6 +349,126 @@ $result = $conn->query($sql); ?>
             </div>
         </div>
     </section>
+    <section class="py-5 bg-zinc-50 font-thai">
+        <div class="container mx-auto px-6 my-10">
+            <div class="max-w-4xl mx-auto">
+
+                <!-- Header -->
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-acme-dark mb-4">
+                        คำถามที่พบบ่อย
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        เรารวบรวมคำถามที่ลูกค้ามักสอบถามเราเป็นประจำ
+                    </p>
+                </div>
+                <div class="grid grid-row">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm flex p-4 gap-6 mb-6">
+                        <div class="flex items-top">
+                            <div class="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-md"><i class="fa-solid fa-hourglass-start"></i></span>
+                            </div>
+                        </div>
+                        <div class="">
+                            <p class="text-md font-bold">ใช้เวลาทำนานไหม?</p>
+                            <p class="text-gray-600">ระยะเวลาในการทำงานขึ้นอยู่กับประเภทและความซับซ้อนของงาน:</p>
+                            <ul class="mt-3 text-gray-600 space-y-2">
+                                <li class="flex items-start">
+                                    <i class="fas fa-clock text-zinc-500 mt-1 mr-2"></i>
+                                    <span>ออกแบบโลโก้: 5-7 วันทำการ</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-clock text-zinc-500 mt-1 mr-2"></i>
+                                    <span>แบรนด์ไอเดนติที: 10-14 วันทำการ</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-clock text-zinc-500 mt-1 mr-2"></i>
+                                    <span>ออกแบบบรรจุภัณฑ์: 7-10 วันทำการ</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-clock text-zinc-500 mt-1 mr-2"></i>
+                                    <span>ออกแบบเว็บไซต์: 14-21 วันทำการ</span>
+                                </li>
+                            </ul>
+                            <p class="mt-3 text-gray-600">ระยะเวลาอาจเปลี่ยนแปลงขึ้นอยู่กับความซับซ้อนของโครงการและจำนวนรอบการแก้ไข</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm flex p-4 gap-6 mb-6">
+                        <div class="flex items-top">
+                            <div class="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-md"><i class="fa-solid fa-file"></i></span>
+                            </div>
+                        </div>
+                        <div class="">
+                            <p class="text-md font-bold">ไฟล์ที่ได้รับมีรูปแบบอะไรบ้าง?</p>
+                            <p class="text-gray-600">คุณจะได้รับไฟล์ครบถ้วนตามความต้องการในการใช้งาน:</p>
+                            <div class="mt-4">
+                                <div class="flex items-start mb-4">
+                                    <div class="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center text-zinc-600 mr-4">
+                                        <i class="fas fa-file-image"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">ไฟล์ภาพมาตรฐาน</h4>
+                                        <p class="text-gray-600">PNG, JPG (ความละเอียดสูง) สำหรับใช้งานบนเว็บไซต์และโซเชียลมีเดีย</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start mb-4">
+                                    <div class="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center text-zinc-600 mr-4">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">ไฟล์ PDF</h4>
+                                        <p class="text-gray-600">สำหรับการพิมพ์และนำเสนอ</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center text-zinc-600 mr-4">
+                                        <i class="fas fa-file-code"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">ไฟล์ Vector</h4>
+                                        <p class="text-gray-600">AI, EPS, SVG (สำหรับแพ็คเกจมาตรฐานและพรีเมียม) สำหรับการแก้ไขและพิมพ์ขนาดใหญ่</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm flex p-4 gap-6 mb-6">
+                        <div class="flex items-top">
+                            <div class="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-md"><i class="fa-solid fa-comments-dollar"></i></span>
+                            </div>
+                        </div>
+                        <div class="">
+                            <p class="text-md font-bold">หากไม่พอใจในงานสามารถขอคืนเงินได้หรือไม่?</p>
+                            <p class="text-gray-600">นโยบายการคืนเงินของเราเป็นไปตามเงื่อนไขดังต่อไปนี้:</p>
+                            <div class="mt-4">
+                                <div class="my-4 bg-red-50 p-4 rounded-lg">
+                                    <h4 class="font-medium text-red-800 mb-2">นโยบายการคืนเงิน</h4>
+                                    <ul class="text-sm text-red-700 space-y-2">
+                                        <li class="flex items-start">
+                                            <i class="fas fa-times-circle text-red-500 mt-0.5 mr-2"></i>
+                                            <span>ยกเลิกก่อนเริ่มงาน: คืนเงิน 100%</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-times-circle text-red-500 mt-0.5 mr-2"></i>
+                                            <span>ยกเลิกระหว่างการออกแบบ: คืนเงิน 50%</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-times-circle text-red-500 mt-0.5 mr-2"></i>
+                                            <span>หลังส่งงานเสร็จแล้ว: ไม่สามารถคืนเงินได้</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <p class="text-gray-600">เราให้ความสำคัญกับความพึงพอใจของลูกค้าเป็นอันดับแรก ดังนั้นเราจะทำงานจนกว่าคุณจะพอใจในงานออกแบบ โดยปกติแล้วเราสามารถแก้ไขงานได้จนกว่าจะตรงกับความต้องการของคุณ</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
