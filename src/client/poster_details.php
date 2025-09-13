@@ -548,10 +548,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <select id="budget_range" name="budget_range" required
                                 class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
                                 <option value="">เลือกงบประมาณ</option>
-                                <option value="500-1000">500 - 1,000 บาท</option>
-                                <option value="1000-2000">1,000 - 2,000 บาท</option>
-                                <option value="2000-5000">2,000 - 5,000 บาท</option>
-                                <option value="5000+">5,000 บาทขึ้นไป</option>
+                                <option value="1000">1,000 บาท</option>
+                                <option value="2000">2,000 บาท</option>
+                                <option value="3000">3,000 บาท</option>
+                                <option value="4000">4,000 บาท</option>
+                                <option value="5000">5,000 บาท</option>
                             </select>
                         </div>
                         <div class="mb-6">
