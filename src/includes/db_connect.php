@@ -1,15 +1,14 @@
 <?php
 // src/includes/db_connect.php
 
-// ตั้งค่า path (XAMPP บน macOS)
-define('ROOT_PATH', dirname(__DIR__, 2)); // ได้ /Applications/XAMPP/htdocs/your-project
+define('ROOT_PATH', dirname(__DIR__, 2)); 
 define('UPLOADS_DIR', ROOT_PATH . '/uploads');
 define('UPLOADS_URL', '/graphic-design/uploads');  // ต้องมีชื่อโปรเจคใน URL
 
-// ตั้งค่า MySQL ของ XAMPP
+// ตั้งค่า MySQL 
 $host = "localhost";
 $user = "root";
-$pass = "root";  # XAMPP macOS มักไม่มีรหัสผ่าน default
+$pass = "root";  
 $dbname = "graphic_design_db";
 
 try {

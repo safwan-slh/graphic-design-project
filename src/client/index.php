@@ -13,7 +13,6 @@ $sql = "SELECT p.*, s.service_name
         ORDER BY p.created_at DESC LIMIT 3";
 
 $result = $conn->query($sql); ?>
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -119,7 +118,7 @@ $result = $conn->query($sql); ?>
                     </div>
 
                     <div class="flex gap-4">
-                        <a href="services.php" class=" text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-5 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center">
+                        <a href="services.php" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-5 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center">
                             🚀 สร้างงานออกแบบ
                         </a>
                         <a href="portfolios.php" class="border border-zinc-300 hover:border-zinc-500 hover:bg-zinc-100 text-slate-700 hover:text-zinc-600 px-5 py-2 rounded-full font-medium transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center">

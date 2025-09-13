@@ -130,7 +130,7 @@ $advantages = [
                                     <?= number_format($service['base_price'], 2) ?>
                                     <span class="text-gray-500 text-sm ml-1">/ <?= htmlspecialchars($service['price_unit']) ?></span>
                                 </p>
-                                <a href="service_detail.php?slug=<?= urlencode($service['slug']) ?>"
+                                <a href="service_detail.php?service_id=<?= urlencode($service['service_id']) ?>"
                                     class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-4 py-2 text-center">
                                     สั่งออกแบบ
                                 </a>
