@@ -1,18 +1,19 @@
 <?php
 require '../includes/db_connect.php';
 
+// ดึงบริการที่ active
 $active_sql = "SELECT * FROM services 
                WHERE is_active = 1 
                ORDER BY is_featured DESC, created_at DESC LIMIT 3";
 $active_result = $conn->query($active_sql);
 
-// ดึงข้อมูลผลงานทั้งหมด
-$sql = "SELECT p.*, s.service_name 
-        FROM portfolios p 
-        LEFT JOIN services s ON p.service_id = s.service_id 
-        ORDER BY p.created_at DESC LIMIT 3";
-
-$result = $conn->query($sql); ?>
+// ดึงผลงาน (portfolio) พร้อมชื่อบริการ
+$portfolio_sql = "SELECT p.*, s.service_name FROM portfolios p
+                  LEFT JOIN services s ON p.service_id = s.service_id
+                  WHERE p.is_active = 1
+                  ORDER BY p.created_at DESC LIMIT 3";
+$result = $conn->query($portfolio_sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -101,7 +102,7 @@ $result = $conn->query($sql); ?>
                             <div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                                 <i class="fas fa-check text-green-600 text-xs"></i>
                             </div>
-                            <span class="text-sm text-acme-gray">ส่งงานเร็วภายใน 3-7 วัน</span>
+                            <span class="text-sm text-acme-gray">ส่งงานเร็วภายใน 7 วัน</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
@@ -211,20 +212,25 @@ $result = $conn->query($sql); ?>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Logo Design -->
                     <?php while ($service = $active_result->fetch_assoc()): ?>
-                        <div class="bg-white rounded-2xl p-8 border border-slate-200 hover:shadow-sm transition-all duration-300 ease-in-out hover:scale-105 ">
-                            <span class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-sm font-medium px-2.5 py-0.5 rounded-md mb-3 inline-block shadow-sm">
-                                <i class="fas fa-star mr-1"></i> บริการแนะนำ
-                            </span>
-                            <h3 class="text-xl font-semibold text-acme-dark mb-3"><?= htmlspecialchars($service['service_name']) ?></h3>
-                            <p class="text-acme-gray leading-relaxed mb-6">
-                                <?= nl2br(htmlspecialchars($service['short_description'])) ?>
-                            </p>
-                            <div class="flex items-center justify-between">
+                        <div class="relative bg-white rounded-2xl p-2 border border-slate-200 hover:shadow-sm transition-all duration-300 ease-in-out hover:scale-105">
+                            <!-- Badge บริการแนะนำ มุมบนซ้าย -->
+                            <?php if ($service['is_featured']): ?>
+                                <span class="absolute -top-2 left-1 z-10 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
+                                    <i class="fas fa-star mr-1"></i> บริการแนะนำ
+                                </span>
+                            <?php endif; ?>
+                            <div class="bg-zinc-100 p-4 rounded-xl" style="height:164px;">
+                                <h3 class="text-xl font-semibold text-acme-dark mb-3"><?= htmlspecialchars($service['service_name']) ?></h3>
+                                <p class="text-acme-gray leading-relaxed mb-6">
+                                    <?= nl2br(htmlspecialchars($service['short_description'])) ?>
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between p-4">
                                 <div>
-                                    <span class="text-2xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span>
-                                    <div class="text-sm text-acme-gray"><?= htmlspecialchars($service['price_unit']) ?></div>
+                                    <span class="text-1xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span><span class="text-sm text-acme-gray"> /<?= htmlspecialchars($service['price_unit']) ?></span>
                                 </div>
-                                <a href="service.php?id=<?= $service['slug'] ?>" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 hover:bg-zinc-800 hover:text-white">
+                                <a href="service_detail.php?slug=<?= urlencode($service['slug']) ?>" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-4 py-2 text-center">
+                                    สั่งออกแบบ
                                     <i class="fas fa-arrow-right text-xs"></i>
                                 </a>
                             </div>

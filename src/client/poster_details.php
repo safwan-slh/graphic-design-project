@@ -201,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <form method="POST" enctype="multipart/form-data" id="designForm">
-                <input type="hidden" name="service_id" value="1">
+                <input type="hidden" name="service_id" value="2">
                 <!-- Section 1: Project Information -->
                 <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="1">
                     <div class="mb-6 flex items-center">
