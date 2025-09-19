@@ -1,6 +1,9 @@
 <?php
 // ตรวจสอบหน้าปัจจุบัน
-session_start();
+// session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -33,7 +36,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </head>
 
 <body>
-  <nav class=" fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out will-change-transform will-change-opacity glassmorphism">
+  <nav class=" fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out will-change-transform will-change-opacity glassmorphism ">
     <div class="flex justify-between items-center px-5 py-3">
       <!-- Logo/Brand -->
       <div class="">

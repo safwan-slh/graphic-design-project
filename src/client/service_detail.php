@@ -1,5 +1,7 @@
 <?php
+require '../auth/auth.php';
 require __DIR__ . '/../includes/db_connect.php';
+requireLogin(); 
 
 // รับ slug หรือ service_id จาก URL
 $service = null;

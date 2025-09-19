@@ -66,7 +66,7 @@ $result = $conn->query($portfolio_sql);
     }
 </style>
 
-<body class="">
+<body class="font-thai">
     <?php
     include __DIR__ . '/../includes/navbar.php';
     ?>
