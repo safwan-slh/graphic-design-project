@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require __DIR__ . '/../includes/db_connect.php';
 require '../auth/auth.php';
-requireLogin(); 
+requireLogin();
 
 $error = '';
 $success = '';
@@ -141,6 +141,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = "บันทึกข้อมูลสำเร็จ!";
         } else {
             $error = "เกิดข้อผิดพลาด: " . $updateStmt->error;
+        }
+
+        // หลังจาก $poster_id = $stmt->insert_id; และอัปโหลดไฟล์เสร็จแล้ว
+        $customer_id = $_SESSION['customer_id'];
+
+        $orderStmt = $conn->prepare("INSERT INTO orders (customer_id, service_id, ref_id, status) VALUES (?, ?, ?, 'pending')");
+        $orderStmt->bind_param("iii", $customer_id, $service_id, $poster_id);
+        if ($orderStmt->execute()) {
+            // สำเร็จ
+            $order_id = $orderStmt->insert_id;
+            header("Location: payment.php?order_id=" . $order_id);
+            exit;
+        } else {
+            $error = "เกิดข้อผิดพลาดในการสร้างออเดอร์: " . $orderStmt->error;
         }
     }
 }

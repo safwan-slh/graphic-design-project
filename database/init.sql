@@ -67,6 +67,20 @@ CREATE TABLE poster_details (
     CONSTRAINT fk_poster_service FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ตารางคำสั่งซื้อ
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    service_id INT NOT NULL,
+    ref_id INT NOT NULL, -- อ้างอิง id ของรายละเอียดงาน เช่น poster_id, logo_id ฯลฯ
+    status VARCHAR(32) DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (service_id) REFERENCES services(service_id)
+    -- ref_id สามารถอ้างอิง id จากตารางรายละเอียดของแต่ละบริการ
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ตารางผลงานร้าน
 CREATE TABLE portfolios (
     portfolio_id INT AUTO_INCREMENT PRIMARY KEY,
