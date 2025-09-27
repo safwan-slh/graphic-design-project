@@ -5,6 +5,21 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $current_page = basename($_SERVER['PHP_SELF']);
+
+$fullname = $_SESSION['fullname'] ?? '';
+$initial = mb_strtoupper(mb_substr(trim($fullname), 0, 1, 'UTF-8'), 'UTF-8');
+
+$order_count = 0;
+if (isset($_SESSION['customer_id'])) {
+    require_once __DIR__ . '/../includes/db_connect.php';
+    $cid = $_SESSION['customer_id'];
+    $sql = "SELECT COUNT(*) as cnt FROM orders WHERE customer_id=? AND status IN ('pending','in_progress')";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $cid);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    $order_count = $result['cnt'] ?? 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +29,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Navigation</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
-  <link href="../../dist/output.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
@@ -60,9 +75,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
           Services
         </a>
         <?php if (isset($_SESSION['customer_id'])): ?>
-          <a href="#" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'order.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
+          <a href="/graphic-design/src/client/order.php" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'order.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
             Order
-            <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full">7</span>
+            <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $order_count ?></span>
           </a>
         <?php endif; ?>
         <a href="#" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'review.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
@@ -83,8 +98,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
             </svg>
           </button>
-          <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="w-9 h-9 rounded-full bg-zinc-950 hover:bg-zinc-600 flex items-center justify-center text-xs font-bold text-zinc-50 cursor-pointer hover:scale-105 transition-all duration-300" type="button">
-            H
+          <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="w-9 h-9 rounded-full bg-gradient-to-r from-zinc-900 to-zinc-900 hover:bg-zinc-600 flex items-center justify-center text-xs font-bold text-zinc-50 cursor-pointer hover:scale-105 transition-all duration-300" type="button">
+            <?= $initial ?>
           </button>
           <div id="dropdown" class="z-10 hidden bg-white divide-y rounded-xl shadow-md w-44 border-1.5 border-gray-200">
             <div class="px-4 py-3 text-sm text-gray-900">

@@ -151,6 +151,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($orderStmt->execute()) {
             // สำเร็จ
             $order_id = $orderStmt->insert_id;
+
+            // สร้างรหัส order_code เช่น #OD-2025-0001
+            $year = date('Y');
+            $order_code = sprintf("OD-%s-%04d", $year, $order_id);
+
+            // อัปเดต order_code ลงในตาราง
+            $updateOrderCode = $conn->prepare("UPDATE orders SET order_code=? WHERE order_id=?");
+            $updateOrderCode->bind_param("si", $order_code, $order_id);
+            $updateOrderCode->execute();
+
             header("Location: payment.php?order_id=" . $order_id);
             exit;
         } else {
@@ -217,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <form method="POST" enctype="multipart/form-data" id="designForm">
-                <input type="hidden" name="service_id" value="2">
+                <input type="hidden" name="service_id" value="1">
                 <!-- Section 1: Project Information -->
                 <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="1">
                     <div class="mb-6 flex items-center">

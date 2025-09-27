@@ -70,6 +70,7 @@ CREATE TABLE poster_details (
 -- ตารางคำสั่งซื้อ
 CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_code VARCHAR(32) UNIQUE,
     customer_id INT NOT NULL,
     service_id INT NOT NULL,
     ref_id INT NOT NULL, -- อ้างอิง id ของรายละเอียดงาน เช่น poster_id, logo_id ฯลฯ
@@ -79,6 +80,25 @@ CREATE TABLE orders (
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
     FOREIGN KEY (service_id) REFERENCES services(service_id)
     -- ref_id สามารถอ้างอิง id จากตารางรายละเอียดของแต่ละบริการ
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    customer_id INT, -- ใช้ customer_id แทน user_id
+    amount DECIMAL(10,2) NOT NULL,
+    payment_type VARCHAR(20) NOT NULL,
+    deposit_remaining DECIMAL(10,2),
+    payment_method VARCHAR(50) NOT NULL,
+    payment_date DATETIME NOT NULL,
+    payment_status VARCHAR(32) DEFAULT 'pending',
+    reference_no VARCHAR(100),
+    slip_file VARCHAR(255),
+    remark TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id) -- เพิ่ม FK นี้ด้วย
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ตารางผลงานร้าน
