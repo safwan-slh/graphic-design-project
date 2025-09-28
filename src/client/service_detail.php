@@ -1,7 +1,7 @@
 <?php
 require '../auth/auth.php';
 require __DIR__ . '/../includes/db_connect.php';
-requireLogin(); 
+requireLogin();
 
 // รับ slug หรือ service_id จาก URL
 $service = null;
@@ -30,9 +30,9 @@ if (!$service) {
 
 // กำหนด mapping slug => ไฟล์ฟอร์ม
 $form_pages = [
-    'poster-design' => 'poster_details.php',
-    'logo-design'   => 'logo_details.php',
-    'banner-design' => 'banner_details.php',
+    'poster-design' => 'poster_form.php',
+    'logo-design'   => 'logo_form.php',
+    'banner-design' => 'banner_form.php',
     // เพิ่มบริการอื่น ๆ ตาม slug และไฟล์ฟอร์มที่ต้องการ
 ];
 
@@ -57,26 +57,40 @@ $form_available = $form_page && file_exists(__DIR__ . '/' . $form_page);
 <body class="bg-gray-50 mt-10">
     <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
+
     <div class="container mx-auto px-4 py-8 md:py-12 pt-10">
-        <!-- Breadcrumb -->
-        <nav class="mb-6 md:mb-8 text-sm text-gray-500">
-            <ol class="list-none p-0 inline-flex">
-                <li class="flex items-center">
-                    <a href="/graphic-design/src/client/index.php" class="hover:text-zinc-800 transition-colors">หน้าหลัก</a>
-                    <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                </li>
-                <li class="flex items-center">
-                    <a href="/graphic-design/src/client/services.php" class="hover:text-zinc-800 transition-colors">บริการทั้งหมด</a>
-                    <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                </li>
-                <li class="text-zinc-900"><?= htmlspecialchars($service['service_name']) ?></li>
-            </ol>
-        </nav>
-
-        <div class="form-card mx-8 mt-8 rounded-xl bg-white shadow-sm ring-1 ring-gray-200">
-
+        <!-- Header with back button -->
+        <div class="flex items-center justify-between bg-white rounded-2xl mb-6 p-4 ring-1 ring-gray-200">
+            <div class="flex items-center space-x-4">
+                <button class="p-1.5 text-gray-800 hover:bg-zinc-100 rounded-lg cursor-pointer hover:text-gray-800 ring-1 ring-gray-200" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <!-- Breadcrumb -->
+                <nav class="text-sm text-gray-500 p-1 rounded-lg ring-1 ring-gray-200">
+                    <ol class="list-none p-0 inline-flex">
+                        <li class="flex items-center">
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a href="/graphic-design/src/client/index.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">หน้าหลัก</a>
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a href="/graphic-design/src/client/services.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">บริการทั้งหมด</a>
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a class="text-zinc-800 transition-colors  hover:bg-zinc-100 p-1 rounded-lg"><?= htmlspecialchars($service['service_name']) ?></a>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="items-center bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
             <!-- Header -->
-            <div class="mb-4 flex items-center border-b border-gray-200 px-8 py-6">
+            <div class="mb-4 flex items-center border-b border-gray-200 p-4">
                 <div class="mr-4 rounded-xl bg-zinc-900 p-3">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6 text-white">
                         <path fill-rule="evenodd"

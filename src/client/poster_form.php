@@ -179,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Poster Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .font-thai {
             font-family: 'IBM Plex Sans Thai', sans-serif;
@@ -188,6 +189,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="min-h-screen bg-zinc-100 py-8 font-thai">
     <div class="mx-auto max-w-4xl px-4">
+        <!-- Header with back button -->
+        <div class="flex items-center justify-between bg-white rounded-2xl mb-6 p-4 ring-1 ring-gray-200">
+            <div class="flex items-center space-x-4">
+                <button class="p-1.5 text-gray-800 hover:bg-zinc-100 rounded-lg cursor-pointer hover:text-gray-800 ring-1 ring-gray-200" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <!-- Breadcrumb -->
+                <nav class="text-sm text-gray-500 p-1 rounded-lg ring-1 ring-gray-200">
+                    <ol class="list-none p-0 inline-flex">
+                        <li class="flex items-center">
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a href="/graphic-design/src/client/index.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">หน้าหลัก</a>
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a href="/graphic-design/src/client/services.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">บริการทั้งหมด</a>
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a href="/graphic-design/src/client/service_detail.php?slug=poster-design" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">บริการออกแบบโปสเตอร์</a>
+                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                        </li>
+                        <li class="flex items-center">
+                            <a class="text-zinc-800 transition-colors  hover:bg-zinc-100 p-1 rounded-lg">ฟอร์มออกแบบโปสเตอร์</a>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <!-- Header -->
             <div class="mb-4 flex items-center border-b border-gray-200 px-8 py-6">
