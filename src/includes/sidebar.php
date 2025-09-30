@@ -1,7 +1,15 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-$current_page = basename($_SERVER['PHP_SELF']); ?>
+$current_page = basename($_SERVER['PHP_SELF']);
+// เชื่อมต่อฐานข้อมูล
+require_once __DIR__ . '/../includes/db_connect.php'; 
+
+// ดึงจำนวน payment ที่ pending
+$sqlPending = "SELECT COUNT(*) AS pending_count FROM payments WHERE payment_status = 'pending'";
+$resultPending = $conn->query($sqlPending);
+$pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)$row['pending_count'] : 0;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -60,6 +68,29 @@ $current_page = basename($_SERVER['PHP_SELF']); ?>
               </li>
             </ul>
           </div>
+          <!-- Payment Section -->
+          <div>
+            <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการชำระเงิน</h2>
+            <ul class="space-y-1">
+              <li>
+                <a href="payment_list.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'payment_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                  รายการชำระเงิน 
+                  <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $pendingCount ?></span>
+                </a>
+              </li> 
+              <li>
+                <a href="payment_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'payment_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  เพิ่มชำระเงินใหม่
+                </a>
+              </li>
+            </ul>
+          </div>
 
           <!-- Services Section -->
           <div>
@@ -83,6 +114,7 @@ $current_page = basename($_SERVER['PHP_SELF']); ?>
               </li>
             </ul>
           </div>
+          
           <!-- Users Section -->
           <div>
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการผู้ใช้</h2>
