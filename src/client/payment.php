@@ -54,13 +54,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $slip_file = null;
 
     // อัปโหลดสลิป
-    if (!empty($_FILES['slip_file']['name'])) {
+    // var_dump($_FILES['slip_file']);
+    if (isset($_FILES['slip_file']) && $_FILES['slip_file']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../../uploads/payments/';
         if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
         $filename = uniqid('slip_') . '_' . basename($_FILES['slip_file']['name']);
         $targetPath = $uploadDir . $filename;
         if (move_uploaded_file($_FILES['slip_file']['tmp_name'], $targetPath)) {
             $slip_file = '/uploads/payments/' . $filename;
+        } else {
+            echo "Upload failed! Error code: " . $_FILES['slip_file']['error'];
         }
     }
 
@@ -324,20 +327,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="space-y-2">
                                 <div class="border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300"
                                     onclick="document.getElementById('slip-upload').click()">
-                                    <div
-                                        class="mx-auto mb-3 w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                            class="size-6">
-                                            <path fill-rule="evenodd"
-                                                d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875ZM12.75 12a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V18a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V12Z"
-                                                clip-rule="evenodd" />
-                                            <path
-                                                d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
-                                        </svg>
+                                    <div id="upload-preview">
+                                        <!-- แสดง preview หรือข้อความ -->
                                     </div>
 
-                                    <input type="file" name="slip_file" accept="image/*" required class="hidden"
-                                        id="slip-upload">
+                                    <input type="file" name="slip_file" accept="image/*" required class="hidden" id="slip-upload">
                                     <p class="text-sm text-gray-600">คลิกเพื่อเลือกไฟล์สลิป</p>
                                     <p class="text-xs text-gray-400">PNG, JPG (ขนาดไม่เกิน 5MB)</p>
                                 </div>
@@ -555,20 +549,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('slip-upload')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                const parent = e.target.parentElement;
-                parent.innerHTML = `
-                    <div
-                        class="mx-auto mb-3 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                class="size-6 text-green-600">
-                                <path fill-rule="evenodd"
-                                    class="size-6"
-                                    d="M9 1.5H5.625c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5Zm6.61 10.936a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 14.47a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                                    clip-rule="evenodd" />
-                                    <path
-                                    d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                                    </svg>
-                                    </div>
+                document.getElementById('upload-preview').innerHTML = `
+                    <div class="mx-auto mb-3 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                            class="size-6 text-green-600">
+                            <path fill-rule="evenodd"
+                                class="size-6"
+                                d="M9 1.5H5.625c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5Zm6.61 10.936a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 14.47a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                clip-rule="evenodd" />
+                                <path
+                                d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                                </svg>
+                                </div>
                     <p class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2">${file.name}</p>
                     <p class="text-xs text-gray-400">อัพโหลดสำเร็จ</p>
                 `;
@@ -598,7 +590,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // เรียกครั้งแรกเมื่อโหลดหน้า
         updatePayButton();
-        
+
         // เพิ่ม event listener ให้ฟอร์ม
         document.querySelector('form').addEventListener('submit', function(e) {
             const payButton = document.getElementById('payButton');
@@ -619,7 +611,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 e.target.submit();
             }, 1500);
         });
-
     </script>
 </body>
 

@@ -1059,16 +1059,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             showSection(currentSection);
         });
 
-        document
-            .getElementById("designForm")
-            .addEventListener("submit", function(e) {
-                e.preventDefault();
-
-                // Show success message
-                alert("ข้อมูลถูกส่งแล้ว! เราจะติดต่อกลับภายใน 24 ชั่วโมง");
-
-                this.submit();
+        document.getElementById('designForm').addEventListener('submit', function(e) {
+            let totalSize = 0;
+            ['logo_file[]', 'images_file[]', 'reference_file[]'].forEach(name => {
+                const input = document.querySelector(`input[name="${name}"]`);
+                if (input && input.files.length > 0) {
+                    Array.from(input.files).forEach(file => totalSize += file.size);
+                }
             });
+            if (totalSize > 30 * 1024 * 1024) { // 30MB
+                alert('ไฟล์รวมเกิน 30MB กรุณาลดขนาดไฟล์');
+                e.preventDefault();
+            }
+        });
 
         // Initialize
         showSection(1);
