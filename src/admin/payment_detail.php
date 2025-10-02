@@ -93,7 +93,11 @@ function getPaymentTypeBadge($type)
     <?php include __DIR__ . '/../includes/sidebar.php'; ?>
     <div class="ml-64">
         <!-- breadcrumb -->
-
+        <?php
+        $breadcrumb = ['Dashboard', 'รายการชำระเงิน', 'รายละเอียดการชำระเงิน'];
+        $breadcrumb_links = ['/graphic-design/src/admin/index.php', '/graphic-design/src/admin/service_list.php'];
+        include '../includes/admin_navbar.php';
+        ?>
         <div class="p-6">
             <main class="">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -102,7 +106,7 @@ function getPaymentTypeBadge($type)
                         <!-- Order Information -->
                         <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
                             <div class="border-b bg-gray-50 rounded-t-2xl flex justify-between items-center">
-                                <h2 class="text-md font-semibold p-2 pl-4 ml-2 ml-2">ข้อมูลคำสั่งซื้อ</h2>
+                                <h2 class="text-md font-semibold p-2 pl-4 ml-2">ข้อมูลคำสั่งซื้อ</h2>
                             </div>
                             <div class="p-6">
                                 <div class="grid grid-cols-2 gap-6">

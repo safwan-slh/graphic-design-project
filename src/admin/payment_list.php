@@ -152,7 +152,11 @@ function getPaymentTypeBadge($type)
     <?php include '../includes/sidebar.php'; ?>
     <div class="ml-64">
         <!-- breadcrumb -->
-         
+        <?php
+        $breadcrumb = ['Dashboard', 'รายการชำระเงิน'];
+        $breadcrumb_links = ['/graphic-design/src/admin/index.php', '/graphic-design/src/admin/payment_list.php'];
+        include '../includes/admin_navbar.php';
+        ?>
         <div class="p-6">
             <div class=" text-zinc-900 bg-white rounded-2xl border border-slate-200 mb-2">
                 <!-- Header -->

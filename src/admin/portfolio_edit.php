@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // จัดการอัพโหลดไฟล์หลัก (ถ้ามีการอัพโหลดใหม่)
         $imageUrl = $portfolio['image_url']; // ใช้รูปเดิมเป็น default
-        
+
         if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = ROOT_PATH . '/uploads/portfolio/';
 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (move_uploaded_file($_FILES['image_url']['tmp_name'], $targetPath)) {
                     $imageUrl = '/uploads/portfolio/' . $newFilename;
-                    
+
                     // ลบไฟล์เก่าถ้ามี
                     if ($portfolio['image_url'] && file_exists(ROOT_PATH . $portfolio['image_url'])) {
                         unlink(ROOT_PATH . $portfolio['image_url']);
@@ -169,171 +169,190 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แก้ไขผลงาน - Admin</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="../../dist/output.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .font-thai {
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
+<body class="font-thai bg-zinc-100">
     <?php include '../includes/sidebar.php'; ?>
 
-    <div class="ml-64 p-8">
-        <div class="form-container w-max-[800px]">
-            <div class="form-card bg-white p-4 rounded-xl shadow-sm ring-1 ring-gray-200">
-
+    <div class="ml-64">
+        <!-- breadcrumb -->
+        <?php
+        $breadcrumb = ['Dashboard', 'จัดการผลงาน', 'อัปเดทผลงาน'];
+        $breadcrumb_links = ['/graphic-design/src/admin/index.php', '/graphic-design/src/admin/portfolio_list.php'];
+        include '../includes/admin_navbar.php';
+        ?>
+        <div class="p-6">
+            <div class=" text-zinc-900 bg-white rounded-2xl border border-slate-200 mb-2">
                 <!-- Header -->
-                <div class="form-header mb-5">
-                    <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                <div class="flex items-center p-4">
+                    <div class="mr-4 rounded-xl bg-zinc-900 p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6 text-white">
+                            <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375Z" />
+                            <path fill-rule="evenodd" d="m3.087 9 .54 9.176A3 3 0 0 0 6.62 21h10.757a3 3 0 0 0 2.995-2.824L20.913 9H3.087Zm6.163 3.75A.75.75 0 0 1 10 12h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
                         </svg>
-                        แก้ไขผลงาน
-                    </h3>
+                    </div>
+                    <div class="">
+                        <h1 class="flex items-center text-2xl font-bold text-zinc-900">
+                            เพิ่มผลงานร้าน
+                        </h1>
+                        <p class="text-gray-600">
+                            เพิ่มผลงานการออกแบบของคุณ
+                        </p>
+                    </div>
                 </div>
+                <div class="form-container w-max-[800px] p-4">
+                    <div class="bg-white items-center p-4 ring-1 ring-zinc-200 rounded-2xl">
+                        <!-- Toast Notification -->
+                        <?php if ($toastMessage): ?>
+                            <div class="toast <?php echo $toastType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?> p-3 rounded-md mb-4">
+                                <?php echo $toastMessage; ?>
+                            </div>
+                        <?php endif; ?>
+                        <form method="POST" enctype="multipart/form-data" class="space-y-6" id="portfolioForm">
+                            <!-- ข้อมูลพื้นฐาน -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">บริการ
+                                        <span class="text-red-500">*</span></label>
+                                    <select name="service_id" required
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                        <option value="">-- เลือกบริการ --</option>
+                                        <?php foreach ($services as $service): ?>
+                                            <option value="<?= $service['service_id'] ?>"
+                                                <?= ($service['service_id'] == $portfolio['service_id']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($service['service_name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อผลงาน
+                                        <span class="text-red-500">*</span></label>
+                                    <input type="text" name="title" required placeholder="กรุณากรอกชื่อผลงาน"
+                                        value="<?= htmlspecialchars($portfolio['title']) ?>"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                </div>
+                            </div>
 
-                <!-- Toast Notification -->
-                <?php if ($toastMessage): ?>
-                    <div class="toast <?php echo $toastType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?> p-3 rounded-md mb-4">
-                        <?php echo $toastMessage; ?>
-                    </div>
-                <?php endif; ?>
+                            <!-- รูปภาพหลัก -->
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-700">รูปภาพหลัก</label>
 
-                <form method="POST" enctype="multipart/form-data" class="space-y-6" id="portfolioForm">
-                    <!-- ข้อมูลพื้นฐาน -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">บริการ
-                                <span class="text-red-500">*</span></label>
-                            <select name="service_id" required
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                <option value="">-- เลือกบริการ --</option>
-                                <?php foreach ($services as $service): ?>
-                                    <option value="<?= $service['service_id'] ?>" 
-                                        <?= ($service['service_id'] == $portfolio['service_id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($service['service_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อผลงาน
-                                <span class="text-red-500">*</span></label>
-                            <input type="text" name="title" required placeholder="กรุณากรอกชื่อผลงาน"
-                                value="<?= htmlspecialchars($portfolio['title']) ?>"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        </div>
-                    </div>
+                                <!-- แสดงภาพปัจจุบัน -->
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-600 mb-2">ภาพปัจจุบัน:</p>
+                                    <img src="<?= htmlspecialchars($portfolio['image_url']) ?>"
+                                        alt="<?= htmlspecialchars($portfolio['title']) ?>"
+                                        class="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                                        onerror="this.style.display='none';">
+                                </div>
 
-                    <!-- รูปภาพหลัก -->
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">รูปภาพหลัก</label>
-                        
-                        <!-- แสดงภาพปัจจุบัน -->
-                        <div class="mb-4">
-                            <p class="text-sm text-gray-600 mb-2">ภาพปัจจุบัน:</p>
-                            <img src="<?= htmlspecialchars($portfolio['image_url']) ?>" 
-                                 alt="<?= htmlspecialchars($portfolio['title']) ?>"
-                                 class="w-32 h-32 object-cover rounded-lg border border-gray-300"
-                                 onerror="this.style.display='none';">
-                        </div>
+                                <div class="upload-area relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300"
+                                    id="uploadArea">
+                                    <div class="flex flex-col items-center justify-center space-y-3" id="uploadContent">
+                                        <div class="w-16 h-16 bg-blue-100 rounded-full text-blue-500 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                                <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
 
-                        <div class="upload-area relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300"
-                            id="uploadArea">
-                            <div class="flex flex-col items-center justify-center space-y-3" id="uploadContent">
-                                <div class="w-16 h-16 bg-blue-100 rounded-full text-blue-500 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                        <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
-                                    </svg>
+                                        <div>
+                                            <p class="font-medium text-gray-900">ลากและวางหรือเลือกไฟล์</p>
+                                            <p class="text-xs text-gray-500 mt-1">ขนาดไฟล์ไม่เกิน 10MB</p>
+                                        </div>
+                                        <label class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors duration-300 cursor-pointer">
+                                            เลือกไฟล์จากคอมพิวเตอร์
+                                        </label>
+                                    </div>
+                                    <!-- ไฟล์ input หลักอยู่ที่นี่ -->
+                                    <input type="file" name="image_url" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" id="fileInput" accept="image/*">
+                                </div>
+                                <div class="text-center mt-4">
+                                    <p class="text-xs text-gray-500 mb-2">รองรับไฟล์:</p>
+                                    <div class="flex justify-center space-x-2">
+                                        <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">JPG</span>
+                                        <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">PNG</span>
+                                        <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">GIF</span>
+                                        <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">WebP</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">ปล่อยว่างไว้หากไม่ต้องการเปลี่ยนรูปภาพ</p>
+                                </div>
+                            </div>
+
+                            <!-- คำอธิบาย -->
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-700">คำอธิบาย</label>
+                                <textarea name="description" rows="4"
+                                    placeholder="กรุณากรอกคำอธิบายเกี่ยวกับผลงาน"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"><?= htmlspecialchars($portfolio['description']) ?></textarea>
+                            </div>
+
+                            <!-- ข้อมูลลูกค้า -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อลูกค้า</label>
+                                    <input type="text" name="client_name"
+                                        placeholder="กรุณากรอกชื่อของลูกค้า"
+                                        value="<?= htmlspecialchars($portfolio['client_name']) ?>"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
 
                                 <div>
-                                    <p class="font-medium text-gray-900">ลากและวางหรือเลือกไฟล์</p>
-                                    <p class="text-xs text-gray-500 mt-1">ขนาดไฟล์ไม่เกิน 10MB</p>
+                                    <label class="block mb-2 text-sm font-medium text-gray-700">วันที่โครงการ</label>
+                                    <input type="date" name="project_date"
+                                        value="<?= htmlspecialchars($portfolio['project_date']) ?>"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
-                                <label class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors duration-300 cursor-pointer">
-                                    เลือกไฟล์จากคอมพิวเตอร์
-                                </label>
                             </div>
-                            <!-- ไฟล์ input หลักอยู่ที่นี่ -->
-                            <input type="file" name="image_url" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" id="fileInput" accept="image/*">
-                        </div>
-                        <div class="text-center mt-4">
-                            <p class="text-xs text-gray-500 mb-2">รองรับไฟล์:</p>
-                            <div class="flex justify-center space-x-2">
-                                <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">JPG</span>
-                                <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">PNG</span>
-                                <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">GIF</span>
-                                <span class="format-tag px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">WebP</span>
+
+                            <!-- Tags -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">แท็ก
+                                    (คั่นด้วย comma)</label>
+                                <input type="text" name="tags"
+                                    placeholder="โลโก้, Minimalist, อาหาร"
+                                    value="<?= htmlspecialchars(implode(', ', $tagsArray)) ?>"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <p class="text-xs text-gray-500 mt-2">ตัวอย่าง: โลโก้, Minimalist, อาหาร, สีน้ำเงิน</p>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">ปล่อยว่างไว้หากไม่ต้องการเปลี่ยนรูปภาพ</p>
-                        </div>
-                    </div>
 
-                    <!-- คำอธิบาย -->
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">คำอธิบาย</label>
-                        <textarea name="description" rows="4"
-                            placeholder="กรุณากรอกคำอธิบายเกี่ยวกับผลงาน"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"><?= htmlspecialchars($portfolio['description']) ?></textarea>
-                    </div>
+                            <!-- การตั้งค่า -->
+                            <div class="col-span-2 space-y-3">
+                                <div class="checkbox-label">
+                                    <input type="checkbox" name="is_featured" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" value="1"
+                                        <?= $portfolio['is_featured'] ? 'checked' : '' ?>>
+                                    <label for="is_featured" class="ml-2 text-sm font-medium text-gray-700">เป็นผลงานแนะนำ</label>
+                                </div>
+                                <div class="checkbox-label">
+                                    <input type="checkbox" name="is_active" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                        <?= $portfolio['is_active'] ? 'checked' : '' ?>>
+                                    <label for="is_active" class="ml-2 text-sm font-medium text-gray-700">แสดงผลในเว็บไซต์</label>
+                                </div>
+                            </div>
 
-                    <!-- ข้อมูลลูกค้า -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อลูกค้า</label>
-                            <input type="text" name="client_name"
-                                placeholder="กรุณากรอกชื่อของลูกค้า"
-                                value="<?= htmlspecialchars($portfolio['client_name']) ?>"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        </div>
-
-                        <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-700">วันที่โครงการ</label>
-                            <input type="date" name="project_date"
-                                value="<?= htmlspecialchars($portfolio['project_date']) ?>"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        </div>
+                            <!-- ปุ่มส่งฟอร์ม -->
+                            <div class="flex space-x-4 pt-2">
+                                <button type="submit" id="submitBtn"
+                                    class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
+                                    อัปเดทผลงาน
+                                </button>
+                                <a href="portfolio_list.php"
+                                    class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                                    ยกเลิก
+                                </a>
+                            </div>
+                        </form>
                     </div>
-
-                    <!-- Tags -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">แท็ก
-                            (คั่นด้วย comma)</label>
-                        <input type="text" name="tags"
-                            placeholder="โลโก้, Minimalist, อาหาร"
-                            value="<?= htmlspecialchars(implode(', ', $tagsArray)) ?>"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <p class="text-xs text-gray-500 mt-2">ตัวอย่าง: โลโก้, Minimalist, อาหาร, สีน้ำเงิน</p>
-                    </div>
-
-                    <!-- การตั้งค่า -->
-                    <div class="col-span-2 space-y-3">
-                        <div class="checkbox-label">
-                            <input type="checkbox" name="is_featured" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" value="1"
-                                <?= $portfolio['is_featured'] ? 'checked' : '' ?>>
-                            <label for="is_featured" class="ml-2 text-sm font-medium text-gray-700">เป็นผลงานแนะนำ</label>
-                        </div>
-                        <div class="checkbox-label">
-                            <input type="checkbox" name="is_active" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                                <?= $portfolio['is_active'] ? 'checked' : '' ?>>
-                            <label for="is_active" class="ml-2 text-sm font-medium text-gray-700">แสดงผลในเว็บไซต์</label>
-                        </div>
-                    </div>
-
-                    <!-- ปุ่มส่งฟอร์ม -->
-                    <div class="flex space-x-4 pt-2">
-                        <button type="submit" id="submitBtn"
-                            class="text-white flex justify-center items-center bg-zinc-900 hover:bg-zinc-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                            <i class="fas fa-save mr-2"></i>อัปเดทผลงาน
-                        </button>
-                        <a href="portfolio_list.php"
-                            class="text-zinc-600 flex justify-center items-center bg-zinc-200 hover:bg-zinc-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                            <i class="fas fa-times mr-2"></i>ยกเลิก
-                        </a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -347,20 +366,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // ฟังก์ชันแสดงสถานะเริ่มต้น
         function showInitialState() {
+            // ดึง url รูปเดิมจาก PHP
+            const oldImageUrl = "<?= htmlspecialchars($portfolio['image_url']) ?>";
+            const oldImageTitle = "<?= htmlspecialchars($portfolio['title']) ?>";
             uploadContent.innerHTML = `
-                <div class="w-16 h-16 bg-blue-100 rounded-full text-blue-500 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div>
-                    <p class="font-medium text-gray-900">ลากและวางหรือเลือกไฟล์</p>
-                    <p class="text-xs text-gray-500 mt-1">ขนาดไฟล์ไม่เกิน 10MB</p>
-                </div>
-                <label class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors duration-300 cursor-pointer">
-                    เลือกไฟล์จากคอมพิวเตอร์
-                </label>
-            `;
+        <div class="w-16 h-16 bg-blue-100 rounded-full text-blue-500 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div>
+            <p class="font-medium text-gray-900">ลากและวางหรือเลือกไฟล์</p>
+            <p class="text-xs text-gray-500 mt-1">ขนาดไฟล์ไม่เกิน 10MB</p>
+        </div>
+        <label class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors duration-300 cursor-pointer">
+            เลือกไฟล์จากคอมพิวเตอร์
+        </label>
+        ${oldImageUrl ? `<div class="mt-4"><img src="${oldImageUrl}" alt="${oldImageTitle}" class="w-32 h-32 object-cover rounded-lg border border-gray-300 mx-auto"></div>` : ''}
+    `;
         }
 
         // ฟังก์ชันแสดงชื่อไฟล์ที่เลือก

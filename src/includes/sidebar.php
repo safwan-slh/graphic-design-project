@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 $current_page = basename($_SERVER['PHP_SELF']);
 // เชื่อมต่อฐานข้อมูล
-require_once __DIR__ . '/../includes/db_connect.php'; 
+require_once __DIR__ . '/../includes/db_connect.php';
 
 // ดึงจำนวน payment ที่ pending
 $sqlPending = "SELECT COUNT(*) AS pending_count FROM payments WHERE payment_status = 'pending'";
@@ -17,9 +17,14 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
-  <link href="../../dist/output.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    .font-thai {
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+    }
+
     .active-menu {
       position: relative;
     }
@@ -37,10 +42,10 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
   </style>
 </head>
 
-<body>
+<body class="font-thai">
   <div class="flex">
     <!-- Sidebar -->
-    <div class="w-64 h-screen bg-zinc-50 border-r border-gray-200 fixed overflow-y-auto sidebar">
+    <div class="w-64 h-screen bg-white border-r border-gray-200 fixed overflow-y-auto sidebar">
       <div class="p-4">
         <!-- Logo/Branding -->
         <!-- ปรับโลโก้ให้มีความทันสมัยมากขึ้น -->
@@ -74,19 +79,11 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
             <ul class="space-y-1">
               <li>
                 <a href="payment_list.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'payment_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
                   </svg>
-                  รายการชำระเงิน 
+                  รายการชำระเงิน
                   <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $pendingCount ?></span>
-                </a>
-              </li> 
-              <li>
-                <a href="payment_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'payment_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  เพิ่มชำระเงินใหม่
                 </a>
               </li>
             </ul>
@@ -103,7 +100,7 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
                   </svg>
                   รายการบริการ
                 </a>
-              </li> 
+              </li>
               <li>
                 <a href="service_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'service_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
                   <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +111,7 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
               </li>
             </ul>
           </div>
-          
+
           <!-- Users Section -->
           <div>
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการผู้ใช้</h2>
@@ -163,7 +160,7 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
           <!-- Divider -->
           <div class="border-t border-gray-200 my-4"></div>
           <!-- Logout -->
-          <div>
+          <!-- <div>
             <ul class="space-y-1">
               <li>
                 <a href="/graphic-design/src/client/index.php" class="flex items-center px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
@@ -182,7 +179,7 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
                 </a>
               </li>
             </ul>
-          </div>
+          </div> -->
         </nav>
       </div>
     </div>
