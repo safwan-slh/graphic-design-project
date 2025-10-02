@@ -95,7 +95,7 @@ function getPaymentTypeBadge($type)
         <!-- breadcrumb -->
         <?php
         $breadcrumb = ['Dashboard', 'รายการชำระเงิน', 'รายละเอียดการชำระเงิน'];
-        $breadcrumb_links = ['/graphic-design/src/admin/index.php', '/graphic-design/src/admin/service_list.php'];
+        $breadcrumb_links = ['/graphic-design/src/admin/index.php', '/graphic-design/src/admin/payment_list.php'];
         include '../includes/admin_navbar.php';
         ?>
         <div class="p-6">

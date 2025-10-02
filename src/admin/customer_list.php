@@ -36,7 +36,7 @@ $result = $conn->query($sql);
     <div class="ml-64">
         <!-- breadcrumb -->
         <?php
-        $breadcrumb = ['Dashboard', 'จัดการลูกค้า', 'รายชื่อลูกค้าทั้งหมด'];
+        $breadcrumb = ['Dashboard', 'จัดการลูกค้า'];
         $breadcrumb_links = ['/graphic-design/src/admin/index.php', '/graphic-design/src/admin/customer_list.php'];
         include '../includes/admin_navbar.php';
         ?>
