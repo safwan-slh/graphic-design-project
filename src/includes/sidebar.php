@@ -89,6 +89,21 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
             </ul>
           </div>
 
+          <!-- Order Section -->
+          <div>
+            <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการออเดอร์</h2>
+            <ul class="space-y-1">
+              <li>
+                <a href="order_list.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'order_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                  </svg>
+                  รายการออเดอร์
+                </a>
+              </li>
+            </ul>
+          </div>
+
           <!-- Services Section -->
           <div>
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการบริการ</h2>
