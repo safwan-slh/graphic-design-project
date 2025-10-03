@@ -2,8 +2,8 @@
 // ตรวจสอบ error
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require '../includes/db_connect.php';
-require '../auth/auth.php';
+require __DIR__ . '/../includes/db_connect.php';
+require_once '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
 $message = '';

@@ -1,7 +1,9 @@
 <?php
-require '../auth/auth.php';
-requireLogin();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require __DIR__ . '/../includes/db_connect.php';
+require_once '../auth/auth.php';
+requireLogin();
 
 // รับ order_id จาก query string
 $order_id = $_GET['order_id'] ?? null;

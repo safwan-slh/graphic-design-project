@@ -1,9 +1,10 @@
 <?php
+// ตรวจสอบ error
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require '../includes/db_connect.php';
-require '../auth/auth.php';
-requireRole('admin');
+require __DIR__ . '/../includes/db_connect.php';
+require_once '../auth/auth.php';
+requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
 $fullname = $_SESSION['fullname'] ?? '';
 $initial = mb_strtoupper(mb_substr(trim($fullname), 0, 1, 'UTF-8'), 'UTF-8');

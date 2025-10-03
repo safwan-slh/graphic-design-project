@@ -1,8 +1,8 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once __DIR__ . '/../includes/db_connect.php';
-require_once __DIR__ . '/../auth/auth.php';
+require __DIR__ . '/../includes/db_connect.php';
+require_once '../auth/auth.php';
 requireLogin();
 // ดึงรายละเอียดโปสเตอร์ (เช่น จากตาราง poster_details)
 $stmt = $conn->prepare("SELECT * FROM poster_details WHERE poster_id = ?");

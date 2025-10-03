@@ -1,6 +1,8 @@
 <?php
-require '../auth/auth.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require __DIR__ . '/../includes/db_connect.php';
+require_once '../auth/auth.php';
 requireLogin();
 
 // รับ slug หรือ service_id จาก URL

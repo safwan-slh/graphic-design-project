@@ -1,5 +1,7 @@
 <?php
-// src/includes/admin_navbar.php
+// ตรวจสอบ error
+error_reporting(E_ALL);
+ini_set('display_errors', 1);  
 $fullname = $_SESSION['fullname'] ?? '';
 ?>
 <!DOCTYPE html>

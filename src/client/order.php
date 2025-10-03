@@ -1,7 +1,9 @@
 <?php
-require '../auth/auth.php';
-requireLogin();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require __DIR__ . '/../includes/db_connect.php';
+require_once '../auth/auth.php';
+requireLogin();
 
 $customer_id = $_SESSION['customer_id'];
 
@@ -283,7 +285,7 @@ $statusLabels = [
 
             <div class="">
                 <?php if (empty($filteredOrders)): ?>
-                    <div class="bg-white p-8 rounded-xl shadow text-center text-gray-500">ยังไม่มีรายการสั่งซื้อ</div>
+                    <div class="bg-white p-8 rounded-xl text-center text-gray-500 ring-1 ring-gray-200">ยังไม่มีรายการสั่งซื้อ</div>
                 <?php else: ?>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
                         <?php foreach ($filteredOrders as $order): ?>
