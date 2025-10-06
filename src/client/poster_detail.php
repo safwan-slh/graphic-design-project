@@ -4,23 +4,53 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../includes/db_connect.php';
 require_once __DIR__ . '/../auth/auth.php';
 requireLogin();
-// ดึงรายละเอียดโปสเตอร์ (เช่น จากตาราง poster_details)
-$stmt = $conn->prepare("SELECT * FROM poster_details WHERE poster_id = ?");
-$stmt->bind_param("i", $order['ref_id']);
-$stmt->execute();
-$detail = $stmt->get_result()->fetch_assoc();
 
-// ฟังก์ชันดึงรายละเอียดบริการแต่ละประเภท
-function getOrderDetail($conn, $service_id, $ref_id)
-{
-    if ($service_id == 1) { // ตัวอย่าง: 1 = poster
-        $stmt = $conn->prepare("SELECT * FROM poster_details WHERE poster_id = ?");
-        $stmt->bind_param("i", $ref_id);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+$order_id = $_GET['order_id'] ?? null;
+if (!$order_id) {
+    exit('ไม่พบรหัสออเดอร์');
+}
+
+// ดึงข้อมูล order, customer, service, payment
+$sql = "SELECT o.*, c.fullname, c.email, s.service_name, s.slug, p.amount, p.payment_type, p.payment_status, p.slip_file
+        FROM orders o
+        LEFT JOIN customers c ON o.customer_id = c.customer_id
+        LEFT JOIN services s ON o.service_id = s.service_id
+        LEFT JOIN payments p ON o.order_id = p.order_id
+        WHERE o.order_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
+
+// ดึงรายละเอียดโปสเตอร์ (เช่น จากตาราง poster_details)
+$detail = null;
+if ($order && isset($order['ref_id'])) {
+    $stmt = $conn->prepare("SELECT * FROM poster_details WHERE poster_id = ?");
+    $stmt->bind_param("i", $order['ref_id']);
+    $stmt->execute();
+    $detail = $stmt->get_result()->fetch_assoc();
+}
+if (!$detail) $detail = [];
+
+// ดึงไฟล์งานทั้งหมดของ order นี้
+$filesSql = "SELECT * FROM work_files WHERE order_id = ? ORDER BY uploaded_at ASC";
+$filesStmt = $conn->prepare($filesSql);
+$filesStmt->bind_param("i", $order_id);
+$filesStmt->execute();
+$filesResult = $filesStmt->get_result();
+
+// แยกไฟล์ตามเวอร์ชัน
+$draft1 = [];
+$draft2 = [];
+$final = [];
+while ($file = $filesResult->fetch_assoc()) {
+    if ($file['version'] === 'draft1') {
+        $draft1[] = $file;
+    } elseif ($file['version'] === 'draft2') {
+        $draft2[] = $file;
+    } elseif ($file['version'] === 'final') {
+        $final[] = $file;
     }
-    // เพิ่มบริการอื่น ๆ เช่น logo_details, banner_details ตาม service_id
-    return null;
 }
 function getOrderStatusTH($status)
 {
@@ -80,6 +110,21 @@ function getOrderProgressSteps($status)
     }
     return [$steps, $current];
 }
+// เพิ่มคอมเมนต์/ขอแก้ไขงาน
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_POST['comment_text'])) {
+    $version = $_POST['comment_version'];
+    $comment = trim($_POST['comment_text']);
+    if ($comment !== '') {
+        $customer_id = $order['customer_id'];
+        $insertSql = "INSERT INTO work_comments (order_id, version, customer_id, comment, created_at) VALUES (?, ?, ?, ?, NOW())";
+        $insertStmt = $conn->prepare($insertSql);
+        $insertStmt->bind_param("isis", $order_id, $version, $customer_id, $comment);
+        $insertStmt->execute();
+        header("Location: poster_detail.php?order_id=$order_id");
+        exit;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +133,7 @@ function getOrderProgressSteps($status)
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>รายละเอียดงานโปสเตอร์ #<?= htmlspecialchars($order['order_code'] ?? $order['order_id']) ?></title>
+    <title>รายละเอียดงานโปสเตอร์</title>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -136,8 +181,8 @@ function getOrderProgressSteps($status)
                 <div class="">
                     <div class="flex items-center">
                         <span class="
-                            <?= getOrderStatusClass($order['status']) ?>">
-                            <?= getOrderStatusTH($order['status']) ?>
+                            <?= getOrderStatusClass($order['status']) ?? '' ?>">
+                            <?= getOrderStatusTH($order['status']) ?? '' ?>
                         </span>
                     </div>
                 </div>
@@ -191,83 +236,339 @@ function getOrderProgressSteps($status)
                                     </div>
                                 </div>
                                 <div class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200">
-                                    <h3 class="font-medium text-gray-900 mb-2">รายละเอียดบริการ</h3>
+                                    <h3 class="font-medium text-gray-900 mb-2">ข้อมูลบริการ</h3>
                                     <div class="space-y-2">
                                         <p class="text-sm flex justify-between">
                                             <span class="text-zinc-600 font-medium">ประเภท:</span>
-                                            <span class="text-gray-500 text-sm"><?= htmlspecialchars($order['service_name']) ?></span>
+                                            <span class="text-gray-500 text-sm"><?= htmlspecialchars($order['service_name'] ?? '-') ?></span>
                                         </p>
-                                        <?php if (!empty($detail['poster_type'])): ?>
-                                            <p class="text-sm flex justify-between">
-                                                <span class="text-zinc-600 font-medium">ประเภทโปสเตอร์:</span>
-                                                <span class="text-gray-500 text-sm"><?= htmlspecialchars($detail['poster_type']) ?></span>
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if (!empty($detail['design_count'])): ?>
-                                            <p class="text-sm flex justify-between">
-                                                <span class="text-zinc-600 font-medium">จำนวนแบบ:</span>
-                                                <span class="text-gray-500 text-sm"><?= htmlspecialchars($detail['design_count']) ?></span> แบบ
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if (!empty($detail['revision_limit'])): ?>
-                                            <p class="text-sm flex justify-between">
-                                                <span class="text-zinc-600 font-medium">แก้ไขได้:</span>
-                                                <span class="text-gray-500 text-sm"><?= htmlspecialchars($detail['revision_limit']) ?></span> ครั้ง
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if (!empty($detail['price'])): ?>
-                                            <p class="text-sm flex justify-between">
-                                                <span class="text-zinc-600 font-medium">ราคา:</span>
-                                                <span class="text-gray-500 text-sm">฿<?= number_format($detail['price']) ?></span>
-                                            </p>
-                                        <?php endif; ?>
+                                        <p class="text-sm flex justify-between">
+                                            <span class="text-zinc-600 font-medium">ชื่อโปรเจค:</span>
+                                            <span class="text-gray-500 text-sm"><?= htmlspecialchars($detail['project_name'] ?? '-') ?></span>
+                                        </p>
+                                        <p class="text-sm flex justify-between">
+                                            <span class="text-zinc-600 font-medium">ขนาด:</span>
+                                            <span class="text-gray-500 text-sm">
+                                                <?php
+                                                if (isset($detail['size']) && $detail['size'] === 'custom') {
+                                                    $width = $detail['custom_width'] ?? '';
+                                                    $height = $detail['custom_height'] ?? '';
+                                                    if ($width && $height) {
+                                                        echo htmlspecialchars($width . ' x ' . $height);
+                                                    } else {
+                                                        echo 'กำหนดเอง';
+                                                    }
+                                                } else {
+                                                    echo htmlspecialchars($detail['size'] ?? '-');
+                                                }
+                                                ?>
+                                            </span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Design Submissions -->
+                    <?php
+                    // ดึงไฟล์ทั้งหมดของ order นี้
+                    $filesSql = "SELECT * FROM work_files WHERE order_id = ? ORDER BY uploaded_at DESC";
+                    $filesStmt = $conn->prepare($filesSql);
+                    $filesStmt->bind_param("i", $order_id);
+                    $filesStmt->execute();
+                    $filesResult = $filesStmt->get_result();
+
+                    // แยกไฟล์ตามเวอร์ชัน
+                    $draft1 = [];
+                    $draft2 = [];
+                    $final = [];
+                    while ($file = $filesResult->fetch_assoc()) {
+                        if ($file['version'] === 'draft1') {
+                            $draft1[] = $file;
+                        } elseif ($file['version'] === 'draft2') {
+                            $draft2[] = $file;
+                        } elseif ($file['version'] === 'final') {
+                            $final[] = $file;
+                        }
+                    }
+                    // ฟังก์ชันแสดงไฟล์ preview
+                    function showFileList($files)
+                    {
+                        if (empty($files)) {
+                            return '<div class="text-gray-500">ยังไม่มีไฟล์งานในเวอร์ชันนี้</div>';
+                        }
+                        $html = '<ul class="list-disc pl-6">';
+                        foreach ($files as $file) {
+                            $ext = strtolower(pathinfo($file['file_path'], PATHINFO_EXTENSION));
+                            $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                            $html .= '<li>';
+                            if ($isImage) {
+                                $html .= '<a href="' . htmlspecialchars($file['file_path']) . '" target="_blank">
+                                <img src="' . htmlspecialchars($file['file_path']) . '" alt="' . htmlspecialchars($file['file_name']) . '" class="w-32 h-32 object-cover rounded border mb-2">
+                              </a>';
+                            } else {
+                                $html .= '<a href="' . htmlspecialchars($file['file_path']) . '" target="_blank" class="text-blue-600 underline">'
+                                    . htmlspecialchars($file['file_name']) .
+                                    '</a>';
+                            }
+                            $html .= ' (อัปโหลดเมื่อ ' . htmlspecialchars($file['uploaded_at']) . ')';
+                            if ($file['note']) {
+                                $html .= '<br><span class="text-gray-500">หมายเหตุ: ' . htmlspecialchars($file['note']) . '</span>';
+                            }
+                            $html .= '</li>';
+                        }
+                        $html .= '</ul>';
+                        return $html;
+                    }
+                    ?>
+
+                    <?php
+                    $filesSql = "SELECT * FROM work_files WHERE order_id = ? ORDER BY uploaded_at DESC";
+                    $filesStmt = $conn->prepare($filesSql);
+                    $filesStmt->bind_param("i", $order_id);
+                    $filesStmt->execute();
+                    $filesResult = $filesStmt->get_result();
+                    ?>
                     <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
                         <div class="border-b bg-gray-50 rounded-t-2xl">
                             <h2 class="text-md font-semibold p-2 pl-4">ไฟล์งานที่ได้รับ</h2>
                         </div>
                         <div class="p-6 space-y-6">
                             <!-- Draft 1 -->
-                            <div class="border border-gray-200 rounded-2xl p-4">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h3 class="font-medium">แบบร่างที่ 1</h3>
-                                    <span class="text-sm text-gray-500">ส่งเมื่อ 17 ส.ค. 2023, 14:30 น.</span>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80"
-                                            alt="Draft 1 - Concept A"
-                                            class="w-full object-cover hover:opacity-90 cursor-pointer">
+                            <?php if (!empty($draft1)): ?>
+                                <div class="border border-gray-200 rounded-2xl p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="font-medium">แบบร่างที่ 1</h3>
+                                        <span class="text-sm text-gray-500">
+                                            ส่งเมื่อ <?= htmlspecialchars(date('d M Y, H:i', strtotime($draft1[0]['uploaded_at']))) ?> น.
+                                        </span>
                                     </div>
-                                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1611162616475-465b2134c4a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-                                            alt="Draft 1 - Concept B"
-                                            class="w-full object-cover hover:opacity-90 cursor-pointer">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <?php foreach ($draft1 as $file): ?>
+                                            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                                <?php
+                                                $ext = strtolower(pathinfo($file['file_path'], PATHINFO_EXTENSION));
+                                                $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                                if ($isImage): ?>
+                                                    <img src="<?= htmlspecialchars($file['file_path']) ?>"
+                                                        alt="<?= htmlspecialchars($file['file_name']) ?>"
+                                                        class="object-cover rounded border hover:opacity-90 cursor-pointer"
+                                                        style="aspect-ratio: 1/1;"
+                                                        onclick="openImageModal('<?= htmlspecialchars($file['file_path']) ?>')">
+                                                <?php else: ?>
+                                                    <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="text-blue-600 underline">
+                                                        <?= htmlspecialchars($file['file_name']) ?>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80"
-                                            alt="Draft 1 - Concept C"
-                                            class="w-full object-cover hover:opacity-90 cursor-pointer">
+                                    <?php if ($draft1[0]['note']): ?>
+                                        <div class="bg-gray-100 p-2 rounded-2xl mb-4 ring-1 ring-zinc-200">
+                                            <h4 class="font-medium text-zinc-800 mb-2">ความคิดเห็นจากนักออกแบบ</h4>
+                                            <div class="bg-white p-4 rounded-xl ring-1 ring-zinc-200">
+                                                <p class="text-zinc-500"><?= htmlspecialchars($draft1[0]['note']) ?></p>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <!-- แสดงคอมเมนต์ -->
+                                    <?php
+                                    $version = 'draft1';
+                                    $commentSql = "SELECT wc.*, c.fullname, c.role
+                                    FROM work_comments wc
+                                    LEFT JOIN customers c ON wc.customer_id = c.customer_id
+                                    WHERE wc.order_id = ? AND wc.version = ?
+                                    ORDER BY wc.created_at ASC";
+                                    $commentStmt = $conn->prepare($commentSql);
+                                    $commentStmt->bind_param("is", $order_id, $version);
+                                    $commentStmt->execute();
+                                    $commentResult = $commentStmt->get_result();
+                                    if ($commentResult && $commentResult->num_rows > 0):
+                                    ?>
+                                        <div class="mt-4 space-y-2">
+                                            <h4 class="font-medium text-zinc-900 mb-1">คอมเมนต์ล่าสุด</h4>
+                                            <div id="commentBox" class="mt-4 space-y-2 max-h-96 overflow-y-auto p-2 border border-gray-200 rounded-2xl">
+                                                <?php while ($row = $commentResult->fetch_assoc()): ?>
+                                                    <div class="<?= $row['role'] === 'admin' ? 'bg-gray-50' : 'bg-gray-50' ?> p-3 rounded-2xl ring-1 ring-zinc-200">
+                                                        <p class="text-zinc-700"><?= htmlspecialchars($row['comment']) ?></p>
+                                                        <p class="text-xs mt-1 text-gray-500">
+                                                            โดย <span class="<?= $row['role'] === 'admin' ? 'text-blue-500' : 'text-yellow-500' ?>"><?= htmlspecialchars($row['fullname'] ?? 'ไม่ระบุ') ?>
+                                                                (<?= $row['role'] === 'admin' ? 'แอดมิน' : 'ลูกค้า' ?>)
+                                                            </span>
+                                                            | ส่งเมื่อ <?= htmlspecialchars(date('d M Y, H:i', strtotime($row['created_at']))) ?>
+                                                        </p>
+                                                    </div>
+                                                <?php endwhile; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <!-- ฟอร์มคอมเมนต์ -->
+                                    <form method="post" class="mt-4" id="commentFormDraft1">
+                                        <input type="hidden" name="comment_version" value="draft1">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">คอมเมนต์/ขอแก้ไขงาน:</label>
+                                        <textarea name="comment_text" rows="2" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl block w-full p-2 mb-2" placeholder="ระบุรายละเอียดที่ต้องการคอมเมนต์หรือขอแก้ไข"></textarea>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">ส่งคอมเมนต์</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Draft 2 -->
+                            <?php if (!empty($draft2)): ?>
+                                <div class="border border-gray-200 rounded-2xl p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="font-medium">แบบร่างที่ 2</h3>
+                                        <span class="text-sm text-gray-500">
+                                            ส่งเมื่อ <?= htmlspecialchars(date('d M Y, H:i', strtotime($draft2[0]['uploaded_at']))) ?> น.
+                                        </span>
                                     </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <?php foreach ($draft2 as $file): ?>
+                                            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                                <?php
+                                                $ext = strtolower(pathinfo($file['file_path'], PATHINFO_EXTENSION));
+                                                $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                                if ($isImage): ?>
+                                                    <img src="<?= htmlspecialchars($file['file_path']) ?>"
+                                                        alt="<?= htmlspecialchars($file['file_name']) ?>"
+                                                        class="object-cover rounded border hover:opacity-90 cursor-pointer"
+                                                        style="aspect-ratio: 1/1;"
+                                                        onclick="openImageModal('<?= htmlspecialchars($file['file_path']) ?>')">
+                                                <?php else: ?>
+                                                    <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="text-blue-600 underline">
+                                                        <?= htmlspecialchars($file['file_name']) ?>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <?php if ($draft2[0]['note']): ?>
+                                        <div class="bg-gray-100 p-2 rounded-2xl mb-4 ring-1 ring-zinc-200">
+                                            <h4 class="font-medium text-zinc-800 mb-2">ความคิดเห็นจากนักออกแบบ</h4>
+                                            <div class="bg-white p-4 rounded-xl ring-1 ring-zinc-200">
+                                                <p class="text-zinc-500"><?= htmlspecialchars($draft2[0]['note']) ?></p>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php
+                                    $version = 'draft2'; // สำหรับ Draft 2
+                                    $commentSql = "SELECT wc.*, c.fullname, c.role
+                                    FROM work_comments wc
+                                    LEFT JOIN customers c ON wc.customer_id = c.customer_id
+                                    WHERE wc.order_id = ? AND wc.version = ?
+                                    ORDER BY wc.created_at ASC ";
+                                    $commentStmt = $conn->prepare($commentSql);
+                                    $commentStmt->bind_param("is", $order_id, $version);
+                                    $commentStmt->execute();
+                                    $commentResult = $commentStmt->get_result();
+                                    if ($commentResult && $commentResult->num_rows > 0):
+                                    ?>
+                                        <div class="mt-4 space-y-2">
+                                            <h4 class="font-medium text-zinc-900 mb-1">คอมเมนต์ล่าสุด</h4>
+                                            <div id="commentBox" class="mt-4 space-y-2 max-h-96 overflow-y-auto p-2 border border-gray-200 rounded-2xl">
+                                                <?php while ($row = $commentResult->fetch_assoc()): ?>
+                                                    <div class="<?= $row['role'] === 'admin' ? 'bg-gray-50' : 'bg-gray-50' ?> p-3 rounded-2xl ring-1 ring-zinc-200">
+                                                        <p class="text-zinc-700"><?= htmlspecialchars($row['comment']) ?></p>
+                                                        <p class="text-xs mt-1 text-gray-500">
+                                                            โดย <span class="<?= $row['role'] === 'admin' ? 'text-blue-500' : 'text-yellow-500' ?>"><?= htmlspecialchars($row['fullname'] ?? 'ไม่ระบุ') ?>
+                                                                (<?= $row['role'] === 'admin' ? 'แอดมิน' : 'ลูกค้า' ?>)
+                                                            </span>
+                                                            | ส่งเมื่อ <?= htmlspecialchars(date('d M Y, H:i', strtotime($row['created_at']))) ?>
+                                                        </p>
+                                                    </div>
+                                                <?php endwhile; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <form method="post" class="mt-4">
+                                        <input type="hidden" name="comment_version" value="draft2"> <!-- เปลี่ยนเป็น draft2 หรือ final ตามเวอร์ชัน -->
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">คอมเมนต์/ขอแก้ไขงาน:</label>
+                                        <textarea name="comment_text" rows="2" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl block w-full p-2 mb-2" placeholder="ระบุรายละเอียดที่ต้องการคอมเมนต์หรือขอแก้ไข"></textarea>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-xl text-sm px-5 py-2">ส่งคอมเมนต์</button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                                    <h4 class="font-medium text-blue-800 mb-2">ความคิดเห็นจากนักออกแบบ</h4>
-                                    <p class="text-blue-700">เราได้ออกแบบ 3 แบบตามความต้องการของคุณ แบบ A เน้นความทันสมัยด้วยเส้นสายเรขาคณิต แบบ B ใช้รูปทรงออร์แกนิกที่ดูเป็นมิตร ส่วนแบบ C ผสมผสานทั้งสองสไตล์ กรุณาเลือกแบบที่ชอบหรือระบุจุดที่ต้องการแก้ไข</p>
+                            <?php endif; ?>
+
+                            <!-- Final -->
+                            <?php if (!empty($final)): ?>
+                                <div class="border border-gray-200 rounded-2xl p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="font-medium">ฉบับสมบูรณ์</h3>
+                                        <span class="text-sm text-gray-500">
+                                            ส่งเมื่อ <?= htmlspecialchars(date('d M Y, H:i', strtotime($final[0]['uploaded_at']))) ?> น.
+                                        </span>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <?php foreach ($final as $file): ?>
+                                            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                                <?php
+                                                $ext = strtolower(pathinfo($file['file_path'], PATHINFO_EXTENSION));
+                                                $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                                if ($isImage): ?>
+                                                    <img src="<?= htmlspecialchars($file['file_path']) ?>"
+                                                        alt="<?= htmlspecialchars($file['file_name']) ?>"
+                                                        class="object-cover rounded border hover:opacity-90 cursor-pointer"
+                                                        style="aspect-ratio: 1/1;"
+                                                        onclick="openImageModal('<?= htmlspecialchars($file['file_path']) ?>')">
+                                                <?php else: ?>
+                                                    <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="text-blue-600 underline">
+                                                        <?= htmlspecialchars($file['file_name']) ?>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <?php if ($final[0]['note']): ?>
+                                        <div class="bg-gray-100 p-2 rounded-2xl mb-4 ring-1 ring-zinc-200">
+                                            <h4 class="font-medium text-zinc-800 mb-2">ความคิดเห็นจากนักออกแบบ</h4>
+                                            <div class="bg-white p-4 rounded-xl ring-1 ring-zinc-200">
+                                                <p class="text-zinc-500"><?= htmlspecialchars($final[0]['note']) ?></p>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php
+                                    $version = 'final'; // สำหรับ Final
+                                    $commentSql = "SELECT wc.*, c.fullname, c.role
+                                    FROM work_comments wc
+                                    LEFT JOIN customers c ON wc.customer_id = c.customer_id
+                                    WHERE wc.order_id = ? AND wc.version = ?
+                                    ORDER BY wc.created_at ASC ";
+                                    $commentStmt = $conn->prepare($commentSql);
+                                    $commentStmt->bind_param("is", $order_id, $version);
+                                    $commentStmt->execute();
+                                    $commentResult = $commentStmt->get_result();
+                                    if ($commentResult && $commentResult->num_rows > 0):
+                                    ?>
+                                        <div class="mt-4 space-y-2">
+                                            <h4 class="font-medium text-zinc-900 mb-1">คอมเมนต์ล่าสุด</h4>
+                                            <div id="commentBox" class="mt-4 space-y-2 max-h-96 overflow-y-auto p-2 border border-gray-200 rounded-2xl">
+                                                <?php while ($row = $commentResult->fetch_assoc()): ?>
+                                                    <div class="<?= $row['role'] === 'admin' ? 'bg-gray-50' : 'bg-gray-50' ?> p-3 rounded-2xl ring-1 ring-zinc-200">
+                                                        <p class="text-zinc-700"><?= htmlspecialchars($row['comment']) ?></p>
+                                                        <p class="text-xs mt-1 text-gray-500">
+                                                            โดย <span class="<?= $row['role'] === 'admin' ? 'text-blue-500' : 'text-yellow-500' ?>"><?= htmlspecialchars($row['fullname'] ?? 'ไม่ระบุ') ?>
+                                                                (<?= $row['role'] === 'admin' ? 'แอดมิน' : 'ลูกค้า' ?>)
+                                                            </span>
+                                                            | ส่งเมื่อ <?= htmlspecialchars(date('d M Y, H:i', strtotime($row['created_at']))) ?>
+                                                        </p>
+                                                    </div>
+                                                <?php endwhile; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <form method="post" class="mt-4">
+                                        <input type="hidden" name="comment_version" value="final"> <!-- เปลี่ยนเป็น draft2 หรือ final ตามเวอร์ชัน -->
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">คอมเมนต์/ขอแก้ไขงาน:</label>
+                                        <textarea name="comment_text" rows="2" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl block w-full p-2 mb-2" placeholder="ระบุรายละเอียดที่ต้องการคอมเมนต์หรือขอแก้ไข"></textarea>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-xl text-sm px-5 py-2">ส่งคอมเมนต์</button>
+                                        </div>
+                                    </form>
                                 </div>
-                            </div>
-                            <div class="flex justify-end space-x-3">
-                                <button class="font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center border border-gray-300 text-gray-700 hover:bg-gray-100">
-                                    ขอแก้ไข
-                                </button>
-                                <button class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
-                                    อนุมัติแบบนี้
-                                </button>
-                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -451,6 +752,13 @@ function getOrderProgressSteps($status)
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var commentBox = document.getElementById('commentBox');
+            if (commentBox) {
+                commentBox.scrollTop = commentBox.scrollHeight;
+            }
+        });
+
         let cancelOrderId = null;
 
         function confirmCancel(orderId, status) {

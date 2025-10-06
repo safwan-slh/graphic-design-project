@@ -118,3 +118,23 @@ CREATE TABLE portfolios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (service_id) REFERENCES services(service_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE work_files (
+    work_file_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    file_name VARCHAR(255),
+    file_path VARCHAR(255),
+    uploaded_at DATETIME,
+    uploaded_by INT,
+    note TEXT,
+    version VARCHAR(20)
+);
+
+CREATE TABLE work_comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    version VARCHAR(20) NOT NULL,
+    customer_id INT, -- เปลี่ยนจาก user_id เป็น customer_id
+    comment TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
