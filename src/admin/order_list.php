@@ -6,9 +6,6 @@ require __DIR__ . '/../includes/db_connect.php';
 require_once '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
-$fullname = $_SESSION['fullname'] ?? '';
-$initial = mb_strtoupper(mb_substr(trim($fullname), 0, 1, 'UTF-8'), 'UTF-8');
-
 // --- Filter ---
 $service_id = $_GET['service_id'] ?? '';
 $status = $_GET['status'] ?? '';
@@ -25,7 +22,7 @@ if ($service_id) {
     $types .= 'i';
 }
 if ($status) {
-    $where[] = 'orders.order_status = ?';
+    $where[] = 'orders.status = ?';
     $params[] = $status;
     $types .= 's';
 }
@@ -48,7 +45,15 @@ $sql = "SELECT orders.*, customers.fullname, customers.email, services.service_n
         LEFT JOIN payments ON orders.order_id = payments.order_id
         LEFT JOIN poster_details ON orders.ref_id = poster_details.poster_id
         $whereSQL
-        ORDER BY orders.created_at DESC";
+        ORDER BY 
+            CASE orders.status
+                WHEN 'pending' THEN 1
+                WHEN 'in_progress' THEN 2
+                WHEN 'completed' THEN 3
+                WHEN 'cancelled' THEN 4
+                ELSE 5
+            END,
+            orders.created_at DESC";
 $stmt = $conn->prepare($sql);
 if ($params) {
     $stmt->bind_param($types, ...$params);
@@ -56,7 +61,34 @@ if ($params) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-
+// ฟังก์ชันสำหรับแสดงสถานะออเดอร์เป็นภาษาไทย
+function getOrderStatusTH($status)
+{
+    switch ($status) {
+        case 'pending':
+            return '<span class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">รอดำเนินการ</span>';
+        case 'in_progress':
+            return '<span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">กำลังดำเนินการ</span>';
+        case 'completed':
+            return '<span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">เสร็จสมบูรณ์</span>';
+        case 'cancelled':
+            return '<span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">ยกเลิก</span>';
+        default:
+            return $status;
+    }
+}
+// ดึงจำนวนแต่ละสถานะ
+$statusCounts = [];
+$statuses = ['pending', 'in_progress', 'completed', 'cancelled'];
+foreach ($statuses as $st) {
+    $sqlCount = "SELECT COUNT(*) AS total FROM orders WHERE status = ?";
+    $stmtCount = $conn->prepare($sqlCount);
+    $stmtCount->bind_param("s", $st);
+    $stmtCount->execute();
+    $resCount = $stmtCount->get_result();
+    $rowCount = $resCount->fetch_assoc();
+    $statusCounts[$st] = $rowCount['total'] ?? 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +120,7 @@ $result = $stmt->get_result();
         <div class="p-6">
             <div class=" text-zinc-900 bg-white rounded-2xl border border-slate-200 mb-2">
                 <!-- Header -->
-                <div class="flex items-center p-4">
+                <div class="flex items-center p-4 border-b border-slate-200">
                     <div class="mr-4 rounded-xl bg-zinc-900 p-3">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6 text-white">
                             <path d="M12 7.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
@@ -103,6 +135,71 @@ $result = $stmt->get_result();
                         <p class="text-gray-600">
                             จัดการและติดตามสถานะการออเดอร์ของลูกค้า
                         </p>
+                    </div>
+                </div>
+                <div class="mx-auto text-center">
+                    <!-- Order Status Summary -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl">
+                        <div class="bg-white flex items-center p-2 ring-1 ring-zinc-200 rounded-2xl">
+                            <div class="mr-4 rounded-xl text-yellow-600 bg-yellow-100 ring-1 ring-yellow-200 p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+                                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="">
+                                <h1 class="flex items-center font-bold text-zinc-900">
+                                    <?= $statusCounts['pending'] ?>
+                                </h1>
+                                <p class="text-gray-500 text-sm font-bold">
+                                    รอตรวจสอบ
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-white flex items-center p-2 ring-1 ring-zinc-200 rounded-2xl">
+                            <div class="mr-4 rounded-xl text-blue-600 bg-blue-100 ring-1 ring-blue-200 p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm.53 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v5.69a.75.75 0 0 0 1.5 0v-5.69l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="">
+                                <h1 class="flex items-center font-bold text-zinc-900">
+                                    <?= $statusCounts['in_progress'] ?>
+                                </h1>
+                                <p class="text-gray-500 text-sm font-bold">
+                                    กำลังดำเนินการ
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-white flex items-center p-2 ring-1 ring-zinc-200 rounded-2xl">
+                            <div class="mr-4 rounded-xl text-green-600 bg-green-100 ring-1 ring-green-200 p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+                                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="">
+                                <h1 class="flex items-center font-bold text-zinc-900">
+                                    <?= $statusCounts['completed'] ?>
+                                </h1>
+                                <p class="text-gray-500 text-sm font-bold">
+                                    เสร็จสมบูรณ์
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-white flex items-center p-2 ring-1 ring-zinc-200 rounded-2xl">
+                            <div class="mr-4 rounded-xl text-red-600 bg-red-100 ring-1 ring-red-200 p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="">
+                                <h1 class="flex items-center font-bold text-zinc-900">
+                                    <?= $statusCounts['cancelled'] ?>
+                                </h1>
+                                <p class="text-gray-500 text-sm font-bold">
+                                    ล้มเหลว
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,10 +218,18 @@ $result = $stmt->get_result();
                         <select name="status" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                             <option value="">สถานะทั้งหมด</option>
                             <option value="pending" <?= $status == 'pending' ? 'selected' : '' ?>>รอดำเนินการ</option>
-                            <option value="processing" <?= $status == 'processing' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
+                            <option value="in_progress" <?= $status == 'in_progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
                             <option value="completed" <?= $status == 'completed' ? 'selected' : '' ?>>เสร็จสมบูรณ์</option>
                         </select>
                         <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center border-gray-300 hover:bg-gray-100">
+                        <?php if ($service_id || $status || $date): ?>
+                            <a href="order_list.php" class="border transition font-medium rounded-xl text-sm px-3 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 me-2">
+                                    <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z" clip-rule="evenodd" />
+                                </svg>
+                                ล้างตัวกรอง
+                            </a>
+                        <?php endif; ?>
                         <button type="submit" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">ค้นหา</button>
                     </div>
                 </form>
@@ -160,11 +265,13 @@ $result = $stmt->get_result();
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-3 whitespace-nowrap">
                                         <div class="font-mono text-sm font-semibold text-indigo-600"><?= htmlspecialchars($order['order_code'] ?? $order['order_id']) ?></div>
-                                        <div class="text-xs text-gray-500"><?= htmlspecialchars(date('Y-m-d', strtotime($order['created_at']))) ?></div>
+                                        <div class="text-sm text-gray-500"><?= htmlspecialchars(date('Y-m-d', strtotime($order['created_at']))) ?></div>
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium"><?= $initial ?></div>
+                                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">
+                                                <?= htmlspecialchars(mb_substr($order['fullname'], 0, 1)) ?>
+                                            </div>
                                             <div class="ml-3">
                                                 <h4 class="font-medium"><?= htmlspecialchars($order['fullname']) ?></h4>
                                                 <p class="text-sm text-gray-500"><?= htmlspecialchars($order['email']) ?></p>
@@ -175,7 +282,7 @@ $result = $stmt->get_result();
                                         <?= htmlspecialchars($order['service_name']) ?><br>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <?= htmlspecialchars($order['status']) ?>
+                                        <?= getOrderStatusTH($order['status']) ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <?= htmlspecialchars($currentVersion) ?>

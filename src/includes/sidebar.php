@@ -9,6 +9,18 @@ require_once __DIR__ . '/../includes/db_connect.php';
 $sqlPending = "SELECT COUNT(*) AS pending_count FROM payments WHERE payment_status = 'pending'";
 $resultPending = $conn->query($sqlPending);
 $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)$row['pending_count'] : 0;
+
+// ดึงจำนวนออเดอร์ที่ pending และ in_progress
+$sqlOrderPending = "SELECT COUNT(*) AS order_pending FROM orders WHERE status = 'pending'";
+$resultOrderPending = $conn->query($sqlOrderPending);
+$orderPending = ($resultOrderPending && $row = $resultOrderPending->fetch_assoc()) ? (int)$row['order_pending'] : 0;
+
+$sqlOrderInProgress = "SELECT COUNT(*) AS order_inprogress FROM orders WHERE status = 'in_progress'";
+$resultOrderInProgress = $conn->query($sqlOrderInProgress);
+$orderInProgress = ($resultOrderInProgress && $row = $resultOrderInProgress->fetch_assoc()) ? (int)$row['order_inprogress'] : 0;
+
+// รวมจำนวนที่ต้อง action
+$orderBadge = $orderPending + $orderInProgress;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,6 +111,7 @@ $pendingCount = ($resultPending && $row = $resultPending->fetch_assoc()) ? (int)
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
                   </svg>
                   รายการออเดอร์
+                  <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $orderBadge ?></span>
                 </a>
               </li>
             </ul>
