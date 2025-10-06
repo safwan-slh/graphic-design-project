@@ -56,7 +56,16 @@ if ($statusFilter && in_array($statusFilter, ['paid', 'pending', 'cancelled'])) 
     $sql .= $where ? " AND" : " WHERE";
     $sql .= " p.payment_status = '" . $conn->real_escape_string($statusFilter) . "'";
 }
-$sql .= " ORDER BY p.payment_date DESC LIMIT $perPage OFFSET $offset";
+$sql .= " ORDER BY 
+    CASE p.payment_status
+        WHEN 'pending' THEN 1
+        WHEN 'cancelled' THEN 2
+        WHEN 'paid' THEN 3
+        ELSE 4
+    END,
+    p.payment_date DESC
+    LIMIT $perPage OFFSET $offset";
+
 $result = $conn->query($sql);
 
 // ดึงข้อมูลสรุปจากฐานข้อมูล
@@ -125,11 +134,11 @@ function getPaymentTypeBadge($type)
 {
     switch ($type) {
         case 'full':
-            return '<span class="px-3 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">เต็มจำนวน</span>';
+            return '<span class="px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">เต็มจำนวน</span>';
         case 'partial':
-            return '<span class="px-3 py-1 text-xs font-semibold text-yellow-700 bg-yellow-100 rounded-full">บางส่วน</span>';
+            return '<span class="px-3 py-1 text-xs font-medium text-yellow-700 bg-yellow-100 rounded-full">บางส่วน</span>';
         default:
-            return '<span class="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">' . htmlspecialchars($type) . '</span>';
+            return '<span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">' . htmlspecialchars($type) . '</span>';
     }
 }
 ?>
