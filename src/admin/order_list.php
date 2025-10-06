@@ -34,18 +34,19 @@ if ($date) {
     $params[] = $date;
     $types .= 's';
 }
-
+// รวมเงื่อนไข
 $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 // --- ดึงรายการบริการสำหรับ filter ---
 $serviceRes = $conn->query("SELECT service_id, service_name FROM services");
 
 // --- Query หลัก ---
-$sql = "SELECT orders.*, customers.fullname, customers.email, services.service_name, payments.amount, payments.payment_type
+$sql = "SELECT orders.*, customers.fullname, customers.email, services.service_name, payments.amount, payments.payment_type, poster_details.due_date
         FROM orders
         LEFT JOIN customers ON orders.customer_id = customers.customer_id
         LEFT JOIN services ON orders.service_id = services.service_id
         LEFT JOIN payments ON orders.order_id = payments.order_id
+        LEFT JOIN poster_details ON orders.ref_id = poster_details.poster_id
         $whereSQL
         ORDER BY orders.created_at DESC";
 $stmt = $conn->prepare($sql);
@@ -54,6 +55,8 @@ if ($params) {
 }
 $stmt->execute();
 $result = $stmt->get_result();
+
+
 ?>
 
 <!DOCTYPE html>
@@ -106,31 +109,24 @@ $result = $stmt->get_result();
             <div class="flex items-center justify-between bg-white rounded-2xl mb-2 p-4 ring-1 ring-gray-200">
                 <!-- Filter -->
                 <form method="get" class="flex gap-2 items-end">
-                    <div>
-                        <label>บริการ</label>
-                        <select name="service_id" class="border rounded px-2 py-1">
-                            <option value="">ทั้งหมด</option>
+                    <div class="flex gap-2">
+                        <select name="service_id" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                            <option value="">บริการทั้งหมด</option>
                             <?php while ($srv = $serviceRes->fetch_assoc()): ?>
                                 <option value="<?= $srv['service_id'] ?>" <?= $service_id == $srv['service_id'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($srv['service_name']) ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
-                    </div>
-                    <div>
-                        <label>สถานะ</label>
-                        <select name="status" class="border rounded px-2 py-1">
-                            <option value="">ทั้งหมด</option>
+                        <select name="status" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                            <option value="">สถานะทั้งหมด</option>
                             <option value="pending" <?= $status == 'pending' ? 'selected' : '' ?>>รอดำเนินการ</option>
                             <option value="processing" <?= $status == 'processing' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
                             <option value="completed" <?= $status == 'completed' ? 'selected' : '' ?>>เสร็จสมบูรณ์</option>
                         </select>
+                        <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center border-gray-300 hover:bg-gray-100">
+                        <button type="submit" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">ค้นหา</button>
                     </div>
-                    <div>
-                        <label>วันที่สั่ง</label>
-                        <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="border rounded px-2 py-1">
-                    </div>
-                    <button type="submit" class="bg-zinc-900 text-white px-4 py-2 rounded">ค้นหา</button>
                 </form>
             </div>
 
@@ -143,6 +139,7 @@ $result = $stmt->get_result();
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ลูกค้า</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ชื่อบริการ</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">สถานะ</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">สถานะงาน</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">วันที่ส่ง</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ประเภทชำระ</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">จำนวนเงิน</th>
@@ -151,9 +148,14 @@ $result = $stmt->get_result();
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php while ($order = $result->fetch_assoc()):
-                                // คำนวณวันเหลือก่อนส่ง
-                                $deadline = $order['dua_date'] ?? $order['due_date'] ?? '';
-                                $daysLeft = $deadline ? (strtotime($deadline) - strtotime(date('Y-m-d'))) / 86400 : '';
+                                // ดึงสถานะเวอร์ชันงานล่าสุดของแต่ละ order
+                                $versionSql = "SELECT version FROM work_files WHERE order_id = ? ORDER BY uploaded_at DESC LIMIT 1";
+                                $versionStmt = $conn->prepare($versionSql);
+                                $versionStmt->bind_param("i", $order['order_id']);
+                                $versionStmt->execute();
+                                $versionRes = $versionStmt->get_result();
+                                $versionRow = $versionRes->fetch_assoc();
+                                $currentVersion = $versionRow['version'] ?? 'ยังไม่มีไฟล์';
                             ?>
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-3 whitespace-nowrap">
@@ -176,7 +178,30 @@ $result = $stmt->get_result();
                                         <?= htmlspecialchars($order['status']) ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <?= htmlspecialchars($deadline) ?>
+                                        <?= htmlspecialchars($currentVersion) ?>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <?php
+                                        $deadline = $order['due_date'] ?? '';
+                                        if ($deadline):
+                                        ?>
+                                            <span><?= htmlspecialchars(date('d/m/Y', strtotime($deadline))) ?></span>
+                                            <?php
+                                            $now = new DateTime();
+                                            $due = new DateTime($deadline);
+                                            $interval = $now->diff($due);
+                                            $daysLeft = (int)$interval->format('%r%a');
+                                            if ($daysLeft > 0) {
+                                                echo '<span class="text-blue-600 ml-2">(เหลือ ' . $daysLeft . ' วัน)</span>';
+                                            } elseif ($daysLeft === 0) {
+                                                echo '<span class="text-orange-600 ml-2">(ครบกำหนดวันนี้)</span>';
+                                            } else {
+                                                echo '<span class="text-red-600 ml-2">(เลยกำหนด ' . abs($daysLeft) . ' วัน)</span>';
+                                            }
+                                            ?>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">-</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <?= $order['payment_type'] == 'full' ? 'เต็มจำนวน' : 'ครึ่งหนึ่ง' ?>
@@ -185,7 +210,7 @@ $result = $stmt->get_result();
                                         <?= $order['amount'] !== null ? number_format($order['amount'], 2) : '-' ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <a href="order_detail.php?id=<?= htmlspecialchars($order['order_id']) ?>">ดูรายละเอียด</a>
+                                        <a href="order_detail.php?id=<?= htmlspecialchars($order['order_id']) ?>" class="text-indigo-600 hover:text-indigo-900 font-medium">ดูรายละเอียด</a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
