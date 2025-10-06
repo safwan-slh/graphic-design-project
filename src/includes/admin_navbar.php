@@ -1,7 +1,7 @@
 <?php
 // ตรวจสอบ error
 error_reporting(E_ALL);
-ini_set('display_errors', 1);  
+ini_set('display_errors', 1);
 $fullname = $_SESSION['fullname'] ?? '';
 ?>
 <!DOCTYPE html>
@@ -25,6 +25,13 @@ $fullname = $_SESSION['fullname'] ?? '';
     <div class="flex items-center justify-between bg-white p-4 sticky top-0 z-10 border-b border-gray-200">
         <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-4">
+                <?php if (isset($breadcrumb) && is_array($breadcrumb) && count($breadcrumb) > 2): ?>
+                    <button class="p-1.5 text-gray-800 hover:bg-zinc-100 rounded-lg cursor-pointer hover:text-gray-800 ring-1 ring-gray-200 transition-all duration-300 ease-in-out hover:scale-105" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <?php endif; ?>
                 <!-- Breadcrumb -->
                 <nav class="text-sm text-gray-500 p-1 rounded-lg ring-1 ring-gray-200 transition-all duration-300 ease-in-out hover:scale-105">
                     <ol class="list-none p-0 inline-flex">

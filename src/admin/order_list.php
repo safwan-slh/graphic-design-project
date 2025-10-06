@@ -77,6 +77,20 @@ function getOrderStatusTH($status)
             return $status;
     }
 }
+// ฟังก์ชันสำหรับแสดง badge สถานะเวอร์ชันงาน
+function getVersionBadge($version)
+{
+    switch ($version) {
+        case 'draft1':
+            return '<span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft 1</span>';
+        case 'draft2':
+            return '<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft 2</span>';
+        case 'final':
+            return '<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Final</span>';
+        default:
+            return '<span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">' . htmlspecialchars($version) . '</span>';
+    }
+}
 // ดึงจำนวนแต่ละสถานะ
 $statusCounts = [];
 $statuses = ['pending', 'in_progress', 'completed', 'cancelled'];
@@ -243,18 +257,17 @@ foreach ($statuses as $st) {
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order Number</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ลูกค้า</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ชื่อบริการ</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">สถานะ</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">สถานะออเดอร์</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">สถานะงาน</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">วันที่ส่ง</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ประเภทชำระ</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">จำนวนเงิน</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">การดำเนินการ</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php while ($order = $result->fetch_assoc()):
                                 // ดึงสถานะเวอร์ชันงานล่าสุดของแต่ละ order
-                                $versionSql = "SELECT version FROM work_files WHERE order_id = ? ORDER BY uploaded_at DESC LIMIT 1";
+                                $versionSql = "SELECT version FROM work_files WHERE order_id = ? ORDER BY 
+                                CASE WHEN version = 'final' THEN 1 ELSE 2 END, uploaded_at DESC LIMIT 1";
                                 $versionStmt = $conn->prepare($versionSql);
                                 $versionStmt->bind_param("i", $order['order_id']);
                                 $versionStmt->execute();
@@ -285,36 +298,34 @@ foreach ($statuses as $st) {
                                         <?= getOrderStatusTH($order['status']) ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <?= htmlspecialchars($currentVersion) ?>
+                                        <?= $currentVersion === 'ยังไม่มีไฟล์' ? '<span class="bg-gray-100 text-gray-400 text-xs font-medium px-2.5 py-0.5 rounded-full">ยังไม่มีไฟล์</span>' : getVersionBadge($currentVersion) ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <?php
                                         $deadline = $order['due_date'] ?? '';
                                         if ($deadline):
                                         ?>
-                                            <span><?= htmlspecialchars(date('d/m/Y', strtotime($deadline))) ?></span>
-                                            <?php
-                                            $now = new DateTime();
-                                            $due = new DateTime($deadline);
-                                            $interval = $now->diff($due);
-                                            $daysLeft = (int)$interval->format('%r%a');
-                                            if ($daysLeft > 0) {
-                                                echo '<span class="text-blue-600 ml-2">(เหลือ ' . $daysLeft . ' วัน)</span>';
-                                            } elseif ($daysLeft === 0) {
-                                                echo '<span class="text-orange-600 ml-2">(ครบกำหนดวันนี้)</span>';
-                                            } else {
-                                                echo '<span class="text-red-600 ml-2">(เลยกำหนด ' . abs($daysLeft) . ' วัน)</span>';
-                                            }
-                                            ?>
-                                        <?php else: ?>
-                                            <span class="text-gray-400">-</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <?= $order['payment_type'] == 'full' ? 'เต็มจำนวน' : 'ครึ่งหนึ่ง' ?>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <?= $order['amount'] !== null ? number_format($order['amount'], 2) : '-' ?>
+                                            <div class="">
+                                                <span><?= htmlspecialchars(date('d/m/Y', strtotime($deadline))) ?></span>
+                                            </div>
+                                            <div class="">
+                                                <?php
+                                                $now = new DateTime();
+                                                $due = new DateTime($deadline);
+                                                $interval = $now->diff($due);
+                                                $daysLeft = (int)$interval->format('%r%a');
+                                                if ($daysLeft > 0) {
+                                                    echo '<span class="text-blue-600 ml-2">(เหลือ ' . $daysLeft . ' วัน)</span>';
+                                                } elseif ($daysLeft === 0) {
+                                                    echo '<span class="text-orange-600 ml-2">(ครบกำหนดวันนี้)</span>';
+                                                } else {
+                                                    echo '<span class="text-red-600 ml-2">(เลยกำหนด ' . abs($daysLeft) . ' วัน)</span>';
+                                                }
+                                                ?>
+                                            <?php else: ?>
+                                                <span class="text-gray-400">-</span>
+                                            <?php endif; ?>
+                                            </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <a href="order_detail.php?id=<?= htmlspecialchars($order['order_id']) ?>" class="text-indigo-600 hover:text-indigo-900 font-medium">ดูรายละเอียด</a>
