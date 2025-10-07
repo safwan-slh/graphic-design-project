@@ -958,10 +958,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return;
             }
 
+            // ตรวจสอบขนาดไฟล์รวมทุก input
+            let totalSize = 0;
+            ['logo_file[]', 'images_file[]', 'reference_file[]'].forEach(name => {
+                const inp = document.querySelector(`input[name="${name}"]`);
+                if (inp && inp.files.length > 0) {
+                    Array.from(inp.files).forEach(file => totalSize += file.size);
+                }
+            });
+            if (totalSize > 30 * 1024 * 1024) { // 30MB
+                alert('ไฟล์รวมทั้งหมดเกิน 30MB กรุณาลดขนาดไฟล์ที่อัปโหลด');
+                input.value = "";
+                preview.innerHTML = '';
+                preview.classList.add('hidden');
+                return;
+            }
+
             if (files.length > 0) {
                 preview.innerHTML = '';
                 preview.classList.remove('hidden');
-
                 Array.from(files).forEach(file => {
                     const fileDiv = document.createElement('div');
                     fileDiv.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2';
