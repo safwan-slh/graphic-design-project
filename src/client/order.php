@@ -131,10 +131,14 @@ $statusLabels = [
     'completed' => 'เสร็จสมบูรณ์',
     'cancelled' => 'ยกเลิก'
 ];
+
+//
+$highlightOrderId = $_GET['order_id'] ?? null;
 ?>
 
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <title>รายการสั่งซื้อของฉัน | Graphic Design</title>
@@ -258,24 +262,24 @@ $statusLabels = [
                 </div>
             </div>
         </div>
-        
-        
+
+
         <div class="bg-white items-center p-2 ring-1 ring-zinc-200 rounded-2xl">
             <!-- <status-filter> -->
-                <div class="flex flex-wrap gap-2 items-center p-2 pb-4 mb-4 border-b border-gray-200">
-                    <a href="order.php"
-                        class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center
+            <div class="flex flex-wrap gap-2 items-center p-2 pb-4 mb-4 border-b border-gray-200">
+                <a href="order.php"
+                    class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center
                    <?= is_null($selectedStatus) ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100' ?>">
-                        ทั้งหมด
-                    </a>
-                    <?php foreach ($statusLabels as $status => $label): ?>
-                        <a href="order.php?status=<?= $status ?>"
-                            class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center
+                    ทั้งหมด
+                </a>
+                <?php foreach ($statusLabels as $status => $label): ?>
+                    <a href="order.php?status=<?= $status ?>"
+                        class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center
                        <?= ($selectedStatus === $status) ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100' ?>">
-                            <?= $label ?>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
+                        <?= $label ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
             <?php
             $filteredOrders = $selectedStatus
                 ? array_filter($orders, fn($o) => $o['status'] === $selectedStatus)
@@ -293,7 +297,9 @@ $statusLabels = [
                             $detail = getOrderDetail($conn, $order['service_id'], $order['ref_id']);
                             ?>
                             <!-- card -->
-                            <div class="bg-white rounded-2xl shadow-sm p-4 space-y-2 cursor-pointer ring-1 ring-gray-200  transition-all duration-300 ease-in-out hover:scale-105">
+                            <div class="bg-white rounded-2xl shadow-sm p-4 space-y-2 cursor-pointer ring-1 ring-gray-200 transition-all duration-300 ease-in-out hover:scale-105
+                                <?= ($highlightOrderId == $order['order_id']) ? 'border-2 border-blue-500 ring-blue-200 animate-pulse' : '' ?>"
+                                id="order-<?= $order['order_id'] ?>">
                                 <!-- header -->
                                 <div class="">
                                     <div class="flex items-center justify-between mb-4">
@@ -422,7 +428,6 @@ $statusLabels = [
 
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script>
-
             let cancelOrderId = null;
 
             function confirmCancel(orderId, status) {
@@ -440,9 +445,23 @@ $statusLabels = [
             }
             document.getElementById('confirmCancelBtn').onclick = function() {
                 this.disabled = true;
-                window.location = "order_cancel.php?order_id=" + cancelOrderId;
+                window.location = "/graphic-design/src/notifications/cancel_order.php?order_id=" + cancelOrderId;
             };
         </script>
+        <!-- scroll ไปยัง card -->
+        <?php if ($highlightOrderId): ?>
+            <script>
+                window.onload = function() {
+                    var el = document.getElementById('order-<?= $highlightOrderId ?>');
+                    if (el) {
+                        el.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                };
+            </script>
+        <?php endif; ?>
 </body>
 
 </html>

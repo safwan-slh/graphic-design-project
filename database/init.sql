@@ -119,6 +119,7 @@ CREATE TABLE portfolios (
     FOREIGN KEY (service_id) REFERENCES services(service_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ตารางไฟล์งานและความคิดเห็น
 CREATE TABLE work_files (
     work_file_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -130,11 +131,23 @@ CREATE TABLE work_files (
     version VARCHAR(20)
 );
 
+-- ตารางความคิดเห็น
 CREATE TABLE work_comments (
     comment_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     version VARCHAR(20) NOT NULL,
     customer_id INT, -- เปลี่ยนจาก user_id เป็น customer_id
     comment TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ตารางการแจ้งเตือน
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    message TEXT,
+    link VARCHAR(255),
+    is_read TINYINT(1) DEFAULT 0,
+    is_admin TINYINT(1) DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

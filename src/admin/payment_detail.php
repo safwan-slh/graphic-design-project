@@ -33,6 +33,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         $stmt->bind_param("si", $newStatus, $paymentId);
     }
     $stmt->execute();
+
+    // ส่งแจ้งเตือนไปยังลูกค้า
+    $customerId = $payment['customer_id'];
+    $orderCode = $payment['order_code'] ?? $payment['order_id'] ?? '-';
+    if ($newStatus === 'paid') {
+        $message = "การชำระเงินสำหรับ Order #{$orderCode} ของคุณได้รับการอนุมัติแล้ว";
+    } elseif ($newStatus === 'cancelled') {
+        $message = "การชำระเงินสำหรับ Order #{$orderCode} ของคุณถูกปฏิเสธ: " . $rejectReason;
+    } else {
+        $message = "สถานะการชำระเงินสำหรับ Order #{$orderCode} ของคุณถูกเปลี่ยนเป็น " . htmlspecialchars($newStatus);
+    }
+    $link = "/graphic-design/src/client/order.php?order_id=" . $payment['order_id'];
+    $stmtNotify = $conn->prepare("INSERT INTO notifications (customer_id, message, link) VALUES (?, ?, ?)");
+    $stmtNotify->bind_param("iss", $customerId, $message, $link);
+    $stmtNotify->execute();
+
     header("Location: payment_detail.php?id=" . $paymentId);
     exit;
 }
