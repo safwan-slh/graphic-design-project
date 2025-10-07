@@ -345,17 +345,23 @@ function getOrderProgressSteps($status)
                                     <div class="space-y-2">
                                         <p class="text-sm flex justify-between">
                                             <span class="text-zinc-600 font-medium">จำนวนเงิน:</span>
-                                            <span class="text-gray-500 text-sm"><?= htmlspecialchars($order['amount']) ?></span>
+                                            <span class="text-gray-500 text-sm"><?= htmlspecialchars($order['amount'] ?? '-') ?></span>
                                         </p>
                                         <p class="text-sm flex justify-between">
                                             <span class="text-zinc-600 font-medium">ประเภทชำระ:</span>
-                                            <span class="text-gray-500 text-sm"><?= $order['payment_type'] == 'full' ? 'เต็มจำนวน' : 'ครึ่งหนึ่ง' ?></span>
+                                            <span class="text-gray-500 text-sm"><?= $order['payment_type'] == 'full' ? 'เต็มจำนวน' : '-' ?></span>
                                         </p>
                                         <p class="text-sm flex justify-between">
                                             <span class="text-zinc-600 font-medium">สถานะการชำระ:</span>
-                                            <span class="<?= getPaymentStatusClass($order['payment_status']) ?>">
-                                                <?= getPaymentStatusTH($order['payment_status']) ?>
-                                            </span>
+                                            <?php if ($order['payment_status']): ?>
+                                                <span class="<?= getPaymentStatusClass($order['payment_status']) ?>">
+                                                    <?= getPaymentStatusTH($order['payment_status']) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-pink-600 text-xs font-medium bg-pink-100 px-3 py-1 rounded-md">
+                                                    รอชำระเงิน
+                                                </span>
+                                            <?php endif; ?>
                                         </p>
                                     </div>
                                 </div>

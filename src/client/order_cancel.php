@@ -32,7 +32,7 @@ if (!in_array($order['status'], ['pending', 'in_progress'])) {
 $stmt = $conn->prepare("UPDATE orders SET status = 'cancelled' WHERE order_id = ?");
 $stmt->bind_param("i", $order_id);
 if ($stmt->execute()) {
-    header("Location: order.php?cancel=success");
+    header("Location: /graphic-design/src/client/order.php?cancel=success");
     exit;
 } else {
     $success = false;

@@ -73,7 +73,7 @@ function getPaymentStatusTH($status)
         case 'failed':
             return 'ไม่สำเร็จ';
         case 'cancelled':
-            return 'ยกเลิก';
+            return 'ล้มเหลว';
         default:
             return $status;
     }
@@ -361,6 +361,10 @@ $highlightOrderId = $_GET['order_id'] ?? null;
                                                     <span class="<?= getPaymentStatusClass($payment_status) ?>">
                                                         <?= getPaymentStatusTH($payment_status) ?>
                                                     </span>
+                                                <?php else: ?>
+                                                    <span class="text-pink-600 text-xs font-medium bg-pink-100 px-3 py-1 rounded-md">
+                                                        รอชำระเงิน
+                                                    </span>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="text-gray-500 text-sm mb-2 flex justify-between">
@@ -405,9 +409,25 @@ $highlightOrderId = $_GET['order_id'] ?? null;
                                         </div>
                                     </div>
                                 </div>
-                                <a href="order_detail.php?order_id=<?= $order['order_id'] ?>" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
-                                    ดูรายละเอียด
-                                </a>
+                                <?php if (!$payment_status): ?>
+                                    <form action="order_delete.php" method="post" class="flex gap-2 w-full" onsubmit="event.stopPropagation(); return confirm('ยืนยันลบออเดอร์นี้?');">
+                                        <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
+                                        <a
+                                            onclick="window.location='payment.php?order_id=<?= $order['order_id'] ?>'"
+                                            class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 flex-1 text-center flex items-center justify-center mb-2">
+                                            ไปชำระเงิน
+                                        </a>
+                                        <button type="button"
+                                            onclick="confirmDelete(<?= $order['order_id'] ?>)"
+                                            class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-xl text-sm px-5 py-2 flex-1 text-center flex items-center justify-center mb-2">
+                                            ลบออเดอร์
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <a href="order_detail.php?order_id=<?= $order['order_id'] ?>" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
+                                        ดูรายละเอียด
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -423,6 +443,20 @@ $highlightOrderId = $_GET['order_id'] ?? null;
                     <button onclick="closeCancelModal()" class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-gray-200 hover:bg-gray-300">ยกเลิก</button>
                     <button id="confirmCancelBtn" class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">ยืนยัน</button>
                 </div>
+            </div>
+        </div>
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm bg-opacity-50 hidden">
+            <div class="bg-white rounded-3xl shadow-lg p-5 max-w-sm w-full text-center">
+                <div class="text-xl font-bold mb-4">ยืนยันการลบออเดอร์</div>
+                <div class="mb-6 text-gray-700">คุณต้องการลบออเดอร์นี้ถาวรใช่หรือไม่? <br> (ไม่สามารถกู้คืนได้)</div>
+                <form id="deleteOrderForm" method="post" action="order_delete.php">
+                    <input type="hidden" name="order_id" id="deleteOrderId">
+                    <div class="flex justify-center gap-4">
+                        <button type="button" onclick="closeDeleteModal()" class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-gray-200 hover:bg-gray-300">ยกเลิก</button>
+                        <button type="submit" class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">ยืนยันลบ</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -447,6 +481,15 @@ $highlightOrderId = $_GET['order_id'] ?? null;
                 this.disabled = true;
                 window.location = "/graphic-design/src/notifications/cancel_order.php?order_id=" + cancelOrderId;
             };
+
+            function confirmDelete(orderId) {
+                document.getElementById('deleteOrderId').value = orderId;
+                document.getElementById('deleteModal').classList.remove('hidden');
+            }
+
+            function closeDeleteModal() {
+                document.getElementById('deleteModal').classList.add('hidden');
+            }
         </script>
         <!-- scroll ไปยัง card -->
         <?php if ($highlightOrderId): ?>
