@@ -53,20 +53,6 @@ if (isset($_SESSION['customer_id'])) {
   $result = $stmt->get_result()->fetch_assoc();
   $unreadChatCount = $result['cnt'] ?? 0;
 }
-// ดึง order ทั้งหมดที่ลูกค้าคนนี้เคยมีแชท
-$ordersWithChat = [];
-if (isset($_SESSION['customer_id'])) {
-  $cid = $_SESSION['customer_id'];
-  $sql = "SELECT o.order_id, o.order_code
-            FROM orders o
-            WHERE o.customer_id = ?
-            AND EXISTS (SELECT 1 FROM chat_messages c WHERE c.order_id = o.order_id)
-            ORDER BY o.created_at DESC";
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("i", $cid);
-  $stmt->execute();
-  $ordersWithChat = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -228,27 +214,78 @@ if (isset($_SESSION['customer_id'])) {
       <!-- Sidebar: รายการออเดอร์ -->
       <div class="w-64 bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
         <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">ประวัติแชทของคุณ</div>
+        <?php
+        if (isset($_SESSION['customer_id'])) {
+          $cid = $_SESSION['customer_id'];
+
+          // ดึง order ทั้งหมดที่ลูกค้าคนนี้เคยมีแชท
+          $ordersWithChat = [];
+          $sql = "SELECT o.order_id, o.order_code
+            FROM orders o
+            WHERE o.customer_id = ?
+            AND EXISTS (SELECT 1 FROM chat_messages c WHERE c.order_id = o.order_id)
+            ORDER BY o.created_at DESC";
+          $stmt = $conn->prepare($sql);
+          $stmt->bind_param("i", $cid);
+          $stmt->execute();
+          $ordersWithChat = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+          $stmt->close();
+
+          // ดึง unread ของแต่ละ order ทั้งหมดในครั้งเดียว
+          $orderUnreadMap = [];
+          $sql = "SELECT order_id, COUNT(*) as unread 
+          FROM chat_messages 
+          WHERE order_id IN (SELECT order_id FROM orders WHERE customer_id=?) 
+            AND sender_role='admin' AND is_read=0
+          GROUP BY order_id";
+          $stmt = $conn->prepare($sql);
+          $stmt->bind_param("i", $cid);
+          $stmt->execute();
+          $result = $stmt->get_result();
+          while ($row = $result->fetch_assoc()) {
+            $orderUnreadMap[$row['order_id']] = $row['unread'];
+          }
+          $stmt->close();
+
+          // ดึง unread ของ "สอบถามทั่วไป"
+          $generalUnread = 0;
+          $sql = "SELECT COUNT(*) as unread FROM chat_messages WHERE (order_id IS NULL OR order_id=0) AND sender_role='admin' AND is_read=0 AND customer_id=?";
+          $stmt = $conn->prepare($sql);
+          $stmt->bind_param("i", $cid);
+          $stmt->execute();
+          $generalUnread = $stmt->get_result()->fetch_assoc()['unread'] ?? 0;
+          $stmt->close();
+        }
+        ?>
+
         <ul id="orderList">
-          <?php foreach ($ordersWithChat as $order): ?>
-            <?php
-            // Query หาจำนวนแชทยังไม่อ่านของแต่ละ order
-            $sql = "SELECT COUNT(*) as unread FROM chat_messages WHERE order_id=? AND sender_role='admin' AND is_read=0";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $order['order_id']);
-            $stmt->execute();
-            $unread = $stmt->get_result()->fetch_assoc()['unread'] ?? 0;
-            ?>
-            <li class="p-2 text-sm pb-0">
-              <button type="button"
-                class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center hover:ring-1 hover:ring-gray-200 <?= $unread > 0 ? 'font-bold' : 'font-medium text-gray-500 bg-gray-50' ?>"
-                onclick="selectOrderChat(<?= $order['order_id'] ?>)">
-                ออเดอร์ #<?= htmlspecialchars($order['order_code']) ?>
-                <?php if ($unread > 0): ?>
-                  <span class="bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $unread ?></span>
-                <?php endif; ?>
-              </button>
-            </li>
-          <?php endforeach; ?>
+          <!-- ปุ่มสอบถามทั่วไป -->
+          <li class="p-2 text-sm pb-0">
+            <button type="button"
+              class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center font-medium text-gray-500 ring-1 ring-gray-300"
+              onclick="selectOrderChat(0)">
+              #สอบถามทั่วไป
+              <?php if (!empty($generalUnread)): ?>
+                <span class="bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $generalUnread ?></span>
+              <?php endif; ?>
+            </button>
+          </li>
+          <!-- ลูปแสดง order -->
+          <?php if (!empty($ordersWithChat)): ?>
+            <?php foreach ($ordersWithChat as $order): ?>
+              <?php $unread = $orderUnreadMap[$order['order_id']] ?? 0; ?>
+              <li class="p-2 text-sm pb-0">
+                <button type="button"
+                  class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center hover:ring-1 hover:ring-gray-200 <?= $unread > 0 ? 'font-bold' : 'font-medium text-gray-500 bg-gray-50' ?>"
+                  onclick="selectOrderChat(<?= $order['order_id'] ?>)">
+                  ออเดอร์ #<?= htmlspecialchars($order['order_code']) ?>
+                  <?php if ($unread > 0): ?>
+                    <span class="bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $unread ?></span>
+                  <?php endif; ?>
+                </button>
+              </li>
+            <?php endforeach; ?>
+          <?php endif; ?>
         </ul>
       </div>
       <!-- Main Chat Area -->
@@ -262,9 +299,9 @@ if (isset($_SESSION['customer_id'])) {
           <h2 class="text-md font-semibold" id="chatOrderTitle">แชทกับทีมงาน</h2>
         </div>
         <div class="flex-1 overflow-y-auto p-4" id="chatBoxModal" style="min-height:200px;">
-          <div class="text-gray-400 text-center" id="chatLoadingModal">กรุณาเลือกออเดอร์เพื่อดูแชท</div>
+          <div class="text-gray-400 text-center" id="chatLoadingModal"></div>
         </div>
-        <form id="chatFormModal" class="p-4 border-t flex gap-2">
+        <form id="chatFormModal" class="p-4 border-t flex gap-2 hidden">
           <textarea id="chatInputModal" rows="1" required class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900" placeholder="พิมพ์ข้อความ..."></textarea>
           <button type="submit" class="bg-gray-900 hover:bg-zinc-800 text-white font-medium rounded-xl text-sm px-4 py-2 flex items-center justify-center hover:scale-105 transition-all duration-300 ease-in-out">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">

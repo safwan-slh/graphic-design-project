@@ -6,33 +6,41 @@ const chatInputModal = document.getElementById("chatInputModal");
 let currentOrderId = null;
 
 function openChatModal() {
-  document.getElementById('chatModal').classList.remove('hidden');
-  document.body.classList.add('overflow-hidden');
-  document.documentElement.classList.add('overflow-hidden'); // เพิ่มบรรทัดนี้
+  document.getElementById("chatModal").classList.remove("hidden");
+  document.body.classList.add("overflow-hidden");
+  document.documentElement.classList.add("overflow-hidden"); // เพิ่มบรรทัดนี้
   fetchChatModal();
 }
 
 function closeChatModal() {
-  document.getElementById('chatModal').classList.add('hidden');
-  document.body.classList.remove('overflow-hidden');
-  document.documentElement.classList.remove('overflow-hidden'); // เพิ่มบรรทัดนี้
+  document.getElementById("chatModal").classList.add("hidden");
+  document.body.classList.remove("overflow-hidden");
+  document.documentElement.classList.remove("overflow-hidden"); // เพิ่มบรรทัดนี้
 }
 
 openChatModalBtn.onclick = openChatModal;
 
 function selectOrderChat(orderId) {
-  currentOrderId = orderId;
-  document.getElementById("chatOrderTitle").textContent =
-    "แชทกับทีมงาน (ออเดอร์ #" + orderId + ")";
+  if (currentOrderId === orderId) return; // ไม่ต้องโหลดซ้ำ
+  if (orderId === 0) {
+    document.getElementById("chatOrderTitle").textContent = "สอบถามทั่วไป";
+  } else {
+    document.getElementById("chatOrderTitle").textContent =
+      "แชทกับทีมงาน (ออเดอร์ #" + orderId + ")";
+  }
+  document.getElementById("chatFormModal").classList.remove("hidden");
   fetchChatModal();
 }
 
 function fetchChatModal() {
-  if (!currentOrderId) {
+  if (currentOrderId === null) {
     document.getElementById("chatBoxModal").innerHTML =
       '<div class="text-gray-400 text-center">กรุณาเลือกออเดอร์เพื่อดูแชท</div>';
+    document.getElementById("chatFormModal").classList.add("hidden");
     return;
   }
+  document.getElementById("chatBoxModal").innerHTML =
+    '<div class="text-gray-400 text-center">กำลังโหลด...</div>';
   fetch("/graphic-design/src/chat/get_messages.php?order_id=" + currentOrderId)
     .then((res) => res.json())
     .then((data) => {
@@ -75,7 +83,10 @@ function fetchChatModal() {
 function selectOrderChat(orderId) {
   currentOrderId = orderId;
   document.getElementById("chatOrderTitle").textContent =
-    "แชทกับทีมงาน (ออเดอร์ #" + orderId + ")";
+    orderId === 0
+      ? "แชทสอบถามทั่วไป"
+      : "แชทกับทีมงาน (ออเดอร์ #" + orderId + ")";
+  document.getElementById("chatFormModal").classList.remove("hidden");
   // mark as read
   fetch("/graphic-design/src/chat/mark_chat_read.php", {
     method: "POST",
@@ -85,7 +96,7 @@ function selectOrderChat(orderId) {
     body: "order_id=" + orderId,
   }).then(() => {
     fetchChatModal();
-    refreshOrderSidebar(); // เรียกฟังก์ชันนี้เพื่อรีเฟรช badge ใน sidebar
+    refreshOrderSidebar();
     refreshChatBadge();
   });
 }
@@ -116,21 +127,19 @@ function refreshOrderSidebar() {
     });
 }
 
-document.getElementById("chatFormModal").onsubmit = function (e) {
+chatFormModal.onsubmit = function (e) {
   e.preventDefault();
-  const msg = document.getElementById("chatInputModal").value.trim();
-  if (!msg || !currentOrderId) return;
+  const msg = chatInputModal.value.trim();
+  if (!msg || currentOrderId === null) return;
   fetch("/graphic-design/src/chat/send_message.php", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `order_id=${currentOrderId}&message=${encodeURIComponent(msg)}`,
   })
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
-        document.getElementById("chatInputModal").value = "";
+        chatInputModal.value = "";
         fetchChatModal();
       }
     });
