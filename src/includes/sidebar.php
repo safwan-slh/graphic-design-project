@@ -95,7 +95,9 @@ $orderBadge = $orderPending + $orderInProgress;
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
                   </svg>
                   รายการชำระเงิน
-                  <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $pendingCount ?></span>
+                  <?php if ($pendingCount > 0): ?>
+                    <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $pendingCount ?></span>
+                  <?php endif; ?>
                 </a>
               </li>
             </ul>
@@ -111,7 +113,9 @@ $orderBadge = $orderPending + $orderInProgress;
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
                   </svg>
                   รายการออเดอร์
-                  <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $orderBadge ?></span>
+                  <?php if ($orderBadge > 0): ?>
+                    <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $orderBadge ?></span>
+                  <?php endif; ?>
                 </a>
               </li>
             </ul>
@@ -187,27 +191,6 @@ $orderBadge = $orderPending + $orderInProgress;
           </div>
           <!-- Divider -->
           <div class="border-t border-gray-200 my-4"></div>
-          <!-- Logout -->
-          <!-- <div>
-            <ul class="space-y-1">
-              <li>
-                <a href="/graphic-design/src/client/index.php" class="flex items-center px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
-                  <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                  </svg>
-                  หน้าหลัก
-                </a>
-              </li>
-              <li>
-                <a href="/graphic-design/src/auth/logout.php" class="flex items-center px-3 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200">
-                  <svg class="w-5 h-5 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2" />
-                  </svg>
-                  ออกจากระบบ
-                </a>
-              </li>
-            </ul>
-          </div> -->
         </nav>
       </div>
     </div>

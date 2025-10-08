@@ -85,11 +85,11 @@ while ($row = $notif_result->fetch_assoc()) {
                         <?php endif; ?>
                     </button>
                     <!-- Dropdown -->
-                    <div id="adminNotifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl mb-6 ring-1 ring-gray-200 z-50">
+                    <div id="adminNotifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-2xl mb-6 ring-1 ring-gray-200 z-50">
                         <div class="border-b bg-gray-50 rounded-t-2xl">
                             <h2 class="text-md font-semibold p-2 pl-2 ml-2">แจ้งเตือน</h2>
                         </div>
-                        <ul class="max-h-80 overflow-y-auto p-2">
+                        <ul class="max-h-96 overflow-y-auto p-2">
                             <?php if (count($adminNotifications) === 0): ?>
                                 <li class="p-4 text-gray-500 text-sm text-center">ไม่มีแจ้งเตือน</li>
                             <?php else: ?>
