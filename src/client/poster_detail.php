@@ -84,12 +84,14 @@ function getOrderStatusClass($status)
 }
 function getOrderProgressSteps($status)
 {
+    if ($status === 'cancelled') {
+        return [[['label' => 'ยกเลิกออเดอร์', 'key' => 'cancelled']], 0];
+    }
     // กำหนดขั้นตอนและสถานะปัจจุบัน
     $steps = [
         ['label' => 'กำลังตรวจสอบ', 'key' => 'pending'],
         ['label' => 'กำลังออกแบบ', 'key' => 'in_progress'],
-        ['label' => 'ส่งแบบร่าง', 'key' => 'waiting_approve'],
-        ['label' => 'ส่งงานไฟล์สุดท้าย', 'key' => 'completed'],
+        ['label' => 'เสร็จสมบูรณ์', 'key' => 'completed'],
     ];
     // หาค่า index ขั้นตอนปัจจุบัน
     switch ($status) {
@@ -99,11 +101,8 @@ function getOrderProgressSteps($status)
         case 'in_progress':
             $current = 1;
             break;
-        case 'waiting_approve':
-            $current = 2;
-            break;
         case 'completed':
-            $current = 3;
+            $current = 2;
             break;
         default:
             $current = 0;
@@ -433,6 +432,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                                             <button type="submit" class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">ส่งคอมเมนต์</button>
                                         </div>
                                     </form>
+                                </div>
+                            <?php else: ?>
+                                <div class="border border-gray-200 rounded-2xl p-8 text-center text-gray-400 text-sm">
+                                    ขณะนี้ยังไม่มีไฟล์งานแบบร่างที่ 1<br>กรุณารอทีมงานอัปโหลดไฟล์งานให้คุณเร็ว ๆ นี้
                                 </div>
                             <?php endif; ?>
 
@@ -772,6 +775,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
         </div>
     </div>
 
+    <!-- Image Modal -->
+    <div id="imageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md bg-opacity-50 hidden"
+        onclick="closeImageModal()">
+        <div class="relative max-w-4xl w-full" onclick="event.stopPropagation();">
+            <button onclick="closeImageModal()"
+                class="absolute top-4 right-4 bg-white rounded-full p-2 hover:bg-gray-100 transition-all">
+                <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <img id="modalImage" src="" alt="Work File" class="w-full h-auto rounded-2xl shadow-2xl mb-4">
+            <div class="flex justify-center">
+                <a id="downloadImageBtn" href="#" download class="bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-xl text-sm px-5 py-2">
+                    <i class="fa fa-download mr-2"></i> ดาวน์โหลดรูปภาพ
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -800,6 +823,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
             this.disabled = true;
             window.location = "order_cancel.php?order_id=" + cancelOrderId;
         };
+
+        function openImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('downloadImageBtn').href = src;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
     </script>
 </body>
 

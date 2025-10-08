@@ -238,12 +238,14 @@ function getWorkVersionSteps($version)
 // ฟังก์ชันสำหรับแสดงขั้นตอนความคืบหน้าของออเดอร์
 function getOrderProgressSteps($status)
 {
+    if ($status === 'cancelled') {
+        return [[['label' => 'ยกเลิกออเดอร์', 'key' => 'cancelled']], 0];
+    }
     // กำหนดขั้นตอนและสถานะปัจจุบัน
     $steps = [
         ['label' => 'กำลังตรวจสอบ', 'key' => 'pending'],
         ['label' => 'กำลังออกแบบ', 'key' => 'in_progress'],
-        ['label' => 'ส่งแบบร่าง', 'key' => 'waiting_approve'],
-        ['label' => 'ส่งงานไฟล์สุดท้าย', 'key' => 'completed'],
+        ['label' => 'เสร็จสมบูรณ์', 'key' => 'completed'],
     ];
     // หาค่า index ขั้นตอนปัจจุบัน
     switch ($status) {
@@ -253,11 +255,8 @@ function getOrderProgressSteps($status)
         case 'in_progress':
             $current = 1;
             break;
-        case 'waiting_approve':
-            $current = 2;
-            break;
         case 'completed':
-            $current = 3;
+            $current = 2;
             break;
         default:
             $current = 0;
@@ -962,28 +961,28 @@ function getOrderProgressSteps($status)
                     <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
                         <div class="border-b bg-gray-50 rounded-t-2xl flex items-center justify-between">
                             <h2 class="text-md font-semibold p-2 pl-4">อัปเดทสถานะ</h2>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium mr-2
+                            <span class="px-3 py-1 rounded-full text-xs font-medium">
                                 <?= getOrderStatusTH($order['status']) ?? '' ?>
                             </span>
                         </div>
                         <div class=" p-4">
-                                <form method="post">
-                                    <div class="flex items-start space-x-3">
-                                        <div class="flex-1 space-y-4">
-                                            <div class="">
-                                                <select name="order_status" id="order_status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                    <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>รอตรวจสอบ</option>
-                                                    <option value="in_progress" <?= $order['status'] == 'in_progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
-                                                    <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>เสร็จสมบูรณ์</option>
-                                                    <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>ยกเลิก</option>
-                                                </select>
-                                            </div>
-                                            <div class="">
-                                                <button type="submit" class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">อัปเดทสถานะ</button>
-                                            </div>
+                            <form method="post">
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-1 space-y-4">
+                                        <div class="">
+                                            <select name="order_status" id="order_status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>รอตรวจสอบ</option>
+                                                <option value="in_progress" <?= $order['status'] == 'in_progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
+                                                <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>เสร็จสมบูรณ์</option>
+                                                <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>ยกเลิก</option>
+                                            </select>
+                                        </div>
+                                        <div class="">
+                                            <button type="submit" class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">อัปเดทสถานะ</button>
                                         </div>
                                     </div>
-                                </form>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <?php
@@ -1082,7 +1081,7 @@ function getOrderProgressSteps($status)
     <!-- Image Modal -->
     <div id="imageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md bg-opacity-50 hidden"
         onclick="closeImageModal()">
-        <div class="relative max-w-4xl w-full">
+        <div class="relative max-w-4xl w-full" onclick="event.stopPropagation();">
             <button onclick="closeImageModal()"
                 class="absolute top-4 right-4 bg-white rounded-full p-2 hover:bg-gray-100 transition-all">
                 <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1090,7 +1089,12 @@ function getOrderProgressSteps($status)
                     </path>
                 </svg>
             </button>
-            <img id="modalImage" src="" alt="Work File" class="w-full h-auto rounded-lg shadow-2xl">
+            <img id="modalImage" src="" alt="Work File" class="w-full h-auto rounded-2xl shadow-2xl mb-4">
+            <div class="flex justify-center">
+                <a id="downloadImageBtn" href="#" download class="bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-xl text-sm px-5 py-2">
+                     ดาวน์โหลดรูปภาพ
+                </a>
+            </div>
         </div>
     </div>
 
@@ -1104,6 +1108,7 @@ function getOrderProgressSteps($status)
 
         function openImageModal(src) {
             document.getElementById('modalImage').src = src;
+            document.getElementById('downloadImageBtn').href = src;
             document.getElementById('imageModal').classList.remove('hidden');
         }
 
