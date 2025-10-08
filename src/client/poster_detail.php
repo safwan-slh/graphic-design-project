@@ -626,59 +626,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                             <?php endforeach; ?>
                         </div>
                     </div>
-
-                    <?php if ($order['status'] !== 'cancelled'): ?>
-                        <!-- Chat -->
-                        <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
-                            <div class="border-b bg-gray-50 rounded-t-2xl">
-                                <h2 class="text-md font-semibold p-2 pl-4">แชทกับนักออกแบบ</h2>
-                            </div>
-                            <div class="p-2">
-                                <div class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200">
-                                    <div class="space-y-4">
-                                        <div class="flex items-start">
-                                            <div class="mr-10">
-                                                <div class="bg-gray-200 rounded-2xl rounded-bl-none py-2 px-4 inline-block">
-                                                    <p class="text-gray-800">สวัสดีครับ ผมส่งตัวอย่างโลโก้รอบแรกมาให้ดูครับ</p>
-                                                </div>
-                                                <p class="text-xs text-gray-500 mt-1">16/08/2023 14:30 น.</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start flex-row-reverse">
-                                            <div class="ml-10 ">
-                                                <div class="bg-zinc-900 rounded-2xl rounded-br-none py-2 px-4 inline-block">
-                                                    <p class="text-white">สวัสดีค่ะ ชอบแนวทางนี้ค่ะ แต่ช่วยปรับสีฟ้าให้เข้มขึ้นหน่อยได้ไหมคะ</p>
-                                                </div>
-                                                <p class="text-xs text-gray-500 mt-1 text-right">16/08/2023 15:45 น.</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start">
-                                            <div class="mr-10">
-                                                <div class="bg-gray-200 rounded-2xl rounded-bl-none py-2 px-4 inline-block">
-                                                    <p class="text-gray-800">ได้ครับ เดี๋ยวผมปรับให้ครับ น่าจะเสร็จพรุ่งนี้เช้าครับ</p>
-                                                </div>
-                                                <p class="text-xs text-gray-500 mt-1">16/08/2023 16:20 น.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-2">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-1 space-y-2">
-                                        <div class="">
-                                            <textarea rows="2" class="block w-full rounded-2xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="พิมพ์ข้อความ..."></textarea>
-                                        </div>
-                                        <div class="">
-                                            <button class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
-                                                ส่งข้อความ
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                    
+                    <!-- Chat -->
+                    <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                        <div class="border-b bg-gray-50 rounded-t-2xl">
+                            <h2 class="text-md font-semibold p-2 pl-4">แชทกับนักออกแบบ</h2>
+                        </div>
+                        <div class="p-2">
+                            <div id="chatBox" class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200 max-h-80 overflow-y-auto space-y-4">
+                                <!-- ข้อความแชทจะถูกเติมที่นี่ด้วย JS -->
+                                <div class="text-gray-400 text-center" id="chatLoading">กำลังโหลด...</div>
                             </div>
                         </div>
-                    <?php endif; ?>
+                        <div class="p-2">
+                            <form id="chatForm" class="flex items-start space-x-3">
+                                <div class="flex-1 space-y-2">
+                                    <textarea id="chatInput" rows="2" required class="block w-full rounded-2xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="พิมพ์ข้อความ..."></textarea>
+                                    <button type="submit" class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
+                                        ส่งข้อความ
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions -->
                     <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
                         <div class="border-b bg-gray-50 rounded-t-2xl">
@@ -833,6 +804,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
         function closeImageModal() {
             document.getElementById('imageModal').classList.add('hidden');
         }
+    </script>
+    <script>
+        const orderId = <?= (int)$order_id ?>;
+        const chatBox = document.getElementById('chatBox');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+
+        function fetchChat() {
+            fetch('/graphic-design/src/chat/get_messages.php?order_id=' + orderId)
+                .then(res => res.json())
+                .then(data => {
+                    chatBox.innerHTML = '';
+                    if (data.success && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            const isMe = msg.sender_role === 'customer';
+                            chatBox.innerHTML += `
+                        <div class="flex ${isMe ? 'flex-row-reverse' : ''} items-start">
+                            <div class="${isMe ? 'ml-10' : 'mr-10'}">
+                                <div class="${isMe ? 'bg-zinc-900 text-white rounded-2xl rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-2xl rounded-bl-none'} py-2 px-4 inline-block">
+                                    <p>${msg.message.replace(/\n/g, '<br>')}</p>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1 ${isMe ? 'text-right' : ''}">
+                                    ${new Date(msg.created_at).toLocaleString('th-TH', { hour12: false })}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                        });
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    } else {
+                        chatBox.innerHTML = '<div class="text-gray-400 text-center">ยังไม่มีข้อความในแชทนี้</div>';
+                    }
+                });
+        }
+        fetchChat();
+        setInterval(fetchChat, 4000);
+
+        chatForm.onsubmit = function(e) {
+            e.preventDefault();
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            fetch('/graphic-design/src/chat/send_message.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `order_id=${orderId}&message=${encodeURIComponent(msg)}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        chatInput.value = '';
+                        fetchChat();
+                    }
+                });
+        };
     </script>
 </body>
 

@@ -25,15 +25,47 @@ $notifications = [];
 $unreadCount = 0;
 if (isset($_SESSION['customer_id'])) {
   $cid = $_SESSION['customer_id'];
-  $sql = "SELECT * FROM notifications WHERE customer_id=? AND is_admin=0 ORDER BY created_at DESC LIMIT 10";
+  // นับเฉพาะแจ้งเตือนที่ไม่ใช่ chat
+  $sql = "SELECT COUNT(*) FROM notifications WHERE customer_id=? AND is_admin=0 AND is_read=0 AND type != 'chat'";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $cid);
+  $stmt->execute();
+  $result = $stmt->get_result()->fetch_assoc();
+  $unreadCount = $result['cnt'] ?? 0;
+
+  $sql = "SELECT * FROM notifications WHERE customer_id=? AND is_admin=0 AND type != 'chat' ORDER BY created_at DESC LIMIT 10";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $cid);
   $stmt->execute();
   $result = $stmt->get_result();
   while ($row = $result->fetch_assoc()) {
     $notifications[] = $row;
-    if ($row['is_read'] == 0) $unreadCount++;
   }
+}
+// นับข้อความแชทที่ยังไม่ได้อ่าน
+$unreadChatCount = 0;
+if (isset($_SESSION['customer_id'])) {
+  $cid = $_SESSION['customer_id'];
+  $sql = "SELECT COUNT(*) as cnt FROM chat_messages WHERE order_id IN (SELECT order_id FROM orders WHERE customer_id=?) AND sender_role='admin' AND is_read=0";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $cid);
+  $stmt->execute();
+  $result = $stmt->get_result()->fetch_assoc();
+  $unreadChatCount = $result['cnt'] ?? 0;
+}
+// ดึง order ทั้งหมดที่ลูกค้าคนนี้เคยมีแชท
+$ordersWithChat = [];
+if (isset($_SESSION['customer_id'])) {
+  $cid = $_SESSION['customer_id'];
+  $sql = "SELECT o.order_id, o.order_code
+            FROM orders o
+            WHERE o.customer_id = ?
+            AND EXISTS (SELECT 1 FROM chat_messages c WHERE c.order_id = o.order_id)
+            ORDER BY o.created_at DESC";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $cid);
+  $stmt->execute();
+  $ordersWithChat = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 ?>
 <!DOCTYPE html>
@@ -138,11 +170,16 @@ if (isset($_SESSION['customer_id'])) {
               </ul>
             </div>
           </div>
-          <button class="w-9 h-9 rounded-full text-zinc-900 hover:bg-zinc-200 flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-105 transition-all duration-300" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-              <path fill-rule="evenodd" d="M4.804 21.644A6.707 6.707 0 0 0 6 21.75a6.721 6.721 0 0 0 3.583-1.029c.774.182 1.584.279 2.417.279 5.322 0 9.75-3.97 9.75-9 0-5.03-4.428-9-9.75-9s-9.75 3.97-9.75 9c0 2.409 1.025 4.587 2.674 6.192.232.226.277.428.254.543a3.73 3.73 0 0 1-.814 1.686.75.75 0 0 0 .44 1.223ZM8.25 10.875a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25ZM10.875 12a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875-1.125a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25Z" clip-rule="evenodd" />
-            </svg>
-          </button>
+          <div class="relative" id="openChatModalBtn">
+            <button class="w-9 h-9 rounded-full text-zinc-900 hover:bg-zinc-200 flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-105 transition-all duration-300" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M4.804 21.644A6.707 6.707 0 0 0 6 21.75a6.721 6.721 0 0 0 3.583-1.029c.774.182 1.584.279 2.417.279 5.322 0 9.75-3.97 9.75-9 0-5.03-4.428-9-9.75-9s-9.75 3.97-9.75 9c0 2.409 1.025 4.587 2.674 6.192.232.226.277.428.254.543a3.73 3.73 0 0 1-.814 1.686.75.75 0 0 0 .44 1.223ZM8.25 10.875a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25ZM10.875 12a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875-1.125a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25Z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <?php if ($unreadChatCount > 0): ?>
+              <span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $unreadChatCount ?></span>
+            <?php endif; ?>
+          </div>
           <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="w-9 h-9 rounded-full bg-gradient-to-r from-zinc-900 to-zinc-900 hover:bg-zinc-600 flex items-center justify-center text-xs font-bold text-zinc-50 cursor-pointer hover:scale-105 transition-all duration-300" type="button">
             <?= $initial ?>
           </button>
@@ -161,15 +198,6 @@ if (isset($_SESSION['customer_id'])) {
                   </a>
                 </li>
               <?php endif; ?>
-              <!-- <li>
-                <a href="#" class="flex items-center justify-between px-3 py-2 text-sm rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
-                  ตั้งค่า
-                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" stroke-width="2" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-                    <path strokeLinecap="round" stroke-width="2" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  </svg>
-                </a>
-              </li> -->
               <li>
                 <a href="/graphic-design/src/auth/logout.php" class=" flex items-center justify-between px-3 py-2 text-sm rounded-lg bg-zinc-50 text-red-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
                   ออกจากระบบ
@@ -194,7 +222,61 @@ if (isset($_SESSION['customer_id'])) {
     </div>
     </div>
   </nav>
+  <!-- Chat Modal -->
+  <div id="chatModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+    <div class="bg-gray-100 p-3 rounded-3xl shadow-xl w-full max-w-3xl mx-auto relative flex space-x-3 max-h-[80vh]" style="height: 500px;">
+      <!-- Sidebar: รายการออเดอร์ -->
+      <div class="w-64 bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
+        <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">ประวัติแชทของคุณ</div>
+        <ul id="orderList">
+          <?php foreach ($ordersWithChat as $order): ?>
+            <?php
+            // Query หาจำนวนแชทยังไม่อ่านของแต่ละ order
+            $sql = "SELECT COUNT(*) as unread FROM chat_messages WHERE order_id=? AND sender_role='admin' AND is_read=0";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $order['order_id']);
+            $stmt->execute();
+            $unread = $stmt->get_result()->fetch_assoc()['unread'] ?? 0;
+            ?>
+            <li class="p-2 text-sm pb-0">
+              <button type="button"
+                class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center hover:ring-1 hover:ring-gray-200 <?= $unread > 0 ? 'font-bold' : 'font-medium text-gray-500 bg-gray-50' ?>"
+                onclick="selectOrderChat(<?= $order['order_id'] ?>)">
+                ออเดอร์ #<?= htmlspecialchars($order['order_code']) ?>
+                <?php if ($unread > 0): ?>
+                  <span class="bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $unread ?></span>
+                <?php endif; ?>
+              </button>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+      <!-- Main Chat Area -->
+      <div class="flex-1 flex flex-col bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
+        <button onclick="closeChatModal()" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">
+          <h2 class="text-md font-semibold" id="chatOrderTitle">แชทกับทีมงาน</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4" id="chatBoxModal" style="min-height:200px;">
+          <div class="text-gray-400 text-center" id="chatLoadingModal">กรุณาเลือกออเดอร์เพื่อดูแชท</div>
+        </div>
+        <form id="chatFormModal" class="p-4 border-t flex gap-2">
+          <textarea id="chatInputModal" rows="1" required class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900" placeholder="พิมพ์ข้อความ..."></textarea>
+          <button type="submit" class="bg-gray-900 hover:bg-zinc-800 text-white font-medium rounded-xl text-sm px-4 py-2 flex items-center justify-center hover:scale-105 transition-all duration-300 ease-in-out">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+              <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+  <script src="/graphic-design/src/chat/chat-modal.js"></script>
   <script>
     document.getElementById('notifBell').addEventListener('click', function(e) {
       e.stopPropagation();
