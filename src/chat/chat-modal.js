@@ -87,13 +87,20 @@ function selectOrderChat(orderId) {
       ? "แชทสอบถามทั่วไป"
       : "แชทกับทีมงาน (ออเดอร์ #" + orderId + ")";
   document.getElementById("chatFormModal").classList.remove("hidden");
+
   // mark as read
+  let body;
+  if (orderId === 0) {
+    body = "customer_id=" + window.customerId; // ต้องมี window.customerId จาก PHP
+  } else {
+    body = "order_id=" + orderId;
+  }
   fetch("/graphic-design/src/chat/mark_chat_read.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: "order_id=" + orderId,
+    body: body,
   }).then(() => {
     fetchChatModal();
     refreshOrderSidebar();

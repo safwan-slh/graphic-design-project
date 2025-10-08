@@ -46,12 +46,23 @@ if (isset($_SESSION['customer_id'])) {
 $unreadChatCount = 0;
 if (isset($_SESSION['customer_id'])) {
   $cid = $_SESSION['customer_id'];
+  // นับแชทออเดอร์ที่ยังไม่ได้อ่าน
   $sql = "SELECT COUNT(*) as cnt FROM chat_messages WHERE order_id IN (SELECT order_id FROM orders WHERE customer_id=?) AND sender_role='admin' AND is_read=0";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $cid);
   $stmt->execute();
   $result = $stmt->get_result()->fetch_assoc();
   $unreadChatCount = $result['cnt'] ?? 0;
+  $stmt->close();
+
+  // นับแชททั่วไปที่ยังไม่ได้อ่าน
+  $sql = "SELECT COUNT(*) as cnt FROM chat_messages WHERE (order_id IS NULL OR order_id=0) AND customer_id=? AND sender_role='admin' AND is_read=0";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $cid);
+  $stmt->execute();
+  $result = $stmt->get_result()->fetch_assoc();
+  $unreadChatCount += $result['cnt'] ?? 0;
+  $stmt->close();
 }
 ?>
 <!DOCTYPE html>
@@ -322,6 +333,9 @@ if (isset($_SESSION['customer_id'])) {
     document.addEventListener('click', function(e) {
       document.getElementById('notifDropdown').classList.add('hidden');
     });
+  </script>
+  <script>
+    window.customerId = <?= (int)$_SESSION['customer_id'] ?>;
   </script>
 </body>
 
