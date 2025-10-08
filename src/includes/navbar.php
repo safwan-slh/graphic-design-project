@@ -127,7 +127,7 @@ if (isset($_SESSION['customer_id'])) {
                     <li class="mb-1">
                       <a href="/graphic-design/src/notifications/read_notification.php?id=<?= $notif['id'] ?>&redirect=<?= urlencode($notif['link']) ?>"
                         class="block px-4 py-3 text-sm rounded-xl <?= $notif['is_read'] ? 'text-gray-400' : 'text-zinc-900 font-medium' ?> bg-zinc-50 hover:bg-zinc-100 transition">
-                        <?= htmlspecialchars($notif['message']) ?>
+                         <?= $notif['message'] ?>
                         <div class="text-xs text-gray-400 mt-1"><?= date('d/m/Y H:i', strtotime($notif['created_at'])) ?></div>
                       </a>
                     </li>

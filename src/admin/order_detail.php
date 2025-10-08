@@ -45,6 +45,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_status'])) {
     $updateStmt = $conn->prepare($updateSql);
     $updateStmt->bind_param("si", $newStatus, $order_id);
     $updateStmt->execute();
+
+    // --- แจ้งเตือนลูกค้า ---
+    require_once __DIR__ . '/../notifications/notify_helper.php';
+    // ดึง customer_id ของ order นี้
+    $customer_id = $order['customer_id'];
+    // กำหนดข้อความแจ้งเตือน
+    $orderCode = $order['order_code'] ?? $order_id;
+    switch ($newStatus) {
+        case 'pending':
+            $msg = "ออเดอร์ #$orderCode ของคุณอยู่ระหว่างรอตรวจสอบ <span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>รอตรวจสอบ</span>";
+            break;
+        case 'in_progress':
+            $msg = "ออเดอร์ #$orderCode ของคุณกำลังดำเนินการ <span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>กำลังดำเนินการ</span>";
+            break;
+        case 'completed':
+            $msg = "ออเดอร์ #$orderCode ของคุณเสร็จสมบูรณ์แล้ว <span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>เสร็จสมบูรณ์</span>";
+            break;
+        case 'cancelled':
+            $msg = "ออเดอร์ #$orderCode ของคุณถูกยกเลิก <span class='bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ยกเลิก</span>";
+            break;
+        default:
+            $msg = "สถานะออเดอร์ #$orderCode ของคุณถูกอัปเดต";
+    }
+    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+    sendNotification($conn, $customer_id, $msg, $link, 0);
+
     // รีเฟรชหน้าเพื่อแสดงสถานะใหม่
     header("Location: order_detail.php?id=$order_id");
     exit;
@@ -73,6 +99,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['work_files'])) {
             }
         }
     }
+
+    // --- แจ้งเตือนลูกค้าเมื่ออัปโหลดไฟล์งาน ---
+    require_once __DIR__ . '/../notifications/notify_helper.php';
+    $customer_id = $order['customer_id'];
+    $orderCode = $order['order_code'] ?? $order_id;
+    // สร้าง badge เวอร์ชัน
+    switch ($version) {
+        case 'draft1':
+            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
+            break;
+        case 'draft2':
+            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
+            break;
+        case 'final':
+            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
+            break;
+        default:
+            $badge = "";
+    }
+    $msg = "แอดมินอัปโหลดไฟล์งานสำหรับออเดอร์ #$orderCode $badge";
+    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+    sendNotification($conn, $customer_id, $msg, $link, 0);
+
     header("Location: order_detail.php?id=$order_id");
     exit;
 }
@@ -82,18 +131,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
     $version = $_POST['comment_version'];
     $comment = trim($_POST['comment_text']);
     if ($comment !== '') {
-        // ตรวจสอบว่าเป็น admin หรือ customer
+        $isAdmin = false;
         if (isset($_SESSION['admin_id'])) {
-            $customer_id = $_SESSION['admin_id']; // ถ้า admin login ด้วย customer_id ให้ใช้ customer_id ของ admin
+            $commenter_id = $_SESSION['admin_id'];
+            $isAdmin = true;
         } elseif (isset($_SESSION['customer_id'])) {
-            $customer_id = $_SESSION['customer_id'];
+            $commenter_id = $_SESSION['customer_id'];
         } else {
-            $customer_id = $order['customer_id']; // fallback
+            $commenter_id = $order['customer_id'];
         }
         $insertSql = "INSERT INTO work_comments (order_id, version, customer_id, comment, created_at) VALUES (?, ?, ?, ?, NOW())";
         $insertStmt = $conn->prepare($insertSql);
-        $insertStmt->bind_param("isis", $order_id, $version, $customer_id, $comment);
+        $insertStmt->bind_param("isis", $order_id, $version, $commenter_id, $comment);
         $insertStmt->execute();
+
+        // --- แจ้งเตือนแอดมินเมื่อ "ลูกค้า" คอมเมนต์ ---
+        require_once __DIR__ . '/../notifications/notify_helper.php';
+        $orderCode = $order['order_code'] ?? $order_id;
+        // Badge เวอร์ชัน
+        switch ($version) {
+            case 'draft1':
+                $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
+                break;
+            case 'draft2':
+                $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
+                break;
+            case 'final':
+                $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
+                break;
+            default:
+                $badge = "";
+        }
+        $msg = "แอดมินคอมเมนต์ในออเดอร์ #$orderCode $badge";
+        $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+        sendNotification($conn, 1, $msg, $link, 0); // 1 = แจ้งเตือนแอดมิน
+
         header("Location: order_detail.php?id=$order_id");
         exit;
     }
@@ -104,31 +176,15 @@ function getOrderStatusTH($status)
 {
     switch ($status) {
         case 'pending':
-            return 'รอตรวจสอบ';
+            return '<span class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">รอดำเนินการ</span>';
         case 'in_progress':
-            return 'กำลังดำเนินการ';
+            return '<span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">กำลังดำเนินการ</span>';
         case 'completed':
-            return 'เสร็จสมบูรณ์';
+            return '<span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">เสร็จสมบูรณ์</span>';
         case 'cancelled':
-            return 'ยกเลิก';
+            return '<span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">ยกเลิก</span>';
         default:
             return $status;
-    }
-}
-// ฟังก์ชันสำหรับกำหนดคลาส CSS ตามสถานะออเดอร์
-function getOrderStatusClass($status)
-{
-    switch ($status) {
-        case 'pending':
-            return 'text-yellow-600 text-sm font-bold bg-yellow-100 px-3 py-2 rounded-xl';
-        case 'in_progress':
-            return 'text-blue-600 text-sm font-bold bg-blue-100 px-3 py-2 rounded-xl';
-        case 'completed':
-            return 'text-green-600 text-sm font-bold bg-green-100 px-3 py-2 rounded-xl';
-        case 'cancelled':
-            return 'text-red-600 text-sm font-bold bg-red-100 px-3 py-2 rounded-xl';
-        default:
-            return 'text-gray-600 text-sm font-bold bg-gray-100 px-3 py-2 rounded-xl';
     }
 }
 function getPaymentStatusTH($status)
@@ -907,28 +963,27 @@ function getOrderProgressSteps($status)
                         <div class="border-b bg-gray-50 rounded-t-2xl flex items-center justify-between">
                             <h2 class="text-md font-semibold p-2 pl-4">อัปเดทสถานะ</h2>
                             <span class="px-3 py-1 rounded-full text-xs font-medium mr-2
-                                 <?= getOrderStatusClass($order['status']) ?? '' ?>">
                                 <?= getOrderStatusTH($order['status']) ?? '' ?>
                             </span>
                         </div>
-                        <div class="p-4">
-                            <form method="post">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-1 space-y-4">
-                                        <div class="">
-                                            <select name="order_status" id="order_status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>รอตรวจสอบ</option>
-                                                <option value="in_progress" <?= $order['status'] == 'in_progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
-                                                <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>เสร็จสมบูรณ์</option>
-                                                <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>ยกเลิก</option>
-                                            </select>
-                                        </div>
-                                        <div class="">
-                                            <button type="submit" class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">อัปเดทสถานะ</button>
+                        <div class=" p-4">
+                                <form method="post">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-1 space-y-4">
+                                            <div class="">
+                                                <select name="order_status" id="order_status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                    <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>รอตรวจสอบ</option>
+                                                    <option value="in_progress" <?= $order['status'] == 'in_progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
+                                                    <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>เสร็จสมบูรณ์</option>
+                                                    <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>ยกเลิก</option>
+                                                </select>
+                                            </div>
+                                            <div class="">
+                                                <button type="submit" class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">อัปเดทสถานะ</button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
                         </div>
                     </div>
                     <?php

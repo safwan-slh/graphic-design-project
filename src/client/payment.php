@@ -88,6 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
     if ($stmt->execute()) {
         $success = "แจ้งชำระเงินเรียบร้อยแล้ว";
+        // --- เพิ่มแจ้งเตือนแอดมินที่นี่ ---
+        require_once __DIR__ . '/../notifications/notify_helper.php';
+        $payment_id = $stmt->insert_id; // ดึง payment_id ที่เพิ่ง insert
+        $message = "ลูกค้าแจ้งชำระเงินสำหรับ Order #{$order['order_code']}";
+        $link = "/graphic-design/src/admin/payment_detail.php?id=" . $payment_id;
+        sendNotification($conn, 1, $message, $link, 1);
     } else {
         $error = "เกิดข้อผิดพลาด: " . $stmt->error;
     }
