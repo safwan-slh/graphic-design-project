@@ -1099,6 +1099,41 @@ function getOrderProgressSteps($status)
                             </form>
                         </div>
                     </div>
+
+                    <?php
+                    $review = $conn->query("SELECT * FROM reviews WHERE order_id={$order['order_id']}")->fetch_assoc();
+                    if ($review):
+                    ?>
+                        <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                            <div class="border-b bg-gray-50 rounded-t-2xl flex justify-between items-center">
+                                <h2 class="text-md font-semibold p-2 pl-4">รีวิวออเดอร์ของคุณ</h2>
+                            </div>
+                            <div class="p-4">
+                                <div class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200">
+                                    <div class="flex"><?= str_repeat('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-yellow-400">
+                                        <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                                        </svg>
+                                        ', $review['rating']) ?>
+                                    </div>
+                                    <div class="py-2">
+                                        <label class="block text-sm font-medium text-gray-700">ความคิดเห็น:</label>
+                                        <div class="block text-sm font-medium text-gray-400"><?= htmlspecialchars($review['comment']) ?></div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-2xl overflow-hidden">
+                                        <?php if ($review['image']): ?>
+                                            <img src="/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>" alt="รีวิว" style="max-width: auto; max-height: 400px;"
+                                                class="object-cover rounded border hover:opacity-90 cursor-pointer"
+                                                style="aspect-ratio: 1/1;"
+                                                onclick="openImageModal('/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>')">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="py-2">
+                                        <p class="text-xs text-gray-400">อัปเดตเมื่อ: <?= $review['updated_at'] ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
