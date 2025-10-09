@@ -96,6 +96,7 @@ function notifyComment($conn, $isAdmin, $order_id, $orderCode, $customer_id, $ve
     sendNotification($conn, $customer_id, $msg, $link, 0, 'comment');
 }
 
+// แจ้งเตือนแชท (ทั่วไป/ออเดอร์)
 function notifyChat($conn, $to_admin, $customer_id, $order_id = null, $order_code = null, $type = 'order') {
     if ($to_admin) {
         $msg = $type === 'order'
@@ -114,4 +115,11 @@ function notifyChat($conn, $to_admin, $customer_id, $order_id = null, $order_cod
             : "/graphic-design/src/client/chat_general.php";
         sendNotification($conn, $customer_id, $msg, $link, 0, 'chat');
     }
+}
+
+// แจ้งเตือนแอดมินเมื่อ "ลูกค้า" รีวิวออเดอร์
+function notifyReviewToAdmin($conn, $order_id, $customer_id) {
+    $msg = "ลูกค้าได้รีวิวออเดอร์ #$order_id";
+    $link = "/graphic-design/src/admin/order_detail.php?id=$order_id";
+    sendNotification($conn, 1, $msg, $link, 1, 'review');
 }

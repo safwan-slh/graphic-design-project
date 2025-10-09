@@ -1,6 +1,5 @@
 <?php
 require_once '../includes/db_connect.php';
-require_once __DIR__ . '/../notifications/notify_helper.php';
 session_start();
 
 $order_id = $_POST['order_id'];
@@ -27,10 +26,9 @@ if ($order_id && $customer_id && $rating) {
     $stmt->bind_param("iiiss", $order_id, $customer_id, $rating, $comment, $image);
     $stmt->execute();
 
-    // แจ้งเตือนแอดมิน
-    $msg = "ลูกค้าได้รีวิวออเดอร์ #$order_id";
-    $link = "/graphic-design/src/admin/order_detail.php?id=$order_id";
-    sendNotification($conn, 1, $msg, $link, 1); // 1 = แจ้งเตือน admin
+    // แจ้งเตือนรีวิวไปยังแอดมิน
+    require_once __DIR__ . '/../notifications/notify_helper.php';
+    notifyReviewToAdmin($conn, $order_id, $customer_id);
 
     header("Location: /graphic-design/src/client/poster_detail.php?order_id=$order_id&review=success");
     exit;
