@@ -27,4 +27,9 @@ function notifyPaymentStatusToCustomer($conn, $customer_id, $order_id, $order_co
     sendNotification($conn, $customer_id, $message, $link, 0, 'payment');
 }
 
-// เพิ่มฟังก์ชันอื่นๆ ตามประเภทแจ้งเตือนที่ต้องการ
+// แจ้งเตือนแอดมินเมื่อลูกค้ายกเลิกออเดอร์
+function notifyOrderCancelledToAdmin($conn, $order_id, $order_code) {
+    $message = "ลูกค้าได้ยกเลิก Order #$order_code";
+    $link = "/graphic-design/src/admin/order_detail.php?id=$order_id";
+    sendNotification($conn, 1, $message, $link, 1, 'order');
+}

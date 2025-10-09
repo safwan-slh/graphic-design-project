@@ -1,4 +1,5 @@
 <?php
+// filepath: /Applications/MAMP/htdocs/graphic-design/src/notifications/cancel_order.php
 require_once __DIR__ . '/../includes/db_connect.php';
 require_once __DIR__ . '/notify_helper.php';
 session_start();
@@ -20,9 +21,7 @@ if ($order_id && $customer_id) {
     $orderCode = $order['order_code'] ?? $order_id;
 
     // เรียกใช้ฟังก์ชันแจ้งเตือน admin
-    $message = "ลูกค้าได้ยกเลิก Order #{$orderCode}";
-    $link = "/graphic-design/src/admin/order_detail.php?id=" . $order_id;
-    sendNotification($conn, 1, $message, $link, 1);
+    notifyOrderCancelledToAdmin($conn, $order_id, $orderCode);
 
     header("Location: /graphic-design/src/client/order.php?cancel=success");
     exit;
