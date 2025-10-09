@@ -626,7 +626,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    
+
                     <!-- Chat -->
                     <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
                         <div class="border-b bg-gray-50 rounded-t-2xl">
@@ -650,81 +650,136 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                         </div>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
-                        <div class="border-b bg-gray-50 rounded-t-2xl">
-                            <h2 class="text-md font-semibold p-2 pl-4">การดำเนินการ</h2>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-3">
-                                <button class="w-full flex items-center justify-between p-3 border border-gray-200 rounded-2xl hover:bg-gray-50">
-                                    <span>แจ้งปัญหาหรือคำถาม</span>
-                                    <i class="fas fa-question-circle text-gray-400"></i>
-                                </button>
-                                <?php if (in_array($order['status'], ['pending', 'in_progress'])): ?>
-                                    <button onclick="event.stopPropagation(); confirmCancel(<?= $order['order_id'] ?>, '<?= $order['status'] ?>');"
-                                        class="w-full flex items-center justify-between p-3 border border-red-200 text-red-600 rounded-2xl hover:bg-red-50">
-                                        <span>ยกเลิกงาน</span>
-                                        <i class="fas fa-times text-red-400"></i>
-                                    </button>
-                                <?php elseif (in_array($order['status'], ['completed', 'cancelled'])): ?>
-                                    <a href="/graphic-design/src/client/poster_form.php?service_id=1"
-                                        class="w-full flex items-center justify-between p-3 border border-blue-200 text-blue-600 rounded-2xl hover:bg-blue-50">
-                                        <span>สั่งซ้ำ</span>
-                                        <i class="fas fa-redo text-blue-400"></i>
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <?php if ($order['status'] !== 'completed'): ?>
-                        <!-- Review -->
-                        <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                    <!-- Review -->
+                    <?php
+                    $review = $conn->query("SELECT * FROM reviews WHERE order_id={$order['order_id']} AND customer_id={$_SESSION['customer_id']}")->fetch_assoc();
+                    $isEdit = $review ? true : false;
+                    ?>
+                    <?php if ($order['status'] === 'completed'): ?>
+                        <div id="reviewForm" class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200" <?= $isEdit ? 'style="display:none;"' : '' ?>>
                             <div class="border-b bg-gray-50 rounded-t-2xl">
-                                <h2 class="text-md font-semibold p-2 pl-4">ให้คะแนนงานนี้</h2>
+                                <h2 class="text-md font-semibold p-2 pl-4"><?= $isEdit ? 'แก้ไขรีวิว' : 'ให้คะแนนงานนี้' ?></h2>
                             </div>
-                            <div class="p-6">
-                                <p class="text-sm text-gray-500 mb-4">คุณพอใจกับงานออกแบบนี้หรือไม่?</p>
-                                <div class="flex items-center">
-                                    <button class="text-gray-300 hover:text-yellow-400 focus:outline-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            <form method="post" action="/graphic-design/src/review/<?= $isEdit ? 'edit_review.php' : 'submit_review.php' ?>" enctype="multipart/form-data">
+                                <input type="hidden" name="order_id" value="<?= (int)$order_id ?>">
+                                <?php if ($isEdit): ?>
+                                    <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                                <?php endif; ?>
+                                <div class="p-6 pb-0">
+                                    <div class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200 items-center flex flex-col">
+                                        <p class="text-sm text-gray-500 mb-4">คุณพอใจกับงานออกแบบนี้หรือไม่?</p>
+                                        <!-- Star Rating -->
+                                        <div class="flex items-center space-x-1 mb-2" id="starRating">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <button type="button" class="star text-3xl <?= ($isEdit && $i <= $review['rating']) ? 'text-yellow-400' : 'text-gray-300' ?>" data-value="<?= $i ?>">&#9733;</button>
+                                            <?php endfor; ?>
+                                            <input type="hidden" name="rating" id="ratingInput" value="<?= $isEdit ? $review['rating'] : '' ?>" required>
+                                        </div>
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                const stars = document.querySelectorAll('#starRating .star');
+                                                const ratingInput = document.getElementById('ratingInput');
+                                                stars.forEach(star => {
+                                                    star.addEventListener('click', function() {
+                                                        const val = this.getAttribute('data-value');
+                                                        ratingInput.value = val;
+                                                        stars.forEach((s, idx) => {
+                                                            s.classList.toggle('text-yellow-400', idx < val);
+                                                            s.classList.toggle('text-gray-300', idx >= val);
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-1 space-y-2">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700">อัปโหลดรูปภาพ (ถ้ามี)</label>
+                                                <input type="file" name="image" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl block w-full" accept=".jpg,.jpeg,.png">
+                                                <?php if ($isEdit && $review['image']): ?>
+                                                    <div class="mt-2">
+                                                        <img src="/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>" alt="รีวิว" style="max-width:100px;">
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700">แสดงความคิดเห็น</label>
+                                                <textarea name="comment" rows="2" class="block w-full rounded-2xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900" placeholder="พิมพ์ข้อความรีวิว..."><?= $isEdit ? htmlspecialchars($review['comment']) : '' ?></textarea>
+                                            </div>
+                                            <div>
+                                                <button type="submit" class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
+                                                    <?= $isEdit ? 'บันทึกการแก้ไข' : 'ส่งรีวิว' ?>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php
+                    $review = $conn->query("SELECT * FROM reviews WHERE order_id={$order['order_id']}")->fetch_assoc();
+                    if ($review):
+                    ?>
+                        <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                            <div class="border-b bg-gray-50 rounded-t-2xl flex justify-between items-center">
+                                <h2 class="text-md font-semibold p-2 pl-4">รีวิวออเดอร์ของคุณ</h2>
+                                <!-- ปุ่ม Dropdown -->
+                                <div class="relative inline-block text-left">
+                                    <button id="dropdownReviewBtn" type="button" class="p-1 hover:bg-gray-200 rounded-lg mr-4" onclick="toggleReviewDropdown()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                            <path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
                                         </svg>
                                     </button>
-                                    <button class="text-gray-300 hover:text-yellow-400 focus:outline-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </button>
-                                    <button class="text-gray-300 hover:text-yellow-400 focus:outline-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </button>
-                                    <button class="text-gray-300 hover:text-yellow-400 focus:outline-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </button>
-                                    <button class="text-gray-300 hover:text-yellow-400 focus:outline-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </button>
+                                    <div id="dropdownReviewMenu" class="hidden absolute right-0 mt-2 w-44 bg-white divide-y rounded-xl shadow-md border ring-1 ring-gray-200 z-50">
+                                        <ul class="space-y-2 p-2 py-2 text-sm text-gray-700">
+                                            <li>
+                                                <a href="#reviewForm" onclick="event.preventDefault(); showReviewForm();" class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-blue-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
+                                                    แก้ไข
+                                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                                                    </svg>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/graphic-design/src/review/delete_review.php?review_id=<?= $review['id'] ?>&order_id=<?= $order_id ?>"
+                                                    onclick="return confirm('ยืนยันลบรีวิวนี้?');"
+                                                    class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-red-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
+                                                    ลบ
+                                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-2">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-1 space-y-2">
-                                        <div class="">
-                                            <textarea rows="2" class="block w-full rounded-2xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="พิมพ์ข้อความ..."></textarea>
-                                        </div>
-                                        <div class="">
-                                            <button class="w-full text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center">
-                                                ส่งรีวิว
-                                            </button>
-                                        </div>
+                            <div class="p-4">
+                                <div class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200">
+                                    <div class="flex"><?= str_repeat('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-yellow-400">
+                                        <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                                        </svg>
+                                        ', $review['rating']) ?>
+                                    </div>
+                                    <div class="py-2">
+                                        <label class="block text-sm font-medium text-gray-700">ความคิดเห็น:</label>
+                                        <div class="block text-sm font-medium text-gray-400"><?= htmlspecialchars($review['comment']) ?></div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-2xl overflow-hidden">
+                                        <?php if ($review['image']): ?>
+                                            <img src="/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>" alt="รีวิว" style="max-width: auto; max-height: 400px;"
+                                                class="object-cover rounded border hover:opacity-90 cursor-pointer"
+                                                style="aspect-ratio: 1/1;"
+                                                onclick="openImageModal('/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>')">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="py-2">
+                                        <p class="text-xs text-gray-400">อัปเดตเมื่อ: <?= $review['updated_at'] ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -860,6 +915,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                     }
                 });
         };
+    </script>
+    <script>
+        function showReviewForm() {
+            document.getElementById('reviewForm').style.display = 'block';
+            document.getElementById('dropdownReviewMenu').classList.add('hidden');
+            // scroll ไปที่ฟอร์ม
+            document.getElementById('reviewForm').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+
+        function toggleReviewDropdown() {
+            document.getElementById('dropdownReviewMenu').classList.toggle('hidden');
+        }
+
+        function scrollToReviewForm() {
+            const form = document.querySelector('form[action*="edit_review.php"], form[action*="submit_review.php"]');
+            if (form) form.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            document.getElementById('dropdownReviewMenu').classList.add('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('dropdownReviewBtn').contains(e.target) &&
+                !document.getElementById('dropdownReviewMenu').contains(e.target)) {
+                document.getElementById('dropdownReviewMenu').classList.add('hidden');
+            }
+        });
     </script>
 </body>
 
