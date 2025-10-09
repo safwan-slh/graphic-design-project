@@ -149,5 +149,20 @@ CREATE TABLE notifications (
     link VARCHAR(255),
     is_read TINYINT(1) DEFAULT 0,
     is_admin TINYINT(1) DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    type VARCHAR(20) DEFAULT 'general'
+);
+
+-- ตารางแชทข้อความ
+CREATE TABLE chat_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    customer_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    sender_role ENUM('customer', 'admin') NOT NULL,
+    message TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_read TINYINT(1) DEFAULT 0,
+    INDEX(order_id),
+    INDEX(sender_id)
 );
