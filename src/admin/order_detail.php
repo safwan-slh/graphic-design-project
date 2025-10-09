@@ -770,6 +770,10 @@ function getOrderProgressSteps($status)
                                         </div>
                                     </form>
                                 </div>
+                            <?php else: ?>
+                                <div class="border border-gray-200 rounded-2xl p-8 text-center text-gray-400 text-sm">
+                                    ขณะนี้ยังไม่มีไฟล์งานแบบร่างที่ 1<br>กรุณาอัปโหลดไฟล์งานให้ลูกค้าตรวจสอบ
+                                </div>
                             <?php endif; ?>
 
                             <!-- Draft 2 -->
@@ -1155,7 +1159,7 @@ function getOrderProgressSteps($status)
                             const isAdmin = msg.sender_role === 'admin';
                             chatBox.innerHTML += `
                         <div class="flex ${isAdmin ? 'flex-row-reverse' : ''} items-start">
-                            <div class="${isAdmin ? 'ml-10' : 'mr-10'}">
+                            <div class="${isAdmin ? 'text-right' : 'text-left'}">
                                 <div class="${isAdmin ? 'bg-zinc-900 text-white rounded-2xl rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-2xl rounded-bl-none'} py-2 px-4 inline-block">
                                     <p>${msg.message.replace(/\n/g, '<br>')}</p>
                                 </div>

@@ -26,7 +26,7 @@ $unreadCount = 0;
 if (isset($_SESSION['customer_id'])) {
   $cid = $_SESSION['customer_id'];
   // นับเฉพาะแจ้งเตือนที่ไม่ใช่ chat
-  $sql = "SELECT COUNT(*) FROM notifications WHERE customer_id=? AND is_admin=0 AND is_read=0 AND type != 'chat'";
+  $sql = "SELECT COUNT(*) as cnt FROM notifications WHERE customer_id=? AND is_admin=0 AND is_read=0 AND type != 'chat'";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $cid);
   $stmt->execute();
