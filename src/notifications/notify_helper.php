@@ -7,18 +7,12 @@ function sendNotification($conn, $customer_id, $message, $link, $is_admin = 0, $
 }
 
 // ฟังก์ชันเฉพาะแต่ละประเภท (ถ้าต้องการ)
-function notifyPaymentApproved($conn, $customer_id, $order_id)
-{
-    $message = "การชำระเงินของคุณสำหรับ Order #$order_id ได้รับการอนุมัติแล้ว";
-    $link = "/client/order.php?order_id=$order_id";
-    sendNotification($conn, $customer_id, $message, $link, 0);
+//ลูกค้าแจ้งชำระเงินสำหรับ Order
+function notifyPaymentToAdmin($conn, $order_code, $payment_id) {
+    $message = "ลูกค้าแจ้งชำระเงินสำหรับ Order #$order_code";
+    $link = "/graphic-design/src/admin/payment_detail.php?id=$payment_id";
+    sendNotification($conn, 1, $message, $link, 1, 'payment');
 }
 
-function notifyOrderCancelledToAdmin($conn, $order_id, $order_code)
-{
-    $message = "ลูกค้าได้ยกเลิก Order #$order_code";
-    $link = "/admin/order_detail.php?id=$order_id";
-    sendNotification($conn, 1, $message, $link, 1);
-}
 
 // เพิ่มฟังก์ชันอื่นๆ ตามประเภทแจ้งเตือนที่ต้องการ
