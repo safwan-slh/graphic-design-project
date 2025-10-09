@@ -104,23 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['work_files'])) {
     require_once __DIR__ . '/../notifications/notify_helper.php';
     $customer_id = $order['customer_id'];
     $orderCode = $order['order_code'] ?? $order_id;
-    // สร้าง badge เวอร์ชัน
-    switch ($version) {
-        case 'draft1':
-            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
-            break;
-        case 'draft2':
-            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
-            break;
-        case 'final':
-            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
-            break;
-        default:
-            $badge = "";
-    }
-    $msg = "แอดมินอัปโหลดไฟล์งานสำหรับออเดอร์ #$orderCode $badge";
-    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
-    sendNotification($conn, $customer_id, $msg, $link, 0);
+    notifyWorkFileUploaded($conn, $customer_id, $order_id, $orderCode, $version);
 
     header("Location: order_detail.php?id=$order_id");
     exit;
@@ -1177,7 +1161,7 @@ function getOrderProgressSteps($status)
             document.getElementById('imageModal').classList.add('hidden');
         }
     </script>
-        <!-- Floating Chat Button Script -->
+    <!-- Floating Chat Button Script -->
     <script>
         const orderId = <?= (int)$order_id ?>;
         const chatBox = document.getElementById('chatBox');
