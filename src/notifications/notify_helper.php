@@ -74,3 +74,24 @@ function notifyAdminCustomerComment($conn, $order_id, $orderCode, $version) {
     $link = "/graphic-design/src/admin/order_detail.php?id=" . $order_id;
     sendNotification($conn, 1, $msg, $link, 1, 'comment');
 }
+
+// แจ้งเตือนลูกค้าเมื่อ "แอดมิน" คอมเมนต์
+function notifyComment($conn, $isAdmin, $order_id, $orderCode, $customer_id, $version) {
+    // กำหนด badge เวอร์ชัน
+    switch ($version) {
+        case 'draft1':
+            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
+            break;
+        case 'draft2':
+            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
+            break;
+        case 'final':
+            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
+            break;
+        default:
+            $badge = "";
+    }
+    $msg = "แอดมินคอมเมนต์ในออเดอร์ #$orderCode $badge";
+    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+    sendNotification($conn, $customer_id, $msg, $link, 0, 'comment');
+}
