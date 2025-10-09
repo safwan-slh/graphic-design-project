@@ -18,19 +18,16 @@ if ($message && $sender_id) {
         $stmt->execute();
 
         // แจ้งเตือนลูกค้า (ถ้าคนส่งคือ admin)
-        if ($sender_role === 'admin') {
-            $msg = "ทีมงานตอบกลับข้อความสอบถามทั่วไปของคุณ";
-            $link = "/graphic-design/src/client/chat_general.php";
-            sendNotification($conn, $customer_id, $msg, $link, 0, 'chat');
-        } else {
-            // แจ้งเตือน admin (เหมือนเดิม)
-            $msg = "ลูกค้าส่งข้อความใหม่ในแชทสอบถามทั่วไป";
-            $link = "/graphic-design/src/admin/general_chat.php?customer_id=" . $customer_id;
-            sendNotification($conn, 1, $msg, $link, 1, 'chat');
+        if ((!$order_id || $order_id == 0) && $customer_id) {
+            // ... insert message ...
+            if ($sender_role === 'admin') {
+                notifyChat($conn, false, $customer_id, null, null, 'general');
+            } else {
+                notifyChat($conn, true, $customer_id, null, null, 'general');
+            }
+            echo json_encode(['success' => true]);
+            exit;
         }
-
-        echo json_encode(['success' => true]);
-        exit;
     }
 
     // แชท order ปกติ
@@ -46,15 +43,10 @@ if ($message && $sender_id) {
         $orderRow = $orderStmt->get_result()->fetch_assoc();
 
         if ($sender_role === 'customer') {
-            $msg = "ลูกค้าส่งข้อความใหม่ในออเดอร์ #{$orderRow['order_code']}";
-            $link = "/graphic-design/src/admin/order_detail.php?id=" . $order_id;
-            sendNotification($conn, 1, $msg, $link, 1, 'chat');
+            notifyChat($conn, true, $orderRow['customer_id'], $order_id, $orderRow['order_code'], 'order');
         } else {
-            $msg = "ทีมงานส่งข้อความใหม่ในออเดอร์ #{$orderRow['order_code']}";
-            $link = "/graphic-design/src/client/poster_detail.php?order_id=" . $order_id;
-            sendNotification($conn, $orderRow['customer_id'], $msg, $link, 0, 'chat');
+            notifyChat($conn, false, $orderRow['customer_id'], $order_id, $orderRow['order_code'], 'order');
         }
-
         echo json_encode(['success' => true]);
         exit;
     }

@@ -95,3 +95,23 @@ function notifyComment($conn, $isAdmin, $order_id, $orderCode, $customer_id, $ve
     $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
     sendNotification($conn, $customer_id, $msg, $link, 0, 'comment');
 }
+
+function notifyChat($conn, $to_admin, $customer_id, $order_id = null, $order_code = null, $type = 'order') {
+    if ($to_admin) {
+        $msg = $type === 'order'
+            ? "ลูกค้าส่งข้อความใหม่ในออเดอร์ #$order_code"
+            : "ลูกค้าส่งข้อความใหม่ในแชทสอบถามทั่วไป";
+        $link = $type === 'order'
+            ? "/graphic-design/src/admin/order_detail.php?id=$order_id"
+            : "/graphic-design/src/admin/general_chat.php?customer_id=$customer_id";
+        sendNotification($conn, 1, $msg, $link, 1, 'chat');
+    } else {
+        $msg = $type === 'order'
+            ? "ทีมงานส่งข้อความใหม่ในออเดอร์ #$order_code"
+            : "ทีมงานตอบกลับข้อความสอบถามทั่วไปของคุณ";
+        $link = $type === 'order'
+            ? "/graphic-design/src/client/poster_detail.php?order_id=$order_id"
+            : "/graphic-design/src/client/chat_general.php";
+        sendNotification($conn, $customer_id, $msg, $link, 0, 'chat');
+    }
+}
