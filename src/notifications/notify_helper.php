@@ -123,3 +123,17 @@ function notifyReviewToAdmin($conn, $order_id, $customer_id) {
     $link = "/graphic-design/src/admin/order_detail.php?id=$order_id";
     sendNotification($conn, 1, $msg, $link, 1, 'review');
 }
+
+// แจ้งเตือนลูกค้าเมื่อรีวิวถูกอนุมัติหรือไม่อนุมัติ
+function notifyReviewApproveStatusToCustomer($conn, $customer_id, $order_id, $is_approved, $reason = '') {
+    if ($is_approved) {
+        $msg = "รีวิวของคุณสำหรับออเดอร์ #$order_id ได้รับการอนุมัติแล้ว";
+    } else {
+        $msg = "รีวิวของคุณสำหรับออเดอร์ #$order_id ไม่ได้รับการอนุมัติ";
+        if ($reason) {
+            $msg .= " เหตุผล: $reason";
+        }
+    }
+    $link = "/graphic-design/src/client/poster_detail.php?order_id=$order_id";
+    sendNotification($conn, $customer_id, $msg, $link, 0, 'review');
+}

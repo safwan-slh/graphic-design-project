@@ -12,6 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("UPDATE reviews SET is_approved = ? WHERE id = ?");
         $stmt->bind_param("ii", $is_approved, $review_id);
         $stmt->execute();
+
+        // ดึง customer_id ของรีวิว
+        $stmt2 = $conn->prepare("SELECT customer_id, order_id FROM reviews WHERE id = ?");
+        $stmt2->bind_param("i", $review_id);
+        $stmt2->execute();
+        $stmt2->bind_result($customer_id, $order_id);
+        $stmt2->fetch();
+        $stmt2->close();
+
+        // แจ้งเตือนลูกค้า
+        require_once '../notifications/notify_helper.php';
+        notifyReviewApproveStatusToCustomer($conn, $customer_id, $order_id, $is_approved);
     }
     header("Location: review_list.php");
     exit;
