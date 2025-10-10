@@ -176,6 +176,7 @@ CREATE TABLE reviews (
     comment TEXT,                  -- ข้อความรีวิว
     image VARCHAR(255),            -- (optional) รูปภาพประกอบรีวิว
     is_approved TINYINT(1) DEFAULT 1, -- (optional) สถานะอนุมัติแสดงผล
+    reason TEXT,                   -- (optional) เหตุผลถ้าไม่อนุมัติ
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(order_id),

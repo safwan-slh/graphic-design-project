@@ -766,6 +766,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                                         <p class="text-xs text-gray-400">อัปเดตเมื่อ: <?= $review['updated_at'] ?></p>
                                     </div>
                                 </div>
+                                <div class="mt-2">
+                                    <?php if ($review && $review['is_approved'] == 0 && !empty($review['reason'])): ?>
+                                        <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3">
+                                            <strong>รีวิวของคุณไม่ได้รับการอนุมัติ</strong><br>
+                                            เหตุผล: <?= htmlspecialchars($review['reason']) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endif; ?>

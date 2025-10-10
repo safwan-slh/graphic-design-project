@@ -7,10 +7,16 @@ requireRole('admin');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $review_id = $_POST['review_id'] ?? null;
     $is_approved = isset($_POST['is_approved']) ? (int)$_POST['is_approved'] : null;
+    $reason = trim($_POST['reason'] ?? '');
 
     if ($review_id !== null && $is_approved !== null) {
-        $stmt = $conn->prepare("UPDATE reviews SET is_approved = ? WHERE id = ?");
-        $stmt->bind_param("ii", $is_approved, $review_id);
+        if ($is_approved === 0) {
+            $stmt = $conn->prepare("UPDATE reviews SET is_approved = ?, reason = ? WHERE id = ?");
+            $stmt->bind_param("isi", $is_approved, $reason, $review_id);
+        } else {
+            $stmt = $conn->prepare("UPDATE reviews SET is_approved = ?, reason = NULL WHERE id = ?");
+            $stmt->bind_param("ii", $is_approved, $review_id);
+        }
         $stmt->execute();
 
         // ดึง customer_id ของรีวิว
@@ -23,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // แจ้งเตือนลูกค้า
         require_once '../notifications/notify_helper.php';
-        notifyReviewApproveStatusToCustomer($conn, $customer_id, $order_id, $is_approved);
+        notifyReviewApproveStatusToCustomer($conn, $customer_id, $order_id, $is_approved, $reason);
     }
     header("Location: review_list.php");
     exit;

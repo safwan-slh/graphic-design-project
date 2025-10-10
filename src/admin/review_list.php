@@ -40,7 +40,7 @@ if ($search_rating !== '') {
 
 $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-$sql = "SELECT r.*, c.fullname, o.order_code 
+$sql = "SELECT r.*, c.fullname, o.order_code, c.email
     FROM reviews r
     JOIN customers c ON r.customer_id = c.customer_id
     JOIN orders o ON r.order_id = o.order_id
@@ -107,10 +107,10 @@ $reviews = $stmt->get_result();
                 <form method="get" class="flex gap-2 items-end">
                     <div class="flex gap-2">
                         <div>
-                            <input type="text" name="customer" placeholder="พิมพ์ชื่อลูกค้า" value="<?= htmlspecialchars($search_customer) ?>" class="border transition rounded-xl text-sm px-3 py-2 flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                            <input type="text" name="customer" placeholder="ค้นหาชื่อลูกค้า" value="<?= htmlspecialchars($search_customer) ?>" class="border transition rounded-xl text-sm px-3 py-2 flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                         </div>
                         <div>
-                            <input type="text" name="order" placeholder="พิมพ์หมายเลขคำสั่งซื้อ" value="<?= htmlspecialchars($search_order) ?>" class="border transition rounded-xl text-sm px-3 py-2 flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                            <input type="text" name="order" placeholder="ค้นหาหมายเลขคำสั่งซื้อ" value="<?= htmlspecialchars($search_order) ?>" class="border transition rounded-xl text-sm px-3 py-2 flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                         </div>
                         <div>
                             <select name="status" class="border transition font-medium rounded-xl text-sm px-10 py-1.5 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
@@ -158,8 +158,8 @@ $reviews = $stmt->get_result();
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ลูกค้า</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ลูกค้า</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">คะแนน</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ข้อความ</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">รูป</th>
@@ -171,8 +171,18 @@ $reviews = $stmt->get_result();
                     <tbody>
                         <?php foreach ($reviews as $review): ?>
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><?= htmlspecialchars($review['fullname']) ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">#<?= htmlspecialchars($review['order_code']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold text-indigo-600">#<?= htmlspecialchars($review['order_code']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">
+                                            <?= htmlspecialchars(mb_substr($review['fullname'], 0, 1)) ?>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="font-medium"><?= htmlspecialchars($review['fullname']) ?></h4>
+                                            <p class="text-sm text-gray-500"><?= htmlspecialchars($review['email']) ?></p>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm"><?= str_repeat('⭐', $review['rating']) ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm"><?= nl2br(htmlspecialchars($review['comment'])) ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -185,26 +195,64 @@ $reviews = $stmt->get_result();
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm"><?= $review['created_at'] ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <form method="post" action="review_approve.php" style="display:inline;">
-                                        <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
-                                        <select name="is_approved" class="border transition font-medium rounded-xl text-sm px-5 py-1 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-                                            onchange="this.form.submit()">
-                                            <option value="0" <?= !$review['is_approved'] ? 'selected' : '' ?>>รออนุมัติ</option>
-                                            <option value="1" <?= $review['is_approved'] ? 'selected' : '' ?>>อนุมัติ</option>
-                                        </select>
-                                    </form>
+                                    <?php if ($review['is_approved'] == 1): ?>
+                                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline w-4 h-4 mr-1">
+                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                                            </svg>
+                                            อนุมัติ</span>
+                                    <?php elseif (!empty($review['reason'])): ?>
+                                        <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline w-4 h-4 mr-1">
+                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                                            </svg>
+                                            ไม่อนุมัติ</span>
+                                    <?php else: ?>
+                                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline w-4 h-4 mr-1">
+                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                                            </svg>
+                                            รออนุมัติ</span>
+                                    <?php endif; ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <a href="delete_review.php?review_id=<?= $review['id'] ?>" onclick="return confirm('ยืนยันลบรีวิวนี้?')" class="text-red-600">ลบ</a>
-                                    <button type="button"
-                                        onclick="showEditForm(
-                                            <?= $review['id'] ?>,
-                                            <?= $review['rating'] ?>,
-                                            this.getAttribute('data-comment'),
-                                            '<?= htmlspecialchars($review['image'] ?? '') ?>'
-                                        )"
-                                        data-comment="<?= htmlspecialchars(json_encode($review['comment']), ENT_QUOTES, 'UTF-8') ?>"
-                                        class="ml-2 text-blue-600 underline">แก้ไข</button>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                                    <div class="relative inline-block text-left">
+                                        <button id="dropdownReviewBtn<?= $review['id'] ?>" data-dropdown-toggle="dropdownReviewMenu<?= $review['id'] ?>"
+                                            class="flex items-center p-1 text-sm font-medium text-center text-gray-400 rounded-lg bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-200"
+                                            type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                                <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <div id="dropdownReviewMenu<?= $review['id'] ?>" class="z-50 hidden absolute right-0 mt-2 w-44 bg-white divide-y rounded-xl shadow-md border ring-1 ring-gray-200">
+                                            <ul class="space-y-2 p-2 py-2 text-sm text-gray-700">
+                                                <li>
+                                                    <button type="button" onclick="showEditForm(
+                                                            <?= $review['id'] ?>,
+                                                            <?= $review['rating'] ?>,
+                                                            this.getAttribute('data-comment'),
+                                                            '<?= htmlspecialchars($review['image'] ?? '') ?>'
+                                                        )"
+                                                        data-comment="<?= htmlspecialchars(json_encode($review['comment']), ENT_QUOTES, 'UTF-8') ?>"
+                                                        class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-blue-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200 w-full">
+                                                        แก้ไข
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button type="button" onclick="openStatusModal(<?= $review['id'] ?>, <?= $review['is_approved'] ?>, '<?= htmlspecialchars($review['reason'] ?? '') ?>')"
+                                                        class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-yellow-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200 w-full">
+                                                        เปลี่ยนสถานะ
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <a href="delete_review.php?review_id=<?= $review['id'] ?>" onclick="return confirm('ยืนยันลบรีวิวนี้?')"
+                                                        class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-red-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
+                                                        ลบ
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -231,7 +279,8 @@ $reviews = $stmt->get_result();
                     <input type="hidden" name="review_id" id="editReviewId">
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">คะแนน</label>
-                        <select name="rating" id="editReviewRating" class="border transition font-medium rounded-xl text-sm px-5 py-1.5 flex items-center justify-center w-full bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                        <select name="rating" id="editReviewRating"
+                            class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
                                 <option value="<?= $i ?>"><?= $i ?> ดาว</option>
                             <?php endfor; ?>
@@ -239,11 +288,11 @@ $reviews = $stmt->get_result();
                     </div>
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">ข้อความ</label>
-                        <textarea name="comment" id="editReviewComment" rows="2" class="border transition font-medium rounded-xl text-sm px-5 py-2 flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100 w-full"></textarea>
+                        <textarea name="comment" id="editReviewComment" rows="2" class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">เปลี่ยนรูป (ถ้าต้องการ)</label>
-                        <input type="file" name="image" class="border transition font-medium rounded-xl text-sm px-5 py-2 flex items-center justify-center w-full bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
+                        <input type="file" name="image" class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900">
                         <div id="editReviewImagePreview" class="mt-2"></div>
                     </div>
                     <div class="flex justify-end">
@@ -253,6 +302,39 @@ $reviews = $stmt->get_result();
             </div>
         </div>
     </div>
+    <!-- Modal เปลี่ยนสถานะรีวิว -->
+    <div id="statusModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md relative ring-1 ring-gray-200">
+            <button onclick="closeStatusModal()" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="border-b bg-gray-50 rounded-t-2xl">
+                <h2 class="text-md font-semibold p-2 pl-4">เปลี่ยนสถานะรีวิว</h2>
+            </div>
+            <div class="p-4">
+                <form id="statusForm" method="post" action="review_approve.php" onsubmit="return checkRejectReason(this);">
+                    <input type="hidden" name="review_id" id="statusReviewId">
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700">สถานะ</label>
+                        <select name="is_approved" id="statusIsApproved" class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900" onchange="toggleReasonInput(this)">
+                            <option value="0">รออนุมัติ/ไม่อนุมัติ</option>
+                            <option value="1">อนุมัติ</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="reasonGroup" style="display:none;">
+                        <label class="block text-sm font-medium text-gray-700">เหตุผล (ถ้าไม่อนุมัติ)</label>
+                        <input type="text" name="reason" id="statusReason" class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         function openImageModal(src) {
             document.getElementById('modalImage').src = src;
@@ -286,6 +368,41 @@ $reviews = $stmt->get_result();
             document.getElementById('editReviewModal').classList.add('hidden');
         }
     </script>
+    <script>
+        function openStatusModal(id, is_approved, reason) {
+            document.getElementById('statusReviewId').value = id;
+            document.getElementById('statusIsApproved').value = is_approved;
+            document.getElementById('statusReason').value = reason || '';
+            document.getElementById('statusModal').classList.remove('hidden');
+            toggleReasonInput(document.getElementById('statusIsApproved'));
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.add('hidden');
+        }
+
+        function toggleReasonInput(sel) {
+            const reasonGroup = document.getElementById('reasonGroup');
+            if (sel.value == "0") {
+                reasonGroup.style.display = "block";
+            } else {
+                reasonGroup.style.display = "none";
+                document.getElementById('statusReason').value = "";
+            }
+        }
+
+        function checkRejectReason(form) {
+            const sel = form.querySelector('select[name="is_approved"]');
+            const reasonInput = form.querySelector('input[name="reason"]');
+            if (sel.value == "0" && reasonInput.value.trim() === "") {
+                alert("กรุณากรอกเหตุผลเมื่อไม่อนุมัติรีวิว");
+                reasonInput.focus();
+                return false;
+            }
+            return true;
+        }
+    </script>
+
 </body>
 
 </html>
