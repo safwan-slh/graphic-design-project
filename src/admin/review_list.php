@@ -245,7 +245,7 @@ $reviews = $stmt->get_result();
                                                     </button>
                                                 </li>
                                                 <li>
-                                                    <a href="delete_review.php?review_id=<?= $review['id'] ?>" onclick="return confirm('ยืนยันลบรีวิวนี้?')"
+                                                    <a href="review_delete.php?review_id=<?= $review['id'] ?>" onclick="return confirm('ยืนยันลบรีวิวนี้?')"
                                                         class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-red-600 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
                                                         ลบ
                                                     </a>
