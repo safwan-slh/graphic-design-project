@@ -3,6 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require __DIR__ . '/../includes/db_connect.php';
+require_once __DIR__ . '/../notifications/notify_helper.php';
 require_once '../auth/auth.php';
 requireRole('admin'); // ให้เข้าหน้านี้ได้เฉพาะ admin
 
@@ -37,18 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     // ส่งแจ้งเตือนไปยังลูกค้า
     $customerId = $payment['customer_id'];
     $orderCode = $payment['order_code'] ?? $payment['order_id'] ?? '-';
-    if ($newStatus === 'paid') {
-        $message = "การชำระเงินสำหรับ Order #{$orderCode} ของคุณได้รับการอนุมัติแล้ว";
-    } elseif ($newStatus === 'cancelled') {
-        $message = "การชำระเงินสำหรับ Order #{$orderCode} ของคุณถูกปฏิเสธ: " . $rejectReason;
-    } else {
-        $message = "สถานะการชำระเงินสำหรับ Order #{$orderCode} ของคุณถูกเปลี่ยนเป็น " . htmlspecialchars($newStatus);
-    }
-    $link = "/graphic-design/src/client/order.php?order_id=" . $payment['order_id'];
-    $stmtNotify = $conn->prepare("INSERT INTO notifications (customer_id, message, link) VALUES (?, ?, ?)");
-    $stmtNotify->bind_param("iss", $customerId, $message, $link);
-    $stmtNotify->execute();
-
+    $orderId = $payment['order_id'];
+    notifyPaymentStatusToCustomer($conn, $customerId, $orderId, $orderCode, $newStatus, $rejectReason);
     header("Location: payment_detail.php?id=" . $paymentId);
     exit;
 }

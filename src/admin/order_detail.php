@@ -104,23 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['work_files'])) {
     require_once __DIR__ . '/../notifications/notify_helper.php';
     $customer_id = $order['customer_id'];
     $orderCode = $order['order_code'] ?? $order_id;
-    // สร้าง badge เวอร์ชัน
-    switch ($version) {
-        case 'draft1':
-            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
-            break;
-        case 'draft2':
-            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
-            break;
-        case 'final':
-            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
-            break;
-        default:
-            $badge = "";
-    }
-    $msg = "แอดมินอัปโหลดไฟล์งานสำหรับออเดอร์ #$orderCode $badge";
-    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
-    sendNotification($conn, $customer_id, $msg, $link, 0);
+    notifyWorkFileUploaded($conn, $customer_id, $order_id, $orderCode, $version);
 
     header("Location: order_detail.php?id=$order_id");
     exit;
@@ -145,26 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
         $insertStmt->bind_param("isis", $order_id, $version, $commenter_id, $comment);
         $insertStmt->execute();
 
-        // --- แจ้งเตือนแอดมินเมื่อ "ลูกค้า" คอมเมนต์ ---
+
         require_once __DIR__ . '/../notifications/notify_helper.php';
         $orderCode = $order['order_code'] ?? $order_id;
-        // Badge เวอร์ชัน
-        switch ($version) {
-            case 'draft1':
-                $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
-                break;
-            case 'draft2':
-                $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
-                break;
-            case 'final':
-                $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
-                break;
-            default:
-                $badge = "";
-        }
-        $msg = "แอดมินคอมเมนต์ในออเดอร์ #$orderCode $badge";
-        $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
-        sendNotification($conn, 1, $msg, $link, 0); // 1 = แจ้งเตือนแอดมิน
+        notifyComment($conn, $isAdmin, $order_id, $orderCode, $order['customer_id'], $version);
 
         header("Location: order_detail.php?id=$order_id");
         exit;
@@ -1099,6 +1067,41 @@ function getOrderProgressSteps($status)
                             </form>
                         </div>
                     </div>
+
+                    <?php
+                    $review = $conn->query("SELECT * FROM reviews WHERE order_id={$order['order_id']}")->fetch_assoc();
+                    if ($review):
+                    ?>
+                        <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                            <div class="border-b bg-gray-50 rounded-t-2xl flex justify-between items-center">
+                                <h2 class="text-md font-semibold p-2 pl-4">รีวิวออเดอร์ของคุณ</h2>
+                            </div>
+                            <div class="p-4">
+                                <div class="bg-gray-50 p-3 rounded-2xl ring-1 ring-gray-200">
+                                    <div class="flex"><?= str_repeat('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-yellow-400">
+                                        <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                                        </svg>
+                                        ', $review['rating']) ?>
+                                    </div>
+                                    <div class="py-2">
+                                        <label class="block text-sm font-medium text-gray-700">ความคิดเห็น:</label>
+                                        <div class="block text-sm font-medium text-gray-400"><?= htmlspecialchars($review['comment']) ?></div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-2xl overflow-hidden">
+                                        <?php if ($review['image']): ?>
+                                            <img src="/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>" alt="รีวิว" style="max-width: auto; max-height: 400px;"
+                                                class="object-cover rounded border hover:opacity-90 cursor-pointer"
+                                                style="aspect-ratio: 1/1;"
+                                                onclick="openImageModal('/graphic-design/uploads/<?= htmlspecialchars($review['image']) ?>')">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="py-2">
+                                        <p class="text-xs text-gray-400">อัปเดตเมื่อ: <?= $review['updated_at'] ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -1142,7 +1145,7 @@ function getOrderProgressSteps($status)
             document.getElementById('imageModal').classList.add('hidden');
         }
     </script>
-        <!-- Floating Chat Button Script -->
+    <!-- Floating Chat Button Script -->
     <script>
         const orderId = <?= (int)$order_id ?>;
         const chatBox = document.getElementById('chatBox');

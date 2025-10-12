@@ -91,9 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // --- เพิ่มแจ้งเตือนแอดมินที่นี่ ---
         require_once __DIR__ . '/../notifications/notify_helper.php';
         $payment_id = $stmt->insert_id; // ดึง payment_id ที่เพิ่ง insert
-        $message = "ลูกค้าแจ้งชำระเงินสำหรับ Order #{$order['order_code']}";
-        $link = "/graphic-design/src/admin/payment_detail.php?id=" . $payment_id;
-        sendNotification($conn, 1, $message, $link, 1);
+        notifyPaymentToAdmin($conn, $order['order_code'], $payment_id);
     } else {
         $error = "เกิดข้อผิดพลาด: " . $stmt->error;
     }

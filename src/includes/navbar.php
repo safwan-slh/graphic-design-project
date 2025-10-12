@@ -126,7 +126,7 @@ if (isset($_SESSION['customer_id'])) {
             <?php endif; ?>
           </a>
         <?php endif; ?>
-        <a href="#" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'review.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
+        <a href="review.php" class="flex items-center geist-mono justify-center px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-in-out hover:scale-105 <?= ($current_page == 'review.php') ? 'bg-zinc-950 text-white' : 'text-zinc-800 hover:bg-zinc-100' ?>">
           Review
         </a>
       </div>

@@ -166,3 +166,19 @@ CREATE TABLE chat_messages (
     INDEX(order_id),
     INDEX(sender_id)
 );
+
+-- ตารางรีวิว
+CREATE TABLE reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    customer_id INT NOT NULL,
+    rating INT NOT NULL,           -- คะแนน (1-5)
+    comment TEXT,                  -- ข้อความรีวิว
+    image VARCHAR(255),            -- (optional) รูปภาพประกอบรีวิว
+    is_approved TINYINT(1) DEFAULT 1, -- (optional) สถานะอนุมัติแสดงผล
+    reason TEXT,                   -- (optional) เหตุผลถ้าไม่อนุมัติ
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);

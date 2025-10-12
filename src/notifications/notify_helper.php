@@ -7,18 +7,133 @@ function sendNotification($conn, $customer_id, $message, $link, $is_admin = 0, $
 }
 
 // ฟังก์ชันเฉพาะแต่ละประเภท (ถ้าต้องการ)
-function notifyPaymentApproved($conn, $customer_id, $order_id)
-{
-    $message = "การชำระเงินของคุณสำหรับ Order #$order_id ได้รับการอนุมัติแล้ว";
-    $link = "/client/order.php?order_id=$order_id";
-    sendNotification($conn, $customer_id, $message, $link, 0);
+//ลูกค้าแจ้งชำระเงินสำหรับ Order
+function notifyPaymentToAdmin($conn, $order_code, $payment_id) {
+    $message = "ลูกค้าแจ้งชำระเงินสำหรับ Order #$order_code";
+    $link = "/graphic-design/src/admin/payment_detail.php?id=$payment_id";
+    sendNotification($conn, 1, $message, $link, 1, 'payment');
 }
 
-function notifyOrderCancelledToAdmin($conn, $order_id, $order_code)
-{
+// แจ้งเตือนลูกค้าเมื่อสถานะการชำระเงินเปลี่ยนแปลง
+function notifyPaymentStatusToCustomer($conn, $customer_id, $order_id, $order_code, $status, $remark = '') {
+    if ($status === 'paid') {
+        $message = "การชำระเงินสำหรับ Order #$order_code ของคุณได้รับการอนุมัติแล้ว";
+    } elseif ($status === 'cancelled') {
+        $message = "การชำระเงินสำหรับ Order #$order_code ของคุณถูกปฏิเสธ: $remark";
+    } else {
+        $message = "สถานะการชำระเงินสำหรับ Order #$order_code ของคุณถูกเปลี่ยนเป็น $status";
+    }
+    $link = "/graphic-design/src/client/order.php?order_id=$order_id";
+    sendNotification($conn, $customer_id, $message, $link, 0, 'payment');
+}
+
+// แจ้งเตือนแอดมินเมื่อลูกค้ายกเลิกออเดอร์
+function notifyOrderCancelledToAdmin($conn, $order_id, $order_code) {
     $message = "ลูกค้าได้ยกเลิก Order #$order_code";
-    $link = "/admin/order_detail.php?id=$order_id";
-    sendNotification($conn, 1, $message, $link, 1);
+    $link = "/graphic-design/src/admin/order_detail.php?id=$order_id";
+    sendNotification($conn, 1, $message, $link, 1, 'order');
 }
 
-// เพิ่มฟังก์ชันอื่นๆ ตามประเภทแจ้งเตือนที่ต้องการ
+// แจ้งเตือนลูกค้าเมื่อแอดมินอัปโหลดไฟล์งาน
+function notifyWorkFileUploaded($conn, $customer_id, $order_id, $orderCode, $version) {
+    // กำหนด badge ตามเวอร์ชัน
+    switch ($version) {
+        case 'draft1':
+            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
+            break;
+        case 'draft2':
+            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
+            break;
+        case 'final':
+            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
+            break;
+        default:
+            $badge = "";
+    }
+    $msg = "แอดมินอัปโหลดไฟล์งานสำหรับออเดอร์ #$orderCode $badge";
+    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+    sendNotification($conn, $customer_id, $msg, $link, 0, 'workfile');
+}
+
+// แจ้งเตือนแอดมินเมื่อ "ลูกค้า" คอมเมนต์
+function notifyAdminCustomerComment($conn, $order_id, $orderCode, $version) {
+    switch ($version) {
+        case 'draft1':
+            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
+            break;
+        case 'draft2':
+            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
+            break;
+        case 'final':
+            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
+            break;
+        default:
+            $badge = "";
+    }
+    $msg = "ลูกค้าคอมเมนต์ในออเดอร์ #$orderCode $badge";
+    $link = "/graphic-design/src/admin/order_detail.php?id=" . $order_id;
+    sendNotification($conn, 1, $msg, $link, 1, 'comment');
+}
+
+// แจ้งเตือนลูกค้าเมื่อ "แอดมิน" คอมเมนต์
+function notifyComment($conn, $isAdmin, $order_id, $orderCode, $customer_id, $version) {
+    // กำหนด badge เวอร์ชัน
+    switch ($version) {
+        case 'draft1':
+            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 1</span>";
+            break;
+        case 'draft2':
+            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>แบบร่างที่ 2</span>";
+            break;
+        case 'final':
+            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ฉบับสมบูรณ์</span>";
+            break;
+        default:
+            $badge = "";
+    }
+    $msg = "แอดมินคอมเมนต์ในออเดอร์ #$orderCode $badge";
+    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+    sendNotification($conn, $customer_id, $msg, $link, 0, 'comment');
+}
+
+// แจ้งเตือนแชท (ทั่วไป/ออเดอร์)
+function notifyChat($conn, $to_admin, $customer_id, $order_id = null, $order_code = null, $type = 'order') {
+    if ($to_admin) {
+        $msg = $type === 'order'
+            ? "ลูกค้าส่งข้อความใหม่ในออเดอร์ #$order_code"
+            : "ลูกค้าส่งข้อความใหม่ในแชทสอบถามทั่วไป";
+        $link = $type === 'order'
+            ? "/graphic-design/src/admin/order_detail.php?id=$order_id"
+            : "/graphic-design/src/admin/general_chat.php?customer_id=$customer_id";
+        sendNotification($conn, 1, $msg, $link, 1, 'chat');
+    } else {
+        $msg = $type === 'order'
+            ? "ทีมงานส่งข้อความใหม่ในออเดอร์ #$order_code"
+            : "ทีมงานตอบกลับข้อความสอบถามทั่วไปของคุณ";
+        $link = $type === 'order'
+            ? "/graphic-design/src/client/poster_detail.php?order_id=$order_id"
+            : "/graphic-design/src/client/chat_general.php";
+        sendNotification($conn, $customer_id, $msg, $link, 0, 'chat');
+    }
+}
+
+// แจ้งเตือนแอดมินเมื่อ "ลูกค้า" รีวิวออเดอร์
+function notifyReviewToAdmin($conn, $order_id, $customer_id) {
+    $msg = "ลูกค้าได้รีวิวออเดอร์ #$order_id";
+    $link = "/graphic-design/src/admin/order_detail.php?id=$order_id";
+    sendNotification($conn, 1, $msg, $link, 1, 'review');
+}
+
+// แจ้งเตือนลูกค้าเมื่อรีวิวถูกอนุมัติหรือไม่อนุมัติ
+function notifyReviewApproveStatusToCustomer($conn, $customer_id, $order_id, $is_approved, $reason = '') {
+    if ($is_approved) {
+        $msg = "รีวิวของคุณสำหรับออเดอร์ #$order_id ได้รับการอนุมัติแล้ว";
+    } else {
+        $msg = "รีวิวของคุณสำหรับออเดอร์ #$order_id ไม่ได้รับการอนุมัติ";
+        if ($reason) {
+            $msg .= " เหตุผล: $reason";
+        }
+    }
+    $link = "/graphic-design/src/client/poster_detail.php?order_id=$order_id";
+    sendNotification($conn, $customer_id, $msg, $link, 0, 'review');
+}

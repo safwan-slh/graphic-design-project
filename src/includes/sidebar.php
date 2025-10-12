@@ -19,6 +19,11 @@ $sqlOrderInProgress = "SELECT COUNT(*) AS order_inprogress FROM orders WHERE sta
 $resultOrderInProgress = $conn->query($sqlOrderInProgress);
 $orderInProgress = ($resultOrderInProgress && $row = $resultOrderInProgress->fetch_assoc()) ? (int)$row['order_inprogress'] : 0;
 
+// ดึงจำนวนรีวิวที่รออนุมัติ
+$sqlReviewPending = "SELECT COUNT(*) AS review_pending FROM reviews WHERE is_approved = 0";
+$resultReviewPending = $conn->query($sqlReviewPending);
+$reviewPending = ($resultReviewPending && $row = $resultReviewPending->fetch_assoc()) ? (int)$row['review_pending'] : 0;
+
 // รวมจำนวนที่ต้อง action
 $orderBadge = $orderPending + $orderInProgress;
 ?>
@@ -90,11 +95,14 @@ $orderBadge = $orderPending + $orderInProgress;
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการชำระเงิน</h2>
             <ul class="space-y-1">
               <li>
-                <a href="payment_list.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'payment_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
-                  </svg>
-                  รายการชำระเงิน
+                <a href="payment_list.php"
+                  class="flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'payment_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+                    </svg>
+                    รายการชำระเงิน
+                  </span>
                   <?php if ($pendingCount > 0): ?>
                     <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $pendingCount ?></span>
                   <?php endif; ?>
@@ -108,11 +116,14 @@ $orderBadge = $orderPending + $orderInProgress;
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการออเดอร์</h2>
             <ul class="space-y-1">
               <li>
-                <a href="order_list.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'order_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                  </svg>
-                  รายการออเดอร์
+                <a href="order_list.php" 
+                class="flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'order_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <span class="flex items-center">
+                    <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                    </svg>
+                    รายการออเดอร์
+                  </span>
                   <?php if ($orderBadge > 0): ?>
                     <span class="bg-red-500 text-white text-xs font-medium ml-2 px-2.5 py-0.5 rounded-full"><?= $orderBadge ?></span>
                   <?php endif; ?>
@@ -133,12 +144,25 @@ $orderBadge = $orderPending + $orderInProgress;
                   รายการบริการ
                 </a>
               </li>
+            </ul>
+          </div>
+
+          <!-- Review Section -->
+          <div>
+            <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-3">จัดการรีวิว</h2>
+            <ul class="space-y-1">
               <li>
-                <a href="service_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'service_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  เพิ่มบริการใหม่
+                <a href="review_list.php"
+                  class="flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'review_list.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
+                  <span class="flex items-center">
+                    <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-width="2" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                    </svg>
+                    รายการรีวิว
+                  </span>
+                  <?php if ($reviewPending > 0): ?>
+                    <span class="bg-red-500 text-white text-xs font-medium px-2.5 py-0.5 rounded-full ml-2"><?= $reviewPending ?></span>
+                  <?php endif; ?>
                 </a>
               </li>
             </ul>
@@ -156,14 +180,6 @@ $orderBadge = $orderPending + $orderInProgress;
                   รายการผู้ใช้
                 </a>
               </li>
-              <li>
-                <a href="customer_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'customer_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  เพิ่มผู้ใช้ใหม่
-                </a>
-              </li>
             </ul>
           </div>
           <!-- Portfolio Section -->
@@ -177,14 +193,6 @@ $orderBadge = $orderPending + $orderInProgress;
                   </svg>
 
                   รายการผลงานร้าน
-                </a>
-              </li>
-              <li>
-                <a href="portfolio_add.php" class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 <?= ($current_page == 'portfolio_add.php') ? 'bg-zinc-200 text-zinc-900 font-medium active-menu' : 'text-gray-700 hover:bg-gray-100' ?>">
-                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  เพิ่มผลงานใหม่
                 </a>
               </li>
             </ul>
