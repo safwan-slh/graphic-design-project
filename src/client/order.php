@@ -142,10 +142,10 @@ $highlightOrderId = $_GET['order_id'] ?? null;
 <head>
     <meta charset="UTF-8">
     <title>รายการสั่งซื้อของฉัน | Graphic Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="../../dist/output.css" rel="stylesheet" />
     <style>
         .font-thai {
             font-family: 'IBM Plex Sans Thai', sans-serif;

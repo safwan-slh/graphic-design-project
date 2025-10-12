@@ -66,11 +66,11 @@ $result = $conn->query($portfolio_sql);
     }
 </style>
 
-<body class="font-thai">
+<body class="bg-gray-50 font-thai mt-10">
     <?php
     include __DIR__ . '/../includes/navbar.php';
     ?>
-    <section class="flex items-center justify-center py-16 px-5 hero-gradient font-thai relative overflow-hidden">
+    <section class="flex items-center justify-center py-16 px-5 hero-gradient font-thai relative overflow-hidden ">
         <div class="container mx-auto pt-10">
             <div class="flex flex-row sm:flex-col w-full items-center px-10 py-10 gap-12">
                 <!-- Left Content -->
