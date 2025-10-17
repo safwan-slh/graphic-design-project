@@ -385,10 +385,14 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
                                 </div>
                             </div>
                         </div>
+                        <?php if ($is_retry): ?>
                         <div class="mb-4 rounded-xl bg-white p-4 m-4 shadow-sm ring-1 ring-gray-200">
-                            <h4 class="font-semibold text-gray-800 mb-2">หมายเหตุ (ถ้ามี)</h4>
-                            <textarea name="remark" rows="1" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"><?= htmlspecialchars($payment['remark'] ?? '') ?></textarea>
+                            <h4 class="font-semibold text-gray-800 mb-2">หมายเหตุจากแอดมิน:</h4>
+                            <div class="bg-red-50 p-3 rounded-xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
+                                <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?></div>
+                            </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -506,29 +510,10 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
         </form>
     </div>
 
-    <?php if ($is_retry): ?>
-        <div id="toast" class="fixed top-5 right-5 flex items-center max-w-sm p-4 mb-4 text-gray-700 bg-white border border-yellow-200 rounded-xl shadow-sm z-50 transition-opacity duration-300" role="alert" aria-live="assertive" aria-atomic="true">
-            <div id="toast-icon" class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg">
-                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-yellow-500 bg-yellow-100 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="sr-only">Success icon</span>
-                </div>
-            </div>
-            <div id="toast-message" class="ml-3 text-sm font-normal">คุณกำลังชำระเงินใหม่สำหรับออเดอร์นี้ กรุณาตรวจสอบข้อมูลก่อนดำเนินการอีกครั้ง</div>
-            <button type="button" class="ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg focus:ring-2 focus:ring-white bg-white text-gray-600 border-gray-300 hover:bg-gray-100 inline-flex h-8 w-8" aria-label="Close" onclick="hideToast()">
-                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                </svg>
-            </button>
-        </div>
-    <?php endif; ?>
-
     <!-- Success Modal -->
     <div id="successModal"
         class="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="rounded-3xl bg-white shadow-sm ring-1 ring-gray-200 p-8 text-center w-10/12 max-w-md mx-4">
+        <div class="bg-white rounded-3xl shadow-lg p-8 max-w-sm w-full text-center relative">
             <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -538,11 +523,11 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
             <p class="text-gray-600 mb-6">เราได้รับการชำระเงินของคุณแล้ว<br>จะเริ่มดำเนินการออกแบบในวันถัดไป</p>
             <div class="space-y-3 flex flex-col">
                 <a href="/graphic-design/src/client/order.php"
-                    class="w-full bg-zinc-900 text-white py-3 rounded-xl font-semibold hover:bg-zinc-800 transition-all">
+                    class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                     ดูสถานะคำสั่งซื้อ
                 </a>
                 <a href="/graphic-design/src/client/index.php"
-                    class="w-full border border-gray-300 bg-zinc-50  text-gray-700 py-3 rounded-xl font-semibold hover:bg-zinc-100 transition-all"
+                    class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
                     onclick="closeModal()">
                     กลับหน้าหลัก
                 </a>
