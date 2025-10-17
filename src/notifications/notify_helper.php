@@ -14,6 +14,13 @@ function notifyPaymentToAdmin($conn, $order_code, $payment_id) {
     sendNotification($conn, 1, $message, $link, 1, 'payment');
 }
 
+// แจ้งเตือนแอดมินเมื่อลูกค้าอัปเดทการชำระเงิน
+function notifyPaymentUpdateToAdmin($conn, $order_code, $payment_id) {
+    $message = "ลูกค้าอัปเดทข้อมูลการชำระเงินสำหรับ Order #$order_code";
+    $link = "/graphic-design/src/admin/payment_detail.php?id=$payment_id";
+    sendNotification($conn, 1, $message, $link, 1, 'payment_update');
+}
+
 // แจ้งเตือนลูกค้าเมื่อสถานะการชำระเงินเปลี่ยนแปลง
 function notifyPaymentStatusToCustomer($conn, $customer_id, $order_id, $order_code, $status, $remark = '') {
     if ($status === 'paid') {
