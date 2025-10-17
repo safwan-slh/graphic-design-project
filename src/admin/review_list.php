@@ -170,7 +170,7 @@ $reviews = $stmt->get_result();
                     </thead>
                     <tbody>
                         <?php foreach ($reviews as $review): ?>
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr class="hover:bg-gray-50 transition-colors border-b last:border-b-0 align-top">
                                 <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold text-indigo-600">#<?= htmlspecialchars($review['order_code']) ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <div class="flex items-center">
