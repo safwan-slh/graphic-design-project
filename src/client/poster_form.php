@@ -852,45 +852,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const imageInput = document.querySelector('input[name="images_file[]"]');
             const referenceInput = document.querySelector('input[name="reference_file[]"]');
 
-            let logoText = 'ไม่มีไฟล์';
+            let logoHtml = 'ไม่มีไฟล์';
             if (logoInput && logoInput.files.length > 0) {
-                logoText = Array.from(logoInput.files).map(file => file.name).join(', ');
+                logoHtml = '';
+                Array.from(logoInput.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        logoHtml += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="inline-block w-16 h-16 object-cover rounded-lg mr-2 mb-2 border border-gray-300" />`;
+                    } else {
+                        logoHtml += `<div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2">${file.name}</div>`;
+                    }
+                });
             }
 
-            let imageText = 'ไม่มีไฟล์';
+            let imageHtml = 'ไม่มีไฟล์';
             if (imageInput && imageInput.files.length > 0) {
-                imageText = Array.from(imageInput.files).map(file => file.name).join(', ');
+                imageHtml = '';
+                Array.from(imageInput.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        imageHtml += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="inline-block w-16 h-16 object-cover rounded-lg mr-2 mb-2 border border-gray-300" />`;
+                    } else {
+                        imageHtml += `<div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2">${file.name}</div>`;
+                    }
+                });
             }
 
-            let referenceText = 'ไม่มีไฟล์';
+            let referenceHtml = 'ไม่มีไฟล์';
             if (referenceInput && referenceInput.files.length > 0) {
-                referenceText = Array.from(referenceInput.files).map(file => file.name).join(', ');
+                referenceHtml = '';
+                Array.from(referenceInput.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        referenceHtml += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="inline-block w-16 h-16 object-cover rounded-lg mr-2 mb-2 border border-gray-300" />`;
+                    } else {
+                        referenceHtml += `<div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2">${file.name}</div>`;
+                    }
+                });
             }
 
             html += `
-        <div class="bg-gray-50 p-6 rounded-xl mb-6 ring-1 ring-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                ไฟล์และประกอบเพิ่มเติม
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="md:col-span-2">
-                    <p class="mb-2 block text-sm font-medium text-gray-500">ไฟล์โลโก้</p>
-                    <p class="font-medium text-sm">${logoText}</p>
-                </div>
-                <div class="md:col-span-2">
-                    <p class="mb-2 block text-sm font-medium text-gray-500">ไฟล์รูปภาพ</p>
-                    <p class="font-medium text-sm">${imageText}</p>
-                </div>
-                <div class="md:col-span-2">
-                    <p class="mb-2 block text-sm font-medium text-gray-500">ไฟล์ตัวอย่าง</p>
-                    <p class="font-medium text-sm">${referenceText}</p>
-                </div>
-                <div class="md:col-span-2">
-                    <p class="mb-2 block text-sm font-medium text-gray-500">ลิงก์ตัวอย่าง</p>
-                    <p class="font-medium">${form.reference_link.value || 'ไม่ได้กรอก'}</p>
+            <div class="bg-gray-50 p-6 rounded-xl mb-6 ring-1 ring-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    ไฟล์และประกอบเพิ่มเติม
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <p class="mb-2 block text-sm font-medium text-gray-500">ไฟล์โลโก้</p>
+                        <div>${logoHtml}</div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="mb-2 block text-sm font-medium text-gray-500">ไฟล์รูปภาพ</p>
+                        <div>${imageHtml}</div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="mb-2 block text-sm font-medium text-gray-500">ไฟล์ตัวอย่าง</p>
+                        <div>${referenceHtml}</div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="mb-2 block text-sm font-medium text-gray-500">ลิงก์ตัวอย่าง</p>
+                        <p class="font-medium">${form.reference_link.value || 'ไม่ได้กรอก'}</p>
+                    </div>
                 </div>
             </div>
-        </div>
+
 
         <div class="bg-gray-50 p-6 rounded-xl mb-6 ring-1 ring-gray-200">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">
