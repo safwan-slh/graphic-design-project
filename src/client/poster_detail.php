@@ -613,27 +613,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                             <?php endforeach; ?>
                         </div>
                     </div>
-
-                    <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
-                        <div class="border-b bg-gray-50 rounded-t-2xl">
-                            <h2 class="text-md font-semibold p-2 pl-4">หมายเหตุจากแอดมิน</h2>
-                        </div>
-                        <div class="p-2">
-                            <div class="bg-red-50 p-3 rounded-2xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
-                                <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?></div>
+                    <?php if ($payment && $payment['payment_status'] === 'cancelled'): ?>
+                        <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                            <div class="border-b bg-gray-50 rounded-t-2xl">
+                                <h2 class="text-md font-semibold p-2 pl-4">หมายเหตุจากแอดมิน</h2>
+                            </div>
+                            <div class="p-2">
+                                <div class="bg-red-50 p-3 rounded-2xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
+                                    <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?: '' ?></div>
+                                </div>
+                            </div>
+                            <div class="p-2">
+                                <form class="flex items-start space-x-3">
+                                    <div class="flex-1 space-y-2">
+                                        <a href="/graphic-design/src/client/payment.php?order_id=<?= $order_id ?>&retry=1"
+                                            class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">
+                                            อัปเดทการชำระเงินใหม่
+                                        </a>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <div class="p-2">
-                            <form class="flex items-start space-x-3">
-                                <div class="flex-1 space-y-2">
-                                    <a href="/graphic-design/src/client/payment.php?order_id=<?= $order_id ?>&retry=1"
-                                        class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">
-                                        อัปเดทการชำระเงินใหม่
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                    <?php endif; ?>
 
                     <!-- Chat -->
                     <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
