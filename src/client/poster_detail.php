@@ -624,7 +624,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                             </div>
                         </div>
                         <div class="p-2">
-                            <form id="chatForm" class="flex items-start space-x-3">
+                            <form class="flex items-start space-x-3">
                                 <div class="flex-1 space-y-2">
                                     <a href="/graphic-design/src/client/payment.php?order_id=<?= $order_id ?>&retry=1"
                                         class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">
@@ -904,11 +904,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                             const isMe = msg.sender_role === 'customer';
                             chatBox.innerHTML += `
                         <div class="flex ${isMe ? 'flex-row-reverse' : ''} items-start">
-                            <div class="${isMe ? 'ml-10' : 'mr-10'}">
-                                <div class="${isMe ? 'bg-zinc-900 text-white rounded-2xl rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-2xl rounded-bl-none'} py-2 px-4 inline-block">
+                            <div class="${isMe ? 'text-right' : 'text-left'}">
+                                <div class="${isMe ? 'bg-zinc-900 text-white rounded-xl' : 'bg-gray-200 text-gray-800 rounded-xl'} py-2 px-4 text-xs inline-block">
                                     <p>${msg.message.replace(/\n/g, '<br>')}</p>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1 ${isMe ? 'text-right' : ''}">
+                                <p class="text-xs text-gray-400 mt-1 ${isMe ? 'text-right' : ''}">
                                     ${new Date(msg.created_at).toLocaleString('th-TH', { hour12: false })}
                                 </p>
                             </div>
