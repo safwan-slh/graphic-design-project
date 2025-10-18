@@ -527,7 +527,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </path>
                             </svg>
                         </div>
-                        <h2 class="text-xl font-semibold text-gray-900">ไฟล์และประกอบเพิ่มเติม</h2>
+                        <h2 class="text-xl font-semibold text-gray-900">ไฟล์ประกอบเพิ่มเติม</h2>
                     </div>
                     <div class="mb-6">
                         <label for="logo_file" class="block text-sm font-medium text-gray-700 mb-2">ไฟล์โลโก้องค์กร/บริษัท</label>
@@ -891,7 +891,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             html += `
             <div class="bg-gray-50 p-6 rounded-xl mb-6 ring-1 ring-gray-200">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                    ไฟล์และประกอบเพิ่มเติม
+                    ไฟล์ประกอบเพิ่มเติม
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
@@ -970,17 +970,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         // Handle file upload
-        function handleFileUpload(input, previewId) {
+                function handleFileUpload(input, previewId) {
             const preview = document.getElementById(previewId);
-            const files = input.files;
-            const maxFiles = 4; // จำกัดไม่เกิน 4 ไฟล์
-            if (input.files.length > maxFiles) {
+            const maxFiles = 4;
+            let files = Array.from(input.files);
+            if (files.length > maxFiles) {
                 alert("อัปโหลดได้ไม่เกิน " + maxFiles + " ไฟล์");
                 input.value = "";
                 return;
             }
-
-            // ตรวจสอบขนาดไฟล์รวมทุก input
+        
+            // ตรวจสอบขนาดไฟล์รวม
             let totalSize = 0;
             ['logo_file[]', 'images_file[]', 'reference_file[]'].forEach(name => {
                 const inp = document.querySelector(`input[name="${name}"]`);
@@ -988,25 +988,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Array.from(inp.files).forEach(file => totalSize += file.size);
                 }
             });
-            if (totalSize > 30 * 1024 * 1024) { // 30MB
+            if (totalSize > 30 * 1024 * 1024) {
                 alert('ไฟล์รวมทั้งหมดเกิน 30MB กรุณาลดขนาดไฟล์ที่อัปโหลด');
                 input.value = "";
                 preview.innerHTML = '';
                 preview.classList.add('hidden');
                 return;
             }
-
-            if (files.length > 0) {
-                preview.innerHTML = '';
-                preview.classList.remove('hidden');
-                Array.from(files).forEach(file => {
-                    const fileDiv = document.createElement('div');
-                    fileDiv.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2';
-                    fileDiv.textContent = file.name;
-                    preview.appendChild(fileDiv);
-                });
-            }
+        
+            preview.innerHTML = '';
+            preview.classList.remove('hidden');
+            files.forEach((file) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'relative inline-block mr-2 mb-2';
+        
+                // กากะบาด
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs z-10';
+                removeBtn.onclick = function() {
+                    // ลบไฟล์นี้ออกจาก input โดยใช้ file.name
+                    const dt = new DataTransfer();
+                    Array.from(input.files).forEach(f => {
+                        if (f.name !== file.name || f.size !== file.size) dt.items.add(f);
+                    });
+                    input.files = dt.files;
+                    handleFileUpload(input, previewId); // refresh preview
+                };
+        
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.alt = file.name;
+                    img.className = 'w-16 h-16 object-cover rounded-lg border border-gray-300';
+                    fileDiv.appendChild(img);
+                } else {
+                    const fileNameDiv = document.createElement('div');
+                    fileNameDiv.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs';
+                    fileNameDiv.textContent = file.name;
+                    fileDiv.appendChild(fileNameDiv);
+                }
+                fileDiv.appendChild(removeBtn);
+                preview.appendChild(fileDiv);
+            });
         }
+
         // File upload click handlers
         document.querySelectorAll('.file-upload-area').forEach(area => {
             area.addEventListener('click', function() {
