@@ -41,7 +41,14 @@ function fetchChatModal() {
   }
   document.getElementById("chatBoxModal").innerHTML =
     '<div class="text-gray-400 text-center">กำลังโหลด...</div>';
-  fetch("/graphic-design/src/chat/get_messages.php?order_id=" + currentOrderId)
+  
+  // เพิ่ม customer_id ใน query string ถ้าเป็นแชททั่วไป
+  let url = "/graphic-design/src/chat/get_messages.php?order_id=" + currentOrderId;
+  if (currentOrderId === 0 && window.customerId) {
+    url += "&customer_id=" + window.customerId;
+  }
+  
+  fetch(url)
     .then((res) => res.json())
     .then((data) => {
       const chatBoxModal = document.getElementById("chatBoxModal");
