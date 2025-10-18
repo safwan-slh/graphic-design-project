@@ -336,7 +336,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <!-- Section 2: Technical Requirements -->
-                <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="2">
+                <div id="designForm" class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="2">
                     <div class="mb-6 flex items-center">
                         <div class="mr-4 rounded-full bg-zinc-100 p-3">
                             <svg class="h-6 w-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
