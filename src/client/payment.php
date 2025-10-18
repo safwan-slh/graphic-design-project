@@ -56,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $slip_file = null;
 
     // อัปโหลดสลิป
-    // var_dump($_FILES['slip_file']);
     if (isset($_FILES['slip_file']) && $_FILES['slip_file']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../../uploads/payments/';
         if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
@@ -69,33 +68,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Insert ข้อมูลการชำระเงิน
-    $stmt = $conn->prepare("INSERT INTO payments 
-        (order_id, customer_id, amount, payment_type, deposit_remaining, payment_method, payment_date, payment_status, reference_no, slip_file, remark)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)");
-    $stmt->bind_param(
-        "iidsdsssss",
-        $order_id,
-        $customer_id,
-        $amount,
-        $payment_type,
-        $deposit_remaining,
-        $payment_method,
-        $payment_date,
-        $reference_no,
-        $slip_file,
-        $remark
-    );
-    if ($stmt->execute()) {
-        $success = "แจ้งชำระเงินเรียบร้อยแล้ว";
-        // --- เพิ่มแจ้งเตือนแอดมินที่นี่ ---
-        require_once __DIR__ . '/../notifications/notify_helper.php';
-        $payment_id = $stmt->insert_id; // ดึง payment_id ที่เพิ่ง insert
-        notifyPaymentToAdmin($conn, $order['order_code'], $payment_id);
+    $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
+
+    // ดึง payment ล่าสุดของ order นี้
+    $payment = $conn->query("SELECT * FROM payments WHERE order_id = $order_id ORDER BY created_at DESC LIMIT 1")->fetch_assoc();
+
+    if ($is_retry && $payment) {
+        // อัปเดทข้อมูลการชำระเงินเดิม
+        $stmt = $conn->prepare("UPDATE payments SET 
+            amount = ?, payment_type = ?, deposit_remaining = ?, payment_method = ?, payment_date = ?, payment_status = 'pending', reference_no = ?, slip_file = ?, remark = ?
+            WHERE payment_id = ?");
+        $stmt->bind_param(
+            "dsdsssssi",
+            $amount,
+            $payment_type,
+            $deposit_remaining,
+            $payment_method,
+            $payment_date,
+            $reference_no,
+            $slip_file,
+            $remark,
+            $payment['payment_id']
+        );
+        if ($stmt->execute()) {
+            $success = "อัปเดทการชำระเงินเรียบร้อยแล้ว";
+            require_once __DIR__ . '/../notifications/notify_helper.php';
+            notifyPaymentUpdateToAdmin($conn, $order['order_code'], $payment['payment_id']);
+        } else {
+            $error = "เกิดข้อผิดพลาด: " . $stmt->error;
+        }
     } else {
-        $error = "เกิดข้อผิดพลาด: " . $stmt->error;
+        // กรณีแจ้งชำระเงินครั้งแรก (INSERT)
+        $stmt = $conn->prepare("INSERT INTO payments 
+            (order_id, customer_id, amount, payment_type, deposit_remaining, payment_method, payment_date, payment_status, reference_no, slip_file, remark)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)");
+        $stmt->bind_param(
+            "iidsdsssss",
+            $order_id,
+            $customer_id,
+            $amount,
+            $payment_type,
+            $deposit_remaining,
+            $payment_method,
+            $payment_date,
+            $reference_no,
+            $slip_file,
+            $remark
+        );
+        if ($stmt->execute()) {
+            $success = "แจ้งชำระเงินเรียบร้อยแล้ว";
+            require_once __DIR__ . '/../notifications/notify_helper.php';
+            $payment_id = $stmt->insert_id;
+            notifyPaymentToAdmin($conn, $order['order_code'], $payment_id);
+        } else {
+            $error = "เกิดข้อผิดพลาด: " . $stmt->error;
+        }
     }
 }
+
+// ดึงข้อมูลการชำระเงินล่าสุดสำหรับออเดอร์นี้
+$payment = $conn->query("SELECT * FROM payments WHERE order_id = $order_id ORDER BY created_at DESC LIMIT 1")->fetch_assoc();
+
+$is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
 ?>
 
 <!DOCTYPE html>
@@ -173,7 +207,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
                                     </div>
                                     <input type="radio" name="payment_method" value="bank" required
-                                        class="w-5 h-5 text-indigo-600">
+                                        class="w-5 h-5 text-indigo-600"
+                                        <?= (isset($payment['payment_method']) && $payment['payment_method'] == 'bank') ? 'checked' : '' ?>>
                                 </div>
                             </div>
                             <!-- PromptPay -->
@@ -195,7 +230,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
                                     </div>
                                     <input type="radio" name="payment_method" value="promptpay" required
-                                        class="w-5 h-5 text-indigo-600">
+                                        class="w-5 h-5 text-indigo-600"
+                                        <?= (isset($payment['payment_method']) && $payment['payment_method'] == 'promptpay') ? 'checked' : '' ?>>
                                 </div>
                             </div>
                         </div>
@@ -330,23 +366,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <!-- QR Selection -->
                         <div class="space-y-3 mb-4 rounded-xl bg-white p-4 m-4 shadow-sm ring-1 ring-gray-200">
                             <h4 class="font-semibold text-gray-800">อัพโหลดสลิปการโอน</h4>
+                            <?php if (!empty($payment['slip_file'])): ?>
+                                <div class="mb-2">
+                                    <span class="text-xs text-gray-500">สลิปเดิม:</span><br>
+                                    <img src="/graphic-design<?= htmlspecialchars($payment['slip_file']) ?>"
+                                        alt="slip"
+                                        class="h-24 rounded-lg border mb-2"
+                                        onerror="this.style.display='none';">
+                                </div>
+                            <?php endif; ?>
                             <div class="space-y-2">
                                 <div class="border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300"
                                     onclick="document.getElementById('slip-upload').click()">
-                                    <div id="upload-preview">
-                                        <!-- แสดง preview หรือข้อความ -->
-                                    </div>
-
-                                    <input type="file" name="slip_file" accept="image/*" required class="hidden" id="slip-upload">
+                                    <div id="upload-preview"></div>
+                                    <input type="file" name="slip_file" accept="image/*" <?= empty($payment['slip_file']) ? 'required' : '' ?> class="hidden" id="slip-upload">
                                     <p class="text-sm text-gray-600">คลิกเพื่อเลือกไฟล์สลิป</p>
                                     <p class="text-xs text-gray-400">PNG, JPG (ขนาดไม่เกิน 5MB)</p>
                                 </div>
                             </div>
                         </div>
+                        <?php if ($is_retry): ?>
                         <div class="mb-4 rounded-xl bg-white p-4 m-4 shadow-sm ring-1 ring-gray-200">
-                            <h4 class="font-semibold text-gray-800 mb-2">หมายเหตุ (ถ้ามี)</h4>
-                            <textarea name="remark" rows="1" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            <h4 class="font-semibold text-gray-800 mb-2">หมายเหตุจากแอดมิน:</h4>
+                            <div class="bg-red-50 p-3 rounded-xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
+                                <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?></div>
+                            </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -455,7 +501,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <!-- Pay Button -->
                             <button type="submit" id="payButton"
                                 class="w-full bg-zinc-900 text-white rounded-xl px-6 py-2 text-center flex items-center justify-center font-bold text-lg transition-all">
-                                ดำเนินการชำระเงิน
+                                <?= $is_retry ? 'อัปเดทการชำระเงินใหม่' : 'ดำเนินการชำระเงิน' ?>
                             </button>
                         </div>
                     </div>
@@ -467,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Success Modal -->
     <div id="successModal"
         class="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="rounded-3xl bg-white shadow-sm ring-1 ring-gray-200 p-8 text-center w-10/12 max-w-md mx-4">
+        <div class="bg-white rounded-3xl shadow-lg p-8 max-w-sm w-full text-center relative">
             <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -477,11 +523,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="text-gray-600 mb-6">เราได้รับการชำระเงินของคุณแล้ว<br>จะเริ่มดำเนินการออกแบบในวันถัดไป</p>
             <div class="space-y-3 flex flex-col">
                 <a href="/graphic-design/src/client/order.php"
-                    class="w-full bg-zinc-900 text-white py-3 rounded-xl font-semibold hover:bg-zinc-800 transition-all">
+                    class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                     ดูสถานะคำสั่งซื้อ
                 </a>
                 <a href="/graphic-design/src/client/index.php"
-                    class="w-full border border-gray-300 bg-zinc-50  text-gray-700 py-3 rounded-xl font-semibold hover:bg-zinc-100 transition-all"
+                    class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
                     onclick="closeModal()">
                     กลับหน้าหลัก
                 </a>
@@ -586,7 +632,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 amount = fullAmount * 0.5;
             }
 
-            payButton.innerHTML = `ดำเนินการชำระเงิน <span class="ml-2">฿${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
+            payButton.innerHTML = `<?= $is_retry ? 'อัปเดทการชำระเงินใหม่' : 'ดำเนินการชำระเงิน' ?> <span class="ml-2">฿${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
         }
 
         // เพิ่ม event listener ให้ radio ทุกตัว
@@ -617,6 +663,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 e.target.submit();
             }, 1500);
         });
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = 0;
+            setTimeout(() => toast.classList.add('hidden'), 300);
+        }
     </script>
 </body>
 

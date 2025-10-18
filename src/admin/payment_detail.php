@@ -297,44 +297,22 @@ function getPaymentTypeBadge($type)
                             </div>
                             <div class="p-6">
                                 <!-- Quick Actions -->
+                                <?php
+                                $isActionDisabled = ($payment['payment_status'] !== 'pending');
+                                ?>
                                 <div class="space-y-3 mb-6">
                                     <button onclick="approvePayment()"
-                                        class="w-full bg-zinc-900 text-white py-3 rounded-xl font-semibold hover:bg-zinc-800 transition-all flex items-center justify-center space-x-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
+                                        class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900"
+                                        <?= $isActionDisabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '' ?>>
                                         <span>อนุมัติการชำระเงิน</span>
                                     </button>
 
                                     <button onclick="rejectPayment()"
-                                        class="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-red-700 hover:to-red-600 transition-all flex items-center justify-center space-x-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
+                                        class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all"
+                                        <?= $isActionDisabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '' ?>>
                                         <span>ปฏิเสธการชำระเงิน</span>
                                     </button>
                                 </div>
-
-                                <!-- Status Change -->
-                                <!-- <div class="border-t pt-4">
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">เปลี่ยนสถานะ</label>
-                                    <select
-                                        class="border mb-2 transition font-medium rounded-xl text-sm px-5 py-2 w-full text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
-                                        <option value="pending">รอตรวจสอบ</option>
-                                        <option value="processing">กำลังตรวจสอบ</option>
-                                        <option value="completed">สำเร็จ</option>
-                                        <option value="failed">ล้มเหลว</option>
-                                        <option value="refunded">คืนเงิน</option>
-                                    </select>
-
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">หมายเหตุ (ถ้ามี)</label>
-                                    <textarea
-                                        class="block w-full rounded-2xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900"
-                                        placeholder="ระบุเหตุผลหรือข้อมูลเพิ่มเติม..."></textarea>
-                                </div> -->
-
                                 <div class="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-2 text-xs text-blue-700">
                                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -374,7 +352,7 @@ function getPaymentTypeBadge($type)
             <!-- Approval Confirmation Modal -->
             <div id="approvalModal"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md bg-opacity-50 hidden">
-                <div class="bg-white rounded-3xl shadow-lg p-5 max-w-sm w-full text-center">
+                <div class="bg-white rounded-3xl shadow-lg p-8 max-w-sm w-full text-center relative">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -387,11 +365,11 @@ function getPaymentTypeBadge($type)
 
                         <div class="space-y-3">
                             <button onclick="confirmApproval()"
-                                class="w-full bg-zinc-900 text-white py-3 rounded-xl font-semibold hover:bg-zinc-800 transition-all">
+                                class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                                 ยืนยันการอนุมัติ
                             </button>
                             <button onclick="closeApprovalModal()"
-                                class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">
+                                class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                                 ยกเลิก
                             </button>
                         </div>
@@ -402,7 +380,7 @@ function getPaymentTypeBadge($type)
             <!-- Rejection Modal -->
             <div id="rejectionModal"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md bg-opacity-50 hidden">
-                <div class="bg-white rounded-3xl shadow-lg p-5 max-w-sm w-full text-center">
+                <div class="bg-white rounded-3xl shadow-lg p-8 max-w-sm w-full text-center relative">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,11 +398,11 @@ function getPaymentTypeBadge($type)
 
                         <div class="space-y-3">
                             <button onclick="confirmRejection()"
-                                class="w-full bg-red-600 text-white py-3 rounded-xl font-semibold hover:bg-red-700 transition-all">
+                                class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">
                                 ยืนยันการปฏิเสธ
                             </button>
                             <button onclick="closeRejectionModal()"
-                                class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">
+                                class="w-full border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                                 ยกเลิก
                             </button>
                         </div>

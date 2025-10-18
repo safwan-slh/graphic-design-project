@@ -22,6 +22,9 @@ $stmt->bind_param("i", $order_id);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
 
+// ดึง payment ล่าสุดของ order นี้
+$payment = $conn->query("SELECT * FROM payments WHERE order_id = $order_id ORDER BY created_at DESC LIMIT 1")->fetch_assoc();
+
 // ดึงรายละเอียดโปสเตอร์ (เช่น จากตาราง poster_details)
 $detail = null;
 if ($order && isset($order['ref_id'])) {
@@ -85,7 +88,7 @@ function getOrderStatusClass($status)
 function getOrderProgressSteps($status)
 {
     if ($status === 'cancelled') {
-        return [[['label' => 'ยกเลิกออเดอร์', 'key' => 'cancelled']], 0];
+        return [[['label' => 'ออเดอร์ถูกยกเลิก', 'key' => 'cancelled']], 0];
     }
     // กำหนดขั้นตอนและสถานะปัจจุบัน
     $steps = [
@@ -611,6 +614,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
                         </div>
                     </div>
 
+                    <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+                        <div class="border-b bg-gray-50 rounded-t-2xl">
+                            <h2 class="text-md font-semibold p-2 pl-4">หมายเหตุจากแอดมิน</h2>
+                        </div>
+                        <div class="p-2">
+                            <div class="bg-red-50 p-3 rounded-2xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
+                                <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?></div>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <form id="chatForm" class="flex items-start space-x-3">
+                                <div class="flex-1 space-y-2">
+                                    <a href="/graphic-design/src/client/payment.php?order_id=<?= $order_id ?>&retry=1"
+                                        class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">
+                                        อัปเดทการชำระเงินใหม่
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Chat -->
                     <div class="bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
                         <div class="border-b bg-gray-50 rounded-t-2xl">
@@ -781,17 +805,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_version'], $_
             </div>
         </div>
     </div>
-    <!-- Cancel Confirmation Modal -->
-    <div id="cancelModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm bg-opacity-50 hidden">
-        <div class="bg-white rounded-3xl shadow-lg p-5 max-w-sm w-full text-center">
-            <div class="text-xl font-bold mb-4">ยืนยันการยกเลิกออเดอร์</div>
-            <div id="cancelModalMsg" class="mb-6 text-gray-700"></div>
-            <div class="flex justify-center gap-4">
-                <button onclick="closeCancelModal()" class="w-full font-medium rounded-2xl text-sm px-5 py-2 text-center flex items-center justify-center bg-gray-200 hover:bg-gray-300">ยกเลิก</button>
-                <button id="confirmCancelBtn" class="w-full font-medium rounded-2xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">ยืนยัน</button>
+    <?php if ($payment && $payment['payment_status'] === 'cancelled'): ?>
+        <div id="paymentFailedModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm bg-opacity-50">
+            <div class="bg-white rounded-3xl shadow-lg p-8 max-w-sm w-full text-center relative">
+                <!-- ปุ่มปิดมุมขวาบน -->
+                <button
+                    class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105"
+                    onclick="document.getElementById('paymentFailedModal').style.display='none';"
+                    aria-label="ปิด">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div class="text-xl font-bold mb-4 text-red-600">การชำระเงินไม่สำเร็จ</div>
+                <div class="mb-6 text-gray-700">
+                    กรุณาตรวจสอบข้อมูลและอัปเดทการชำระเงินใหม่
+                </div>
+                <a href="/graphic-design/src/client/payment.php?order_id=<?= $order_id ?>&retry=1"
+                    class="w-full font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-all">
+                    อัปเดทการชำระเงินใหม่
+                </a>
             </div>
         </div>
-    </div>
+    <?php endif; ?>
 
     <!-- Image Modal -->
     <div id="imageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md bg-opacity-50 hidden"
