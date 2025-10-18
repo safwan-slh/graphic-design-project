@@ -12,7 +12,7 @@ $portfolio_sql = "SELECT p.*, s.service_name FROM portfolios p
                   LEFT JOIN services s ON p.service_id = s.service_id
                   WHERE p.is_active = 1
                   ORDER BY p.created_at DESC LIMIT 3";
-$result = $conn->query($portfolio_sql);
+$portfolioResult = $conn->query($portfolio_sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -258,9 +258,9 @@ $result = $conn->query($portfolio_sql);
                 <!-- Portfolio Grid -->
                 <div class="grid grid-cols-3 gap-6">
                     <?php if (
-                        $result->num_rows > 0
+                        $portfolioResult->num_rows > 0
                     ): ?>
-                        <?php while ($portfolio = $result->fetch_assoc()):
+                        <?php while ($portfolio = $portfolioResult->fetch_assoc()):
                             $tags = json_decode($portfolio['tags'], true); // ตรวจสอบว่าภาพมีอยู่จริง
                             $imagePath = __DIR__ . '/../../' . $portfolio['image_url'];
                             $imageExists =
