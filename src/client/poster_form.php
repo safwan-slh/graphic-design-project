@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </nav>
             </div>
         </div>
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <!-- Header -->
             <div class="mb-4 flex items-center border-b border-gray-200 px-8 py-6">
                 <div class="mr-4 rounded-xl bg-zinc-900 p-3">
@@ -263,7 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" enctype="multipart/form-data" id="designForm">
                 <input type="hidden" name="service_id" value="1">
                 <!-- Section 1: Project Information -->
-                <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="1">
+                <div class="form-section form-card rounded-2xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="1">
                     <div class="mb-6 flex items-center">
                         <div class="mr-4 rounded-full bg-zinc-100 p-3">
                             <svg class="h-6 w-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="mb-2 block text-sm font-medium text-gray-700">ชื่อโครงการ/กิจกรรม
                                 <span class="text-red-500">*</span></label>
                             <input type="text" name="project_name" required
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                                 placeholder="เช่น โครงการรณรงค์ลดโลกร้อน" />
                         </div>
 
@@ -290,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="poster_type" class="mb-2 block text-sm font-medium text-gray-700">ประเภทโปสเตอร์ <span
                                     class="text-red-500">*</span></label>
                             <select id="poster_type" name="poster_type" required
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 ">
                                 <option value="">เลือกประเภท</option>
                                 <option value="ประชาสัมพันธ์">โปสเตอร์ประชาสัมพันธ์</option>
                                 <option value="กิจกรรม">โปสเตอร์กิจกรรม</option>
@@ -306,7 +306,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label class="mb-2 block text-sm font-medium text-gray-700">วัตถุประสงค์ของโปสเตอร์
                             <span class="text-red-500">*</span></label>
                         <textarea name="objective" required rows="3"
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="อธิบายว่าต้องการให้โปสเตอร์สื่อสารอะไรกับผู้ชม"></textarea>
                     </div>
 
@@ -314,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label class="mb-2 block text-sm font-medium text-gray-700">กลุ่มเป้าหมาย <span
                                 class="text-red-500">*</span></label>
                         <input type="text" name="target_audience" required
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="เช่น นักเรียน, ผู้ปกครอง, บุคคลทั่วไป" />
                     </div>
 
@@ -322,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label class="mb-2 block text-sm font-medium text-gray-700">ข้อความหลัก <span
                                 class="text-red-500">*</span></label>
                         <textarea name="main_message" required rows="2"
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="ข้อความสำคัญที่ต้องการสื่อ"></textarea>
                     </div>
 
@@ -330,13 +330,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label class="mb-2 block text-sm font-medium text-gray-700">เนื้อหาที่ต้องการ <span
                                 class="text-red-500">*</span></label>
                         <textarea name="content" required rows="4"
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="เช่น ชื่อโครงการ วันที่ สถานที่ เนื้อหาสำคัญ โลโก้องค์กร เบอร์ติดต่อ"></textarea>
                     </div>
                 </div>
 
                 <!-- Section 2: Technical Requirements -->
-                <div id="designForm" class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="2">
+                <div id="designForm" class="form-section form-card rounded-2xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="2">
                     <div class="mb-6 flex items-center">
                         <div class="mr-4 rounded-full bg-zinc-100 p-3">
                             <svg class="h-6 w-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,7 +356,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block">
                                 <input type="radio" name="size" value="A4" class="peer hidden" required />
                                 <div
-                                    class="size-option cursor-pointer rounded-lg border border-gray-200 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                                    class="size-option cursor-pointer rounded-xl border border-gray-300 hover:bg-gray-100 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
                                     <p class="font-medium">A4</p>
                                     <p class="text-sm text-gray-500">21 × 29.7 cm</p>
                                 </div>
@@ -364,7 +364,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block">
                                 <input type="radio" name="size" value="A3" class="peer hidden" />
                                 <div
-                                    class="size-option cursor-pointer rounded-lg border border-gray-200 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                                    class="size-option cursor-pointer rounded-xl border border-gray-300 hover:bg-gray-100 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
                                     <p class="font-medium">A3</p>
                                     <p class="text-sm text-gray-500">29.7 × 42 cm</p>
                                 </div>
@@ -372,7 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block">
                                 <input type="radio" name="size" value="A2" class="peer hidden" />
                                 <div
-                                    class="size-option cursor-pointer rounded-lg border border-gray-200 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                                    class="size-option cursor-pointer rounded-xl border border-gray-300 hover:bg-gray-100 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
                                     <p class="font-medium">A2</p>
                                     <p class="text-sm text-gray-500">42 × 59.4 cm</p>
                                 </div>
@@ -380,7 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block">
                                 <input type="radio" name="size" value="A1" class="peer hidden" />
                                 <div
-                                    class="size-option cursor-pointer rounded-lg border border-gray-200 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                                    class="size-option cursor-pointer rounded-xl border border-gray-300 hover:bg-gray-100 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
                                     <p class="font-medium">A1</p>
                                     <p class="text-sm text-gray-500">59.4 × 84.1 cm</p>
                                 </div>
@@ -388,7 +388,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block">
                                 <input type="radio" name="size" value="A0" class="peer hidden" />
                                 <div
-                                    class="size-option cursor-pointer rounded-lg border border-gray-200 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                                    class="size-option cursor-pointer rounded-xl border border-gray-300 hover:bg-gray-100 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
                                     <p class="font-medium">A0</p>
                                     <p class="text-sm text-gray-500">84.1 × 118.9 cm</p>
                                 </div>
@@ -396,7 +396,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="block">
                                 <input type="radio" name="size" value="custom" class="peer hidden" />
                                 <div
-                                    class="size-option cursor-pointer rounded-lg border border-gray-200 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                                    class="size-option cursor-pointer rounded-xl border border-gray-300 hover:bg-gray-100 p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50">
                                     <p class="font-medium">กำหนดเอง</p>
                                     <p class="text-sm text-gray-500">ระบุขนาดด้านล่าง</p>
                                 </div>
@@ -407,13 +407,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div>
                                     <label for="custom_width" class="mb-2 block text-sm font-medium text-gray-700">ความกว้าง (ซม.)</label>
                                     <input type="number" name="custom_width"
-                                        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+                                        class="w-full rounded-xl border border-gray-300 px-4 py-2 "
                                         placeholder="เช่น 50">
                                 </div>
                                 <div>
                                     <label for="custom_height" class="mb-2 block text-sm font-medium text-gray-700">ความสูง (ซม.)</label>
                                     <input type="number" name="custom_height"
-                                        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+                                        class="w-full rounded-xl border border-gray-300 px-4 py-2 "
                                         placeholder="เช่น 70">
                                 </div>
                             </div>
@@ -424,7 +424,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="orientation" class="mb-2 block text-sm font-medium text-gray-700">การวางแนว <span
                                     class="text-red-500">*</span></label>
                             <select id="orientation" name="orientation" required
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 ">
                                 <option value="">เลือกการวางแนว</option>
                                 <option value="แนวตั้ง">แนวตั้ง (Portrait)</option>
                                 <option value="แนวนอน">แนวนอน (Landscape)</option>
@@ -437,7 +437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="mb-6">
                             <label for="style" class="mb-2 block text-sm font-medium text-gray-700">สไตล์ที่ต้องการ</label>
                             <select id="style" name="style"
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 ">
                                 <option value="">เลือกสไตล์</option>
                                 <option value="มินิมอล">มินิมอล</option>
                                 <option value="โมเดิร์น">โมเดิร์น</option>
@@ -461,7 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             class="color-picker-preview w-12 h-12 rounded-xl"
                                             onchange="document.getElementById('color_primary').value = this.value">
                                         <input type="text" id="color_primary" name="color_primary" value="#4F46E5"
-                                            class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                            class="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm"
                                             onchange="document.getElementById('color_picker_primary').value = this.value">
                                     </div>
                                 </div>
@@ -474,7 +474,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             class="color-picker-preview w-12 h-12 rounded-xl"
                                             onchange="document.getElementById('color_secondary').value = this.value">
                                         <input type="text" id="color_secondary" name="color_secondary" value="#ffffff"
-                                            class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                            class="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm"
                                             onchange="document.getElementById('color_picker_secondary').value = this.value">
                                     </div>
                                 </div>
@@ -486,7 +486,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             class="color-picker-preview w-12 h-12 rounded-xl"
                                             onchange="document.getElementById('color_accent').value = this.value">
                                         <input type="text" id="color_accent" name="color_accent" value="#ffffff"
-                                            class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                            class="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm"
                                             onchange="document.getElementById('color_picker_accent').value = this.value">
                                     </div>
                                 </div>
@@ -494,7 +494,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="">
                                 <label for="color_mode" class="block text-sm font-medium text-gray-700 mb-1">โหมดสี</label>
                                 <select id="color_mode" name="color_mode"
-                                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                                    class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 ">
                                     <option value="both">ทั้ง CMYK และ RGB</option>
                                     <option value="CMYK">CMYK (สำหรับพิมพ์)</option>
                                     <option value="RGB">RGB (สำหรับออนไลน์)</option>
@@ -506,19 +506,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="mt-6">
                             <label class="block text-sm font-medium text-gray-700 mb-1">ฟอนต์ที่ต้องการใช้ (ถ้ามี)</label>
                             <input type="text" name="preferred_fonts"
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                                 placeholder="เช่น TH Sarabun New, Kanit, Anuphan">
                         </div>
                         <div class="mt-6">
                             <label class="block text-sm font-medium text-gray-700 mb-1">โค้ดสีที่ต้องการ (ถ้ามี)</label>
                             <input type="text" name="color_codes"
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                                 placeholder="เช่น #4F46E5, #10B981, #F59E0B">
                         </div>
                     </div>
                 </div>
                 <!-- Section 3: Content -->
-                <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="3">
+                <div class="form-section form-card rounded-2xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="3">
                     <div class="mb-6 flex items-center">
                         <div class="mr-4 rounded-full bg-zinc-100 p-3">
                             <svg class="h-6 w-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -532,12 +532,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-6">
                         <label for="logo_file" class="block text-sm font-medium text-gray-700 mb-2">ไฟล์โลโก้องค์กร/บริษัท</label>
                         <div
-                            class="file-upload-area border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300">
-                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                                <path
-                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
+                            class="file-upload-area bg-gray-50 rounded-xl border border-dashed border-gray-300 p-6 text-center hover:bg-gray-100 cursor-pointer transition-colors duration-300">
+                            <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white ring-1 ring-gray-300 text-zinc-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                </svg>
+                            </div>
                             <input id="logo_file" type="file" name="logo_file[]" class="hidden" accept="image/*,.ai,.eps,.svg" multiple onchange="handleFileUpload(this, 'logo-preview')">
                             <p class="text-sm text-gray-600">คลิกเพื่อเลือกไฟล์โลโก้</p>
                             <p class="text-xs text-gray-400 mt-1">PNG, JPG, AI, EPS, SVG</p>
@@ -548,12 +548,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-6">
                         <label for="images_file" class="block text-sm font-semibold text-gray-700 mb-2">อัพโหลดรูปภาพ</label>
                         <div
-                            class="file-upload-area border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300">
-                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                                <path
-                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
+                            class="file-upload-area bg-gray-50 rounded-xl border border-dashed border-gray-300 p-6 text-center hover:bg-gray-100 cursor-pointer transition-colors duration-300">
+                            <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white ring-1 ring-gray-300 text-zinc-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                </svg>
+                            </div>
                             <input id="images_file" type="file" name="images_file[]" class="hidden" accept="image/*" multiple
                                 onchange="handleFileUpload(this, 'images-preview')">
                             <p class="text-sm text-gray-600">คลิกเพื่อเลือกรูปภาพ</p>
@@ -565,12 +565,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-6">
                         <label for="reference_file" class="block text-sm font-semibold text-gray-700 mb-2">ตัวอย่างงานที่ชอบ</label>
                         <div
-                            class="file-upload-area border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300">
-                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                                <path
-                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
+                            class="file-upload-area bg-gray-50 rounded-xl border border-dashed border-gray-300 p-6 text-center hover:bg-gray-100 cursor-pointer transition-colors duration-300">
+                            <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white ring-1 ring-gray-300 text-zinc-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                </svg>
+                            </div>
                             <input id="reference_file" type="file" name="reference_file[]" class="hidden" accept="image/*,.pdf" multiple onchange="handleFileUpload(this, 'reference-preview')">
                             <p class="text-sm text-gray-600">อัพโหลดตัวอย่าง</p>
                             <p class="text-xs text-gray-400 mt-1">PNG, JPG, PDF</p>
@@ -581,14 +581,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700">ลิงก์ตัวอย่างอื่นๆ (ถ้ามี)</label>
                         <input type="url" name="reference_link"
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="เช่น Pinterest, Behance, หรือเว็บไซต์อื่นๆ">
                         <p class="text-xs text-gray-500 mt-1.5">ลิงก์ Pinterest, Behance หรือเว็บไซต์ที่มีตัวอย่างที่ชอบ</p>
                     </div>
                 </div>
 
                 <!-- Section 4: Additional Information -->
-                <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="4">
+                <div class="form-section form-card rounded-2xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="4">
                     <div class="mb-6 flex items-center">
                         <div class="mr-4 rounded-full bg-zinc-100 p-3">
                             <svg class="h-6 w-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -606,7 +606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="budget_range" class="mb-2 block text-sm font-medium text-gray-700">งบประมาณ <span
                                     class="text-red-500">*</span></label>
                             <select id="budget_range" name="budget_range" required
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 ">
                                 <option value="">เลือกงบประมาณ</option>
                                 <option value="1000">1,000 บาท</option>
                                 <option value="2000">2,000 บาท</option>
@@ -619,7 +619,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="due_date" class="mb-2 block text-sm font-medium text-gray-700">วันที่ต้องการรับงาน <span
                                     class="text-red-500">*</span></label>
                             <input id="due_date" type="date" name="due_date" required
-                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                class="block w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                                 min="<?= date('Y-m-d', strtotime('+7 days')) ?>">
                             <p class="text-xs text-gray-500 mt-1.5">⚠️ การออกแบบต้องใช้เวลาอย่างน้อยขั้นต่ำ 7 วัน</p>
                         </div>
@@ -627,21 +627,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-6">
                         <label class="mb-2 block text-sm font-medium text-gray-700">สิ่งที่ไม่ต้องการ</label>
                         <textarea name="avoid_elements" rows="3"
-                            class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="เช่น ไม่ต้องการใช้สีฟ้า, ไม่อยากเห็นรูปเด็ก, ฯลฯ"></textarea>
                     </div>
 
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700">ข้อกำหนดพิเศษ (ถ้ามี)</label>
                         <textarea name="special_requirements" rows="3"
-                            class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            class="w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 "
                             placeholder="เช่น ต้องมี QR Code, ต้องเว้นพื้นที่สำหรับตราประทับ, ต้องส่งไฟล์ต้นฉบับ"></textarea>
                     </div>
 
                 </div>
 
                 <!-- Section 5: Review Section -->
-                <div class="form-section form-card rounded-xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="5">
+                <div class="form-section form-card rounded-2xl bg-white m-8 p-6 shadow-sm ring-1 ring-gray-200" data-section="5">
                     <div class="mb-6 flex items-center">
                         <div class="mr-4 rounded-full bg-zinc-100 p-3">
                             <svg class="h-6 w-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -674,24 +674,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Navigation Buttons -->
                 <div class="flex items-center justify-between m-8">
                     <button type="button" id="prevBtn"
-                        class="hidden bg-zinc-200 text-zinc-600 font-bold rounded-xl px-6 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 items-center justify-center">
+                        class="hidden border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                         ย้อนกลับ
                     </button>
                     <div class="ml-auto flex space-x-3">
                         <button type="button" id="nextBtn"
-                            class="text-white bg-zinc-900 hover:bg-zinc-800 font-bold rounded-xl px-6 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center">
+                            class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                             ถัดไป
                         </button>
                         <button type="button" id="reviewBtn"
-                            class="hidden text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl px-6 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 items-center justify-center">
+                            class="hidden border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-blue-100 text-blue-600 border-blue-300 hover:bg-blue-200">
                             ตรวจสอบข้อมูล
                         </button>
                         <button type="button" id="editBtn"
-                            class="hidden bg-zinc-200 text-zinc-600 font-bold rounded-xl px-6 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 items-center justify-center">
+                            class="hidden border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-white text-gray-600 border-gray-300 hover:bg-gray-100">
                             แก้ไขข้อมูล
                         </button>
                         <button type="submit" id="submitBtn"
-                            class="hidden text-white bg-green-600 hover:bg-green-700 font-bold rounded-xl px-6 py-2 text-center transition-all duration-300 ease-in-out hover:scale-105 items-center justify-center">
+                            class="hidden border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                             ส่งข้อมูล
                         </button>
                     </div>
@@ -970,7 +970,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         // Handle file upload
-                function handleFileUpload(input, previewId) {
+        function handleFileUpload(input, previewId) {
             const preview = document.getElementById(previewId);
             const maxFiles = 4;
             let files = Array.from(input.files);
@@ -979,7 +979,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 input.value = "";
                 return;
             }
-        
+
             // ตรวจสอบขนาดไฟล์รวม
             let totalSize = 0;
             ['logo_file[]', 'images_file[]', 'reference_file[]'].forEach(name => {
@@ -995,13 +995,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 preview.classList.add('hidden');
                 return;
             }
-        
+
             preview.innerHTML = '';
             preview.classList.remove('hidden');
             files.forEach((file) => {
                 const fileDiv = document.createElement('div');
                 fileDiv.className = 'relative inline-block mr-2 mb-2';
-        
+
                 // กากะบาด
                 const removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
@@ -1016,7 +1016,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     input.files = dt.files;
                     handleFileUpload(input, previewId); // refresh preview
                 };
-        
+
                 if (file.type.startsWith('image/')) {
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(file);
