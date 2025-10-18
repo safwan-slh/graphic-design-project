@@ -10,6 +10,18 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
 <!-- Modal โปรไฟล์ -->
 <div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
     <div class="bg-gray-100 p-3 rounded-3xl shadow-xl w-full max-w-3xl mx-auto relative flex space-x-3 max-h-[80vh]" style="height: 500px;">
+        <div class="w-64 bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
+        <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">การตั้งค่าโปรไฟล์</div>
+        <ul id="orderList">
+          <!-- ปุ่มสอบถามทั่วไป -->
+          <li class="p-2 text-sm pb-0">
+            <button type="button"
+              class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center font-medium text-gray-500 ring-1 ring-gray-300">
+              โปรไฟล์ของฉัน
+            </button>
+          </li>
+        </ul>
+      </div>
         <!-- Main Chat Area -->
         <div class="flex-1 flex flex-col bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
             <button onclick="document.getElementById('profileModal').classList.add('hidden')" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
