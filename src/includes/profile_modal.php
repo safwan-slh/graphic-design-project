@@ -22,6 +22,15 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
                         </svg>
                     </button>
                 </li>
+                <li class="p-2 text-sm pb-0">
+                    <button type="button"
+                        class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center font-medium text-gray-500 ring-1 ring-gray-300">
+                        ประวัติการชำระเงิน
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </li>
             </ul>
         </div>
         <!-- Main Chat Area -->
