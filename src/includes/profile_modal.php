@@ -8,7 +8,7 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
 ?>
 
 <!-- Modal โปรไฟล์ -->
-<div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm ">
+<div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
     <div class="bg-gray-100 p-3 rounded-3xl shadow-xl w-full max-w-3xl mx-auto relative flex space-x-3 max-h-[80vh]" style="height: 500px;">
         <div class="w-64 bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
             <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">การตั้งค่า</div>
@@ -31,15 +31,6 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
                         </svg>
                     </button>
                 </li>
-                <li class="p-2 text-sm pb-0">
-                    <button type="button"
-                        class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center font-medium text-gray-500 ring-1 ring-gray-300">
-                        ประวัติการชำระเงิน
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </li>
             </ul>
         </div>
         <!-- Main Chat Area -->
@@ -54,6 +45,19 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
             </div>
             <div class="flex-1 overflow-y-auto p-4" style="min-height:200px;">
                 <div class="flex flex-col items-center gap-4">
+                    <?php if (!empty($_SESSION['change_password_error'])): ?>
+                        <div class="mb-4 px-4 py-2 bg-red-100 text-red-700 rounded-xl text-center font-medium">
+                            <?= htmlspecialchars($_SESSION['change_password_error']) ?>
+                        </div>
+                        <?php unset($_SESSION['change_password_error']); ?>
+                    <?php endif; ?>
+
+                    <?php if (!empty($_SESSION['change_password_success'])): ?>
+                        <div class="mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-xl text-center font-medium">
+                            <?= htmlspecialchars($_SESSION['change_password_success']) ?>
+                        </div>
+                        <?php unset($_SESSION['change_password_success']); ?>
+                    <?php endif; ?>
                     <div class="w-full flex justify-center mx-auto max-h-10 bg-gray-100 rounded-xl p-4 ring-1 ring-gray-200 relative" style="padding-top: 4.5rem;">
                         <!-- วงกลมตัวอักษรแรก -->
                         <div class="absolute left-1/2 -translate-x-1/2 -bottom-10 w-20 h-20 rounded-full bg-zinc-900 text-white flex items-center justify-center text-3xl font-bold select-none ring-4 ring-white">
@@ -216,4 +220,30 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
             };
         }
     });
+
+    document.getElementById('changePasswordForm').onsubmit = function(e) {
+        const current = this.current_password.value.trim();
+        const newPass = this.new_password.value.trim();
+        const confirm = this.confirm_password.value.trim();
+
+        // ตรวจสอบว่ากรอกครบ
+        if (!current || !newPass || !confirm) {
+            alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+            e.preventDefault();
+            return false;
+        }
+        // ตรวจสอบความยาวรหัสผ่านใหม่
+        if (newPass.length < 6) {
+            alert('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร');
+            e.preventDefault();
+            return false;
+        }
+        // ตรวจสอบรหัสผ่านใหม่และยืนยันตรงกัน
+        if (newPass !== confirm) {
+            alert('รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน');
+            e.preventDefault();
+            return false;
+        }
+        // ไม่ต้อง return true
+    };
 </script>
