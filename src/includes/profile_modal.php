@@ -11,17 +11,19 @@ $customer = $conn->query("SELECT fullname, email, phone FROM customers WHERE cus
 <div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
     <div class="bg-gray-100 p-3 rounded-3xl shadow-xl w-full max-w-3xl mx-auto relative flex space-x-3 max-h-[80vh]" style="height: 500px;">
         <div class="w-64 bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
-        <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">การตั้งค่าโปรไฟล์</div>
-        <ul id="orderList">
-          <!-- ปุ่มสอบถามทั่วไป -->
-          <li class="p-2 text-sm pb-0">
-            <button type="button"
-              class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center font-medium text-gray-500 ring-1 ring-gray-300">
-              โปรไฟล์ของฉัน
-            </button>
-          </li>
-        </ul>
-      </div>
+            <div class="p-2 pl-4 font-semibold text-zinc-900 border-b bg-gray-50">การตั้งค่า</div>
+            <ul>
+                <li class="p-2 text-sm pb-0">
+                    <button type="button"
+                        class="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl flex justify-between items-center font-medium text-gray-500 ring-1 ring-gray-300">
+                        โปรไฟล์ของฉัน
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+        </div>
         <!-- Main Chat Area -->
         <div class="flex-1 flex flex-col bg-white rounded-2xl overflow-y-auto ring-1 ring-gray-200 shadow-sm">
             <button onclick="document.getElementById('profileModal').classList.add('hidden')" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
