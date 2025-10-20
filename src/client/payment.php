@@ -291,11 +291,10 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
                                     <div
                                         class="w-48 h-48 bg-white rounded-xl shadow-lg mx-auto mb-6 flex items-center justify-center">
                                         <div class="w-40 h-40 bg-gray-200 rounded-lg flex items-center justify-center">
-                                            <img src="" alt="">
+                                            <img src="/graphic-design/src/images/promptpay.png" alt="">
                                         </div>
                                     </div>
                                     <p class="text-zinc-800 font-semibold mb-2">สแกน QR Code นี้เพื่อชำระเงิน</p>
-                                    <p class="text-sm text-zinc-600">จำนวนเงิน: <span class="font-bold">฿1,500.00</span></p>
                                 </div>
                             </div>
                         </div>
