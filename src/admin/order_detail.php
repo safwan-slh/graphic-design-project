@@ -46,30 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_status'])) {
     $updateStmt->bind_param("si", $newStatus, $order_id);
     $updateStmt->execute();
 
-    // --- แจ้งเตือนลูกค้า ---
-    require_once __DIR__ . '/../notifications/notify_helper.php';
     // ดึง customer_id ของ order นี้
     $customer_id = $order['customer_id'];
     // กำหนดข้อความแจ้งเตือน
     $orderCode = $order['order_code'] ?? $order_id;
-    switch ($newStatus) {
-        case 'pending':
-            $msg = "ออเดอร์ #$orderCode ของคุณอยู่ระหว่างรอตรวจสอบ <span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>รอตรวจสอบ</span>";
-            break;
-        case 'in_progress':
-            $msg = "ออเดอร์ #$orderCode ของคุณกำลังดำเนินการ <span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>กำลังดำเนินการ</span>";
-            break;
-        case 'completed':
-            $msg = "ออเดอร์ #$orderCode ของคุณเสร็จสมบูรณ์แล้ว <span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>เสร็จสมบูรณ์</span>";
-            break;
-        case 'cancelled':
-            $msg = "ออเดอร์ #$orderCode ของคุณถูกยกเลิก <span class='bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ยกเลิก</span>";
-            break;
-        default:
-            $msg = "สถานะออเดอร์ #$orderCode ของคุณถูกอัปเดต";
-    }
-    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
-    sendNotification($conn, $customer_id, $msg, $link, 0);
+    // --- แจ้งเตือนลูกค้า ---
+    require_once __DIR__ . '/../notifications/notify_helper.php';
+    notifyOrderStatusChanged($conn, $customer_id, $order_id, $orderCode, $newStatus);
 
     // รีเฟรชหน้าเพื่อแสดงสถานะใหม่
     header("Location: order_detail.php?id=$order_id");

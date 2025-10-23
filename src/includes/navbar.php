@@ -146,20 +146,105 @@ if (isset($_SESSION['customer_id'])) {
               <?php endif; ?>
             </button>
             <!-- Dropdown -->
-            <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-2xl mb-6 ring-1 ring-gray-200 z-50">
+            <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-2xl mb-6 ring-1 ring-gray-200 z-50">
               <div class="border-b bg-gray-50 rounded-t-2xl">
                 <h2 class="text-md font-semibold p-2 pl-2 ml-2">แจ้งเตือน</h2>
               </div>
+              <?php
+              // Mapping type กับ SVG หรือ class ไอคอน
+              $notifIcons = [
+                'payment' => '
+                  <div class="w-10 h-10 text-green-600 bg-green-100 ring-1 ring-green-200 mr-4 rounded-lg flex items-center justify-center">       
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path d="M12 7.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
+                      <path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 14.625v-9.75ZM8.25 9.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM18.75 9a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75V9.75a.75.75 0 0 0-.75-.75h-.008ZM4.5 9.75A.75.75 0 0 1 5.25 9h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H5.25a.75.75 0 0 1-.75-.75V9.75Z" clip-rule="evenodd" />
+                      <path d="M2.25 18a.75.75 0 0 0 0 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 0 0-.75-.75H2.25Z" />
+                    </svg>
+                  </div>
+                ',
+                'payment_update' => '
+                  <div class="w-10 h-10 text-green-600 bg-green-100 ring-1 ring-green-200 mr-4 rounded-lg flex items-center justify-center">       
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path d="M12 7.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
+                      <path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 14.625v-9.75ZM8.25 9.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM18.75 9a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75V9.75a.75.75 0 0 0-.75-.75h-.008ZM4.5 9.75A.75.75 0 0 1 5.25 9h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H5.25a.75.75 0 0 1-.75-.75V9.75Z" clip-rule="evenodd" />
+                      <path d="M2.25 18a.75.75 0 0 0 0 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 0 0-.75-.75H2.25Z" />
+                    </svg>
+                  </div>
+                ',
+                'payment_rejected' => '
+                  <div class="w-10 h-10 text-red-600 bg-red-100 ring-1 ring-red-200 mr-4 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                ',
+                'order'   => '
+                  <div class="w-10 h-10 text-blue-600 bg-blue-100 ring-1 ring-blue-200 mr-4 rounded-lg flex items-center justify-center">       
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 0 0 .372.648l8.628 5.033Z" />
+                    </svg>
+                  </div>
+                ',
+                'workfile' => '
+                  <div class="w-10 h-10 text-orange-600 bg-orange-100 ring-1 ring-orange-200 mr-4 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path fill-rule="evenodd" d="M19.5 21a3 3 0 0 0 3-3V9a3 3 0 0 0-3-3h-5.379a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H4.5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h15Zm-6.75-10.5a.75.75 0 0 0-1.5 0v4.19l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V10.5Z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                ',
+                'comment' => '
+                  <div class="w-10 h-10 text-purple-600 bg-purple-100 ring-1 ring-purple-200 mr-4 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 0 0-1.032-.211 50.89 50.89 0 0 0-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 0 0 2.433 3.984L7.28 21.53A.75.75 0 0 1 6 21v-4.03a48.527 48.527 0 0 1-1.087-.128C2.905 16.58 1.5 14.833 1.5 12.862V6.638c0-1.97 1.405-3.718 3.413-3.979Z" />
+                      <path d="M15.75 7.5c-1.376 0-2.739.057-4.086.169C10.124 7.797 9 9.103 9 10.609v4.285c0 1.507 1.128 2.814 2.67 2.94 1.243.102 2.5.157 3.768.165l2.782 2.781a.75.75 0 0 0 1.28-.53v-2.39l.33-.026c1.542-.125 2.67-1.433 2.67-2.94v-4.286c0-1.505-1.125-2.811-2.664-2.94A49.392 49.392 0 0 0 15.75 7.5Z" />
+                    </svg>
+                  </div>
+                ',
+                'review'  => '
+                  <div class="w-10 h-10 text-yellow-600 bg-yellow-100 ring-1 ring-yellow-200 mr-4 rounded-lg flex items-center justify-center">       
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-400">
+                      <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                ',
+                'chat'    => '
+                  <div class="w-10 h-10 text-purple-600 bg-purple-100 ring-1 ring-purple-200 mr-4 rounded-lg flex items-center justify-center">       
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-5 h-5" viewBox="0 0 24 24">
+                      <path d="M4 19.5V17A2.5 2.5 0 0 1 6.5 14.5h11A2.5 2.5 0 0 1 20 17v2.5"/>
+                      <circle cx="12" cy="10" r="6"/>
+                    </svg>
+                  </div>
+                ',
+                'general' => '
+                  <div class="w-10 h-10 text-gray-600 bg-gray-100 ring-1 ring-gray-200 mr-4 rounded-lg flex items-center justify-center">       
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-5 h-5" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"/>
+                      <text x="12" y="16" text-anchor="middle" font-size="10" fill="#fff">i</text>
+                    </svg>
+                  </div>
+                ',
+              ];
+              ?>
               <ul class="max-h-80 overflow-y-auto p-2">
                 <?php if (count($notifications) === 0): ?>
                   <li class="p-4 text-gray-500 text-sm text-center">ไม่มีแจ้งเตือน</li>
                 <?php else: ?>
                   <?php foreach ($notifications as $notif): ?>
+                    <?php
+                    $icon = $notifIcons[$notif['type']] ?? $notifIcons['general'];
+                    ?>
                     <li class="mb-1">
                       <a href="/graphic-design/src/notifications/read_notification.php?id=<?= $notif['id'] ?>&redirect=<?= urlencode($notif['link']) ?>"
-                        class="block px-4 py-3 text-sm rounded-xl <?= $notif['is_read'] ? 'text-gray-400' : 'text-zinc-900 font-medium' ?> bg-zinc-50 hover:bg-zinc-100 transition">
-                        <?= $notif['message'] ?>
-                        <div class="text-xs text-gray-400 mt-1"><?= date('d/m/Y H:i', strtotime($notif['created_at'])) ?></div>
+                        class="block px-4 py-3 text-sm rounded-xl <?= $notif['is_read'] ? 'text-gray-400' : 'text-zinc-900 font-medium' ?> bg-zinc-50 hover:bg-zinc-100 transition flex items-center">
+                        <div class="flex items-center space-x-3">
+                          <!-- <div class="w-10 h-10 bg-zinc-900 ring-1 ring-gray-200 mr-4 rounded-lg flex items-center justify-center">
+                            </div> -->
+                            <?= $icon ?>
+                        </div>
+                        <div class="flex flex-col w-full">
+                          <span><?= $notif['message'] ?></span>
+                          <div class="text-xs text-gray-400 mt-1 w-full"><?= date('d/m/Y H:i', strtotime($notif['created_at'])) ?></div>
+                        </div>
                       </a>
                     </li>
                   <?php endforeach; ?>
@@ -228,7 +313,7 @@ if (isset($_SESSION['customer_id'])) {
     </div>
   </nav>
 
-  <?php include $_SERVER['DOCUMENT_ROOT'].'/graphic-design/src/includes/profile_modal.php'; ?>
+  <?php include $_SERVER['DOCUMENT_ROOT'] . '/graphic-design/src/includes/profile_modal.php'; ?>
   <!-- Chat Modal -->
   <div id="chatModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
     <div class="bg-gray-100 p-3 rounded-3xl shadow-xl w-full max-w-3xl mx-auto relative flex space-x-3 max-h-[80vh]" style="height: 500px;">
