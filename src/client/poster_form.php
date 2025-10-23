@@ -1119,6 +1119,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
+        document.getElementById('designForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // ป้องกัน submit ทันที
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        กำลังส่งข้อมูล...
+    `;
+            setTimeout(() => {
+                this.submit(); // submit ฟอร์มหลังจากรอ 2 วินาที
+            }, 2000); // 2000 = 2 วินาที
+        });
+
         // Initialize
         showSection(1);
 
