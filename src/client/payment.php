@@ -291,11 +291,10 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
                                     <div
                                         class="w-48 h-48 bg-white rounded-xl shadow-lg mx-auto mb-6 flex items-center justify-center">
                                         <div class="w-40 h-40 bg-gray-200 rounded-lg flex items-center justify-center">
-                                            <img src="" alt="">
+                                            <img src="/graphic-design/src/images/promptpay.png" alt="">
                                         </div>
                                     </div>
                                     <p class="text-zinc-800 font-semibold mb-2">สแกน QR Code นี้เพื่อชำระเงิน</p>
-                                    <p class="text-sm text-zinc-600">จำนวนเงิน: <span class="font-bold">฿1,500.00</span></p>
                                 </div>
                             </div>
                         </div>
@@ -376,8 +375,13 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
                                 </div>
                             <?php endif; ?>
                             <div class="space-y-2">
-                                <div class="border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors duration-300"
+                                <div class="bg-gray-50 rounded-xl border border-dashed border-gray-300 p-6 text-center hover:bg-gray-100 cursor-pointer transition-colors duration-300"
                                     onclick="document.getElementById('slip-upload').click()">
+                                    <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white ring-1 ring-gray-300 text-zinc-900">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                    </div>
                                     <div id="upload-preview"></div>
                                     <input type="file" name="slip_file" accept="image/*" <?= empty($payment['slip_file']) ? 'required' : '' ?> class="hidden" id="slip-upload">
                                     <p class="text-sm text-gray-600">คลิกเพื่อเลือกไฟล์สลิป</p>
@@ -386,12 +390,12 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
                             </div>
                         </div>
                         <?php if ($is_retry): ?>
-                        <div class="mb-4 rounded-xl bg-white p-4 m-4 shadow-sm ring-1 ring-gray-200">
-                            <h4 class="font-semibold text-gray-800 mb-2">หมายเหตุจากแอดมิน:</h4>
-                            <div class="bg-red-50 p-3 rounded-xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
-                                <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?></div>
+                            <div class="mb-4 rounded-xl bg-white p-4 m-4 shadow-sm ring-1 ring-gray-200">
+                                <h4 class="font-semibold text-gray-800 mb-2">หมายเหตุจากแอดมิน:</h4>
+                                <div class="bg-red-50 p-3 rounded-xl ring-1 ring-red-200 max-h-80 overflow-y-auto space-y-4">
+                                    <div class="text-red-600"><?= nl2br(htmlspecialchars($payment['remark'])) ?></div>
+                                </div>
                             </div>
-                        </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -597,26 +601,45 @@ $is_retry = isset($_GET['retry']) && $_GET['retry'] == 1;
             document.getElementById('successModal').classList.add('hidden');
         }
 
-        // File upload handler
-        document.getElementById('slip-upload')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('upload-preview').innerHTML = `
-                    <div class="mx-auto mb-3 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                            class="size-6 text-green-600">
-                            <path fill-rule="evenodd"
-                                class="size-6"
-                                d="M9 1.5H5.625c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5Zm6.61 10.936a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 14.47a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                                clip-rule="evenodd" />
-                                <path
-                                d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                                </svg>
-                                </div>
-                    <p class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs inline-block mr-2 mb-2">${file.name}</p>
-                    <p class="text-xs text-gray-400">อัพโหลดสำเร็จ</p>
-                `;
+        // ฟังก์ชัน handleSlipUpload สำหรับ preview และลบไฟล์
+        function handleSlipUpload(input) {
+            const preview = document.getElementById('upload-preview');
+            preview.innerHTML = '';
+            if (input.files && input.files.length > 0) {
+                const file = input.files[0];
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'relative inline-block mr-2 mb-2';
+
+                // ปุ่มกากะบาด
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.className = 'absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs z-10';
+                removeBtn.onclick = function() {
+                    input.value = '';
+                    preview.innerHTML = '';
+                };
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.alt = file.name;
+                    img.className = 'w-16 h-16 object-cover rounded-lg border border-gray-300';
+                    fileDiv.appendChild(img);
+                } else {
+                    const fileNameDiv = document.createElement('div');
+                    fileNameDiv.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs';
+                    fileNameDiv.textContent = file.name;
+                    fileDiv.appendChild(fileNameDiv);
+                }
+                fileDiv.appendChild(removeBtn);
+                preview.appendChild(fileDiv);
             }
+        }
+
+        // เปลี่ยน event listener เดิมเป็นแบบนี้
+        document.getElementById('slip-upload')?.addEventListener('change', function(e) {
+            handleSlipUpload(this);
         });
 
         // ดึงราคาจาก PHP

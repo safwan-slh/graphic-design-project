@@ -25,13 +25,44 @@ function notifyPaymentUpdateToAdmin($conn, $order_code, $payment_id) {
 function notifyPaymentStatusToCustomer($conn, $customer_id, $order_id, $order_code, $status, $remark = '') {
     if ($status === 'paid') {
         $message = "การชำระเงินสำหรับ Order #$order_code ของคุณได้รับการอนุมัติแล้ว";
+        $type = 'payment';
     } elseif ($status === 'cancelled') {
         $message = "การชำระเงินสำหรับ Order #$order_code ของคุณถูกปฏิเสธ: $remark";
+        $type = 'payment_rejected'; // ใช้ type ใหม่
     } else {
         $message = "สถานะการชำระเงินสำหรับ Order #$order_code ของคุณถูกเปลี่ยนเป็น $status";
+        $type = 'payment';
     }
     $link = "/graphic-design/src/client/order.php?order_id=$order_id";
-    sendNotification($conn, $customer_id, $message, $link, 0, 'payment');
+    sendNotification($conn, $customer_id, $message, $link, 0, $type);
+}
+
+// แจ้งเตือนลูกค้าเมื่อสถานะออเดอร์เปลี่ยนแปลง
+function notifyOrderStatusChanged($conn, $customer_id, $order_id, $order_code, $newStatus) {
+    // กำหนดข้อความและ badge ตามสถานะ
+    switch ($newStatus) {
+        case 'pending':
+            $badge = "<span class='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>รอตรวจสอบ</span>";
+            $msg = "ออเดอร์ #$order_code ของคุณอยู่ระหว่างรอตรวจสอบ $badge";
+            break;
+        case 'in_progress':
+            $badge = "<span class='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>กำลังดำเนินการ</span>";
+            $msg = "ออเดอร์ #$order_code ของคุณกำลังดำเนินการ $badge";
+            break;
+        case 'completed':
+            $badge = "<span class='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>เสร็จสมบูรณ์</span>";
+            $msg = "ออเดอร์ #$order_code ของคุณเสร็จสมบูรณ์แล้ว $badge";
+            break;
+        case 'cancelled':
+            $badge = "<span class='bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-1'>ยกเลิก</span>";
+            $msg = "ออเดอร์ #$order_code ของคุณถูกยกเลิก $badge";
+            break;
+        default:
+            $badge = "";
+            $msg = "สถานะออเดอร์ #$order_code ของคุณถูกอัปเดต";
+    }
+    $link = "/graphic-design/src/client/order_detail.php?order_id=" . $order_id;
+    sendNotification($conn, $customer_id, $msg, $link, 0, 'order');
 }
 
 // แจ้งเตือนแอดมินเมื่อลูกค้ายกเลิกออเดอร์
