@@ -65,40 +65,8 @@ $form_available = $form_page && file_exists(__DIR__ . '/' . $form_page);
 </head>
 
 <body class="bg-gray-50 mt-10">
-    <?php include __DIR__ . '/../includes/navbar.php'; ?>
-
-
-    <div class="container mx-auto px-4 py-8 md:py-12 pt-10">
-        <!-- Header with back button -->
-        <div class="flex items-center justify-between bg-white rounded-2xl mb-6 p-4 ring-1 ring-gray-200">
-            <div class="flex items-center space-x-4">
-                <button class="p-1.5 text-gray-800 hover:bg-zinc-100 rounded-lg cursor-pointer hover:text-gray-800 ring-1 ring-gray-200" onclick="window.history.back()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                        <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-                <!-- Breadcrumb -->
-                <nav class="text-sm text-gray-500 p-1 rounded-lg ring-1 ring-gray-200">
-                    <ol class="list-none p-0 inline-flex">
-                        <li class="flex items-center">
-                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                        </li>
-                        <li class="flex items-center">
-                            <a href="/graphic-design/src/client/index.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">หน้าหลัก</a>
-                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                        </li>
-                        <li class="flex items-center">
-                            <a href="/graphic-design/src/client/services.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">บริการทั้งหมด</a>
-                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                        </li>
-                        <li class="flex items-center">
-                            <a class="text-zinc-800 transition-colors  hover:bg-zinc-100 p-1 rounded-lg"><?= htmlspecialchars($service['service_name']) ?></a>
-                        </li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-        <div class="items-center bg-white rounded-2xl mb-6 ring-1 ring-gray-200">
+    <div class="">
+        <div class="items-center bg-white rounded-2xl ring-1 ring-gray-200">
             <!-- Header -->
             <div class="mb-4 flex items-center border-b border-gray-200 p-4">
                 <?php $icon = $serviceIcons[$service['slug']] ?? '<i class="fas fa-paint-brush"></i>'; ?>
@@ -117,7 +85,7 @@ $form_available = $form_page && file_exists(__DIR__ . '/' . $form_page);
 
             <div class="p-6 md:p-8">
                 <!-- Call to Action Bottom -->
-                <div class="bg-zinc-100 rounded-xl p-6 text-center">
+                <div class="bg-gray-50 rounded-xl p-6 text-center ring-1 ring-gray-200">
                     <h3 class="text-xl font-semibold text-zinc-800 mb-2">พร้อมเริ่มโครงการออกแบบของคุณแล้วหรือยัง?</h3>
                     <p class="text-gray-600 mb-4">สั่งซื้อตอนนี้และรับงานออกแบบคุณภาพสูงจากมืออาชีพ</p>
                     <div class="mb-6">
@@ -127,7 +95,7 @@ $form_available = $form_page && file_exists(__DIR__ . '/' . $form_page);
                     </div>
                     <?php if ($form_available): ?>
                         <a href="<?= $form_page . '?service_id=' . urlencode($service['service_id']) ?>"
-                            class="text-white bg-zinc-900 hover:bg-zinc-800 font-medium rounded-full text-sm px-4 py-3 text-center transition-all duration-300 ease-in-out hover:scale-105">
+                            class="border font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                             <i class="fas fa-shopping-cart mr-2"></i>
                             เริ่มสั่งออกแบบเลย
                         </a>

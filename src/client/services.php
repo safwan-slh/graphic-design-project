@@ -120,7 +120,8 @@ $serviceIcons = [
                                 <div>
                                     <span class="text-2xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span><span class="text-sm text-acme-gray"> /<?= htmlspecialchars($service['price_unit']) ?></span>
                                 </div>
-                                <a href="service_detail.php?slug=<?= urlencode($service['slug']) ?>" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
+                                <a href="#" onclick="openServiceModal('<?= $service['slug'] ?>'); return false;"
+                                    class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                                     สั่งออกแบบ
                                 </a>
                             </div>
@@ -175,7 +176,8 @@ $serviceIcons = [
                                 <div>
                                     <span class="text-2xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span><span class="text-sm text-acme-gray"> /<?= htmlspecialchars($service['price_unit']) ?></span>
                                 </div>
-                                <a href="service_detail.php?slug=<?= urlencode($service['slug']) ?>" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
+                                <a href="#" onclick="openServiceModal('<?= $service['slug'] ?>'); return false;"
+                                    class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
                                     สั่งออกแบบ
                                 </a>
                             </div>
@@ -206,10 +208,43 @@ $serviceIcons = [
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="serviceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-2xl mx-auto relative p-4">
+            <!-- <button onclick="closeServiceModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button> -->
+            <button onclick="closeServiceModal()" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="serviceModalBody">
+                <!-- เนื้อหา service_detail จะถูกโหลดมาตรงนี้ -->
+            </div>
+        </div>
+    </div>
+
     <?php
     include __DIR__ . '/../includes/footer.php';
     ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        function openServiceModal(slug) {
+            document.getElementById('serviceModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // ป้องกัน scroll
+            document.getElementById('serviceModalBody').innerHTML = '<div class="text-center py-10">กำลังโหลด...</div>';
+            fetch('service_detail.php?slug=' + encodeURIComponent(slug) + '&modal=1')
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('serviceModalBody').innerHTML = html;
+                });
+        }
+
+        function closeServiceModal() {
+            document.getElementById('serviceModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden'); // กลับมา scroll ได้
+        }
+    </script>
 </body>
 
 </html>

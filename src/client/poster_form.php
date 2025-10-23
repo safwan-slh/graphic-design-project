@@ -204,18 +204,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="fas fa-chevron-right mx-2 text-xs"></i>
                         </li>
                         <li class="flex items-center">
-                            <a href="/graphic-design/src/client/index.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">หน้าหลัก</a>
-                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                        </li>
-                        <li class="flex items-center">
-                            <a href="/graphic-design/src/client/services.php" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">บริการทั้งหมด</a>
-                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                        </li>
-                        <li class="flex items-center">
-                            <a href="/graphic-design/src/client/service_detail.php?slug=poster-design" class="hover:text-zinc-800 transition-colors hover:bg-zinc-100 p-1 rounded-lg">บริการออกแบบโปสเตอร์</a>
-                            <i class="fas fa-chevron-right mx-2 text-xs"></i>
-                        </li>
-                        <li class="flex items-center">
                             <a class="text-zinc-800 transition-colors  hover:bg-zinc-100 p-1 rounded-lg">ฟอร์มออกแบบโปสเตอร์</a>
                         </li>
                     </ol>
