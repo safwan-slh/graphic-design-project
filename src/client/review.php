@@ -62,7 +62,7 @@ $review_result = $conn->query($review_sql);
             </div>
         </div>
     </div>
-    <section class="px-10 pt-10">
+    <section class="px-10 pt-10 mb-10 pb-10">
         <div class="columns-1 sm:columns-2 md:columns-3 gap-4 [column-fill:_balance]">
             <?php while ($review = $review_result->fetch_assoc()): ?>
                 <div class="mb-4 break-inside-avoid p-4 bg-white rounded-2xl shadow-md hover:shadow-lg ring-1 ring-gray-200 transition">
@@ -104,6 +104,9 @@ $review_result = $conn->query($review_sql);
             <?php endwhile; ?>
         </div>
     </section>
+    <?php
+    include __DIR__ . '/../includes/footer.php';
+    ?>
 
     <!-- Image Modal -->
     <div id="imgModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden backdrop-blur-md">

@@ -71,7 +71,7 @@ $serviceIcons = [
     </div>
 
     <!-- Section 1: บริการแนะนำ -->
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 mb-10 pb-10">
         <div class="mb-10">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-xl font-bold text-gray-800 bg-white py-1 ring-1 ring-gray-200 rounded-full px-4">
@@ -206,6 +206,9 @@ $serviceIcons = [
             </div>
         </div>
     </div>
+    <?php
+    include __DIR__ . '/../includes/footer.php';
+    ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 

@@ -41,7 +41,7 @@ $portfolioResult = $conn->query($sql); ?>
 		</div>
 	</div>
 
-	<div class="">
+	<div class="mb-10 pb-10">
 		<div class="container mx-auto px-4 ">
 			<!-- Portfolio Grid -->
 			<div class="columns-1 sm:columns-2 md:columns-3 gap-4 [column-fill:_balance]">
@@ -139,6 +139,9 @@ $portfolioResult = $conn->query($sql); ?>
 			</div>
 		</div>
 	</div>
+	<?php
+    include __DIR__ . '/../includes/footer.php';
+    ?>
 
 	<!-- Image Modal -->
 	<div id="imgModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-md hidden">

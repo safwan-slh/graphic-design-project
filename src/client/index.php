@@ -496,11 +496,13 @@ $serviceIcons = [
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </section>
+    <?php
+    include __DIR__ . '/../includes/footer.php';
+    ?>
 </body>
 
 </html>
