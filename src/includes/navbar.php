@@ -142,7 +142,7 @@ if (isset($_SESSION['customer_id'])) {
                 <path fill-rule="evenodd" d="M12 2.25A6.75 6.75 0 0 0 5.25 9v.75a8.217 8.217 0 0 1-2.119 5.52.75.75 0 0 0 .298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 1 0 7.48 0 24.583 24.583 0 0 0 4.83-1.244.75.75 0 0 0 .298-1.205 8.217 8.217 0 0 1-2.118-5.52V9A6.75 6.75 0 0 0 12 2.25ZM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 0 0 4.496 0l.002.1a2.25 2.25 0 1 1-4.5 0Z" clip-rule="evenodd" />
               </svg>
               <?php if ($unreadCount > 0): ?>
-                <span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $unreadCount ?></span>
+                <span class="absolute top-0 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5"><?= $unreadCount ?></span>
               <?php endif; ?>
             </button>
             <!-- Dropdown -->
