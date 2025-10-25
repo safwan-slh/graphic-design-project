@@ -239,7 +239,7 @@ if (isset($_SESSION['customer_id'])) {
                         <div class="flex items-center space-x-3">
                           <!-- <div class="w-10 h-10 bg-zinc-900 ring-1 ring-gray-200 mr-4 rounded-lg flex items-center justify-center">
                             </div> -->
-                            <?= $icon ?>
+                          <?= $icon ?>
                         </div>
                         <div class="flex flex-col w-full">
                           <span><?= $notif['message'] ?></span>
@@ -282,9 +282,18 @@ if (isset($_SESSION['customer_id'])) {
               <?php endif; ?>
               <li>
                 <a href="#" onclick="openProfileModal(); return false;" class="flex items-center justify-between px-3 py-2 text-sm rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
-                  โปรไฟล์ของฉัน
+                  การตั้งค่าบัญชี
                   <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd" d="M4.5 3.75a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V6.75a3 3 0 0 0-3-3h-15Zm4.125 3a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Zm-3.873 8.703a4.126 4.126 0 0 1 7.746 0 .75.75 0 0 1-.351.92 7.47 7.47 0 0 1-3.522.877 7.47 7.47 0 0 1-3.522-.877.75.75 0 0 1-.351-.92ZM15 8.25a.75.75 0 0 0 0 1.5h3.75a.75.75 0 0 0 0-1.5H15ZM14.25 12a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H15a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h3.75a.75.75 0 0 0 0-1.5H15Z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              </li>
+              <li>
+                <a href="#" onclick="openPaymentHistoryModal(); return false;" class="flex items-center justify-between px-3 py-2 text-sm rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-100 transition-colors duration-200 ring-1 ring-gray-200">
+                  ประวัติการชำระเงิน
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4.5 3.75a3 3 0 0 0-3 3v.75h21v-.75a3 3 0 0 0-3-3h-15Z" />
+                    <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3v-7.5Zm-18 3.75a.75.75 0 0 1 .75-.75h6a.75.75 0 0 1 0 1.5h-6a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z" clip-rule="evenodd" />
                   </svg>
                 </a>
               </li>
@@ -418,6 +427,29 @@ if (isset($_SESSION['customer_id'])) {
       </div>
     </div>
   </div>
+
+  <div id="paymentHistoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
+    <div class="bg-gray-100 rounded-3xl w-full max-w-7xl mx-auto relative p-3">
+      <button onclick="closePaymentHistoryModal()" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      <iframe src="/graphic-design/src/client/payment_history.php" class="w-full h-[80vh]" frameborder="0"></iframe>
+    </div>
+  </div>
+  <script>
+    function openPaymentHistoryModal() {
+      document.getElementById('paymentHistoryModal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closePaymentHistoryModal() {
+      document.getElementById('paymentHistoryModal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+  </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
   <script src="/graphic-design/src/chat/chat-modal.js"></script>
   <script>
