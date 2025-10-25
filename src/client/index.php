@@ -221,43 +221,44 @@ $serviceIcons = [
                     <!-- Logo Design -->
                     <?php while ($service = $active_result->fetch_assoc()): ?>
                         <?php $icon = $serviceIcons[$service['slug']] ?? '<i class="fas fa-paint-brush"></i>'; ?>
-                    <div class="relative bg-white rounded-3xl border border-slate-200 hover:shadow-sm transition-all duration-300 ease-in-out hover:scale-105">
-                        <div class="flex items-center p-4 pb-0">
-                            <div class="mr-4 rounded-xl bg-zinc-900 p-3 text-white text-2xl flex items-center justify-center">
-                                <?= $icon ?>
-                            </div>
-                            <div class="">
-                                <h3 class="flex items-center text-xl font-bold text-zinc-900">
-                                    <?= htmlspecialchars($service['service_name']) ?>
-                                </h3>
-                                <!-- Badge บริการแนะนำ มุมบนซ้าย -->
-                                <?php if ($service['is_featured']): ?>
-                                    <div class=" text-sm font-medium">
-                                        บริการแนะนำ
-                                    </div>
-                                <?php elseif (! $service['is_featured']): ?>
-                                    <span class="text-sm font-medium">
-                                        บริการทั่วไป
-                                    </span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <div class="bg-zinc-50 p-4 rounded-xl ring-1 ring-gray-200" style="height:164px;">
-                                <p class="text-acme-gray leading-relaxed mb-6">
-                                    <?= nl2br(htmlspecialchars($service['short_description'])) ?>
-                                </p>
-                            </div>
-                            <div class="flex items-center justify-between pt-4">
-                                <div>
-                                    <span class="text-2xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span><span class="text-sm text-acme-gray"> /<?= htmlspecialchars($service['price_unit']) ?></span>
+                        <div class="relative bg-white rounded-3xl border border-slate-200 hover:shadow-sm transition-all duration-300 ease-in-out hover:scale-105">
+                            <div class="flex items-center p-4 pb-0">
+                                <div class="mr-4 rounded-xl bg-zinc-900 p-3 text-white text-2xl flex items-center justify-center">
+                                    <?= $icon ?>
                                 </div>
-                                <a href="service_detail.php?slug=<?= urlencode($service['slug']) ?>" class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
-                                    สั่งออกแบบ
-                                </a>
+                                <div class="">
+                                    <h3 class="flex items-center text-xl font-bold text-zinc-900">
+                                        <?= htmlspecialchars($service['service_name']) ?>
+                                    </h3>
+                                    <!-- Badge บริการแนะนำ มุมบนซ้าย -->
+                                    <?php if ($service['is_featured']): ?>
+                                        <div class=" text-sm font-medium">
+                                            บริการแนะนำ
+                                        </div>
+                                    <?php elseif (! $service['is_featured']): ?>
+                                        <span class="text-sm font-medium">
+                                            บริการทั่วไป
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="bg-zinc-50 p-4 rounded-xl ring-1 ring-gray-200" style="height:164px;">
+                                    <p class="text-acme-gray leading-relaxed mb-6">
+                                        <?= nl2br(htmlspecialchars($service['short_description'])) ?>
+                                    </p>
+                                </div>
+                                <div class="flex items-center justify-between pt-4">
+                                    <div>
+                                        <span class="text-2xl font-bold text-acme-dark">฿<?= number_format($service['base_price'], 2) ?></span><span class="text-sm text-acme-gray"> /<?= htmlspecialchars($service['price_unit']) ?></span>
+                                    </div>
+                                    <a href="#" onclick="openServiceModal('<?= $service['slug'] ?>'); return false;"
+                                        class="border transition font-medium rounded-xl text-sm px-5 py-2 text-center flex items-center justify-center bg-zinc-900 hover:bg-zinc-700 text-white border-zinc-900">
+                                        สั่งออกแบบ
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     <?php endwhile; ?>
                 </div>
                 <div class="text-center mt-10">
@@ -281,96 +282,96 @@ $serviceIcons = [
                 <!-- Portfolio Grid -->
                 <div class="grid grid-cols-3 gap-6">
                     <?php
-				$i = 0;
-				if ($portfolioResult->num_rows > 0):
-					while ($portfolio = $portfolioResult->fetch_assoc()):
-						$tags = json_decode($portfolio['tags'], true);
-						$imagePath = __DIR__ . '/../../' . $portfolio['image_url'];
-						$imageExists = file_exists($imagePath);
-						$isFeatured = $portfolio['is_featured'];
-						// Featured item: col-span-2 เฉพาะตัวแรกที่เป็น featured
-						$itemClass = $isFeatured && $i === 0
-							? ''
-							: '';
-				?>
-						<div
-							class="portfolio-item mb-4 break-inside-avoid p-1.5 bg-white rounded-2xl shadow-md hover:shadow-lg ring-1 ring-gray-200 transition relative <?= $itemClass ?>">
-							<div class="w-full relative">
-								<?php if ($imageExists): ?>
-									<img src="/graphic-design/<?= htmlspecialchars($portfolio['image_url']) ?>"
-										alt="<?= htmlspecialchars($portfolio['title']) ?>"
-										class="w-full rounded-xl object-cover cursor-pointer transition ring-1 ring-gray-200 shadow-sm hover:brightness-90"
-										onclick="openPortfolioModal(
+                    $i = 0;
+                    if ($portfolioResult->num_rows > 0):
+                        while ($portfolio = $portfolioResult->fetch_assoc()):
+                            $tags = json_decode($portfolio['tags'], true);
+                            $imagePath = __DIR__ . '/../../' . $portfolio['image_url'];
+                            $imageExists = file_exists($imagePath);
+                            $isFeatured = $portfolio['is_featured'];
+                            // Featured item: col-span-2 เฉพาะตัวแรกที่เป็น featured
+                            $itemClass = $isFeatured && $i === 0
+                                ? ''
+                                : '';
+                    ?>
+                            <div
+                                class="portfolio-item mb-4 break-inside-avoid p-1.5 bg-white rounded-2xl shadow-md hover:shadow-lg ring-1 ring-gray-200 transition relative <?= $itemClass ?>">
+                                <div class="w-full relative">
+                                    <?php if ($imageExists): ?>
+                                        <img src="/graphic-design/<?= htmlspecialchars($portfolio['image_url']) ?>"
+                                            alt="<?= htmlspecialchars($portfolio['title']) ?>"
+                                            class="w-full rounded-xl object-cover cursor-pointer transition ring-1 ring-gray-200 shadow-sm hover:brightness-90"
+                                            onclick="openPortfolioModal(
         								<?= htmlspecialchars(json_encode([
-											'title' => $portfolio['title'],
-											'description' => $portfolio['description'],
-											'image_url' => '/graphic-design/' . $portfolio['image_url'],
-											'service_name' => $portfolio['service_name'],
-											'tags' => $cleanTags,
-											'is_featured' => $portfolio['is_featured'],
-										])) ?>
+                                            'title' => $portfolio['title'],
+                                            'description' => $portfolio['description'],
+                                            'image_url' => '/graphic-design/' . $portfolio['image_url'],
+                                            'service_name' => $portfolio['service_name'],
+                                            'tags' => $cleanTags,
+                                            'is_featured' => $portfolio['is_featured'],
+                                        ])) ?>
     								)" />
-								<?php else: ?>
-									<div
-										class="w-full flex items-center justify-center text-white font-bold text-2xl">
-										<?= htmlspecialchars(substr($portfolio['title'], 0, 1)) ?>
-									</div>
-								<?php endif; ?>
-								<!-- Badge สถานะ -->
-								<div class="absolute top-2 flex space-x-2">
-									<?php if ($portfolio['is_featured']): ?>
-										<span
-											class="px-2 py-1 glassmorphism text-white text-xs font-bold rounded-full ml-2">
-											<i class="fas fa-star mr-1 text-yellow-300"></i>
-											แนะนำ
-										</span>
-									<?php endif; ?>
-								</div>
-								<div class="absolute top-2 right-2 flex space-x-2">
-									<span class="px-2 py-1 glassmorphism text-white text-xs rounded-full shadow-md ml-2">
-										บริการ: <?= htmlspecialchars($portfolio['service_name']) ?>
-									</span>
-								</div>
-								<!-- แท็ก -->
-								<?php
-								// ทำความสะอาดแท็ก: trim และตัดค่าว่างออก
-								$cleanTags = [];
-								if (is_array($tags)) {
-									$cleanTags = array_values(array_filter(array_map('trim', $tags), function ($v) {
-										return $v !== '';
-									}));
-								}
-								?>
-								<?php if (!empty($cleanTags)): ?>
-									<div class="absolute bottom-2 left-2 flex items-center justify-between">
-										<div class="flex flex-wrap gap-1">
-											<?php foreach (array_slice($cleanTags, 0, 4) as $tag): ?>
-												<span
-													class=" glassmorphism text-white text-xs px-3 py-1 rounded-full">
-													<?= htmlspecialchars($tag) ?>
-												</span>
-											<?php endforeach; ?>
-											<?php if (count($cleanTags) > 4): ?>
-												<span
-													class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium glassmorphism text-white">
-													+
-													<?= count($cleanTags) - 4 ?>
-												</span>
-											<?php endif; ?>
-										</div>
-									</div>
-								<?php endif; ?>
-							</div>
-						</div>
-					<?php endwhile; ?>
-				<?php else: ?>
-					<div class="col-span-full text-center py-12">
-						<div class="text-gray-400 mb-4">
-							<i class="fas fa-image fa-3x"></i>
-						</div>
-						<h3 class="text-lg font-medium text-gray-600 mb-2">ยังไม่มีผลงาน</h3>
-					</div>
-				<?php endif; ?>
+                                    <?php else: ?>
+                                        <div
+                                            class="w-full flex items-center justify-center text-white font-bold text-2xl">
+                                            <?= htmlspecialchars(substr($portfolio['title'], 0, 1)) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <!-- Badge สถานะ -->
+                                    <div class="absolute top-2 flex space-x-2">
+                                        <?php if ($portfolio['is_featured']): ?>
+                                            <span
+                                                class="px-2 py-1 glassmorphism text-white text-xs font-bold rounded-full ml-2">
+                                                <i class="fas fa-star mr-1 text-yellow-300"></i>
+                                                แนะนำ
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="absolute top-2 right-2 flex space-x-2">
+                                        <span class="px-2 py-1 glassmorphism text-white text-xs rounded-full shadow-md ml-2">
+                                            บริการ: <?= htmlspecialchars($portfolio['service_name']) ?>
+                                        </span>
+                                    </div>
+                                    <!-- แท็ก -->
+                                    <?php
+                                    // ทำความสะอาดแท็ก: trim และตัดค่าว่างออก
+                                    $cleanTags = [];
+                                    if (is_array($tags)) {
+                                        $cleanTags = array_values(array_filter(array_map('trim', $tags), function ($v) {
+                                            return $v !== '';
+                                        }));
+                                    }
+                                    ?>
+                                    <?php if (!empty($cleanTags)): ?>
+                                        <div class="absolute bottom-2 left-2 flex items-center justify-between">
+                                            <div class="flex flex-wrap gap-1">
+                                                <?php foreach (array_slice($cleanTags, 0, 4) as $tag): ?>
+                                                    <span
+                                                        class=" glassmorphism text-white text-xs px-3 py-1 rounded-full">
+                                                        <?= htmlspecialchars($tag) ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                                <?php if (count($cleanTags) > 4): ?>
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium glassmorphism text-white">
+                                                        +
+                                                        <?= count($cleanTags) - 4 ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="col-span-full text-center py-12">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-image fa-3x"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-600 mb-2">ยังไม่มีผลงาน</h3>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="text-center mt-10">
@@ -500,9 +501,43 @@ $serviceIcons = [
             </div>
         </div>
     </section>
+
+    <!-- Modal -->
+    <div id="serviceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-2xl mx-auto relative p-4">
+            <!-- <button onclick="closeServiceModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button> -->
+            <button onclick="closeServiceModal()" class="absolute top-2 right-2 bg-zinc-900 text-white rounded-full p-2 ring-1 ring-gray-200 shadow-md hover:bg-zinc-700 transition-all duration-300 ease-in-out hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="serviceModalBody">
+                <!-- เนื้อหา service_detail จะถูกโหลดมาตรงนี้ -->
+            </div>
+        </div>
+    </div>
+
     <?php
     include __DIR__ . '/../includes/footer.php';
     ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        function openServiceModal(slug) {
+            document.getElementById('serviceModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // ป้องกัน scroll
+            document.getElementById('serviceModalBody').innerHTML = '<div class="text-center py-10">กำลังโหลด...</div>';
+            fetch('service_detail.php?slug=' + encodeURIComponent(slug) + '&modal=1')
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('serviceModalBody').innerHTML = html;
+                });
+        }
+
+        function closeServiceModal() {
+            document.getElementById('serviceModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden'); // กลับมา scroll ได้
+        }
+    </script>
 </body>
 
 </html>
