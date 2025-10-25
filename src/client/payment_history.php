@@ -135,7 +135,7 @@ $statusText = [
                             <h3 class="font-bold text-zinc-700 text-xl tracking-tight">ยอดเงินที่อนุมัติแล้ว</h3>
                         </div>
                         <div class="p-4 bg-gray-50 rounded-xl max-h-auto ring-1 ring-gray-200">
-                            <span class="text-2xl font-bold text-zinc-700"><?= number_format($totalApproved, 2) ?> บาท</span>
+                            <span class="text-2xl font-bold text-zinc-700"><?= number_format($totalApproved ?? 0, 2) ?> บาท</span>
                         </div>
                     </div>
                 </div>
@@ -165,6 +165,7 @@ $statusText = [
                         </thead>
                         <tbody>
                             <?php $i = 1;
+                            $hasData = false;
                             while ($row = $result->fetch_assoc()): ?>
                                 <tr class="border-b last:border-b-0 hover:bg-zinc-50 transition">
                                     <td class="px-4 py-2 text-center"><?= $i++ ?></td>
@@ -212,13 +213,21 @@ $statusText = [
                                     </td>
                                     <td class="px-4 py-2"><?= htmlspecialchars($row['remark'] ?? '') ?></td>
                                 </tr>
-                                <?php endwhile; ?>
+                            <?php endwhile; ?>
+                            <?php if (!$hasData): ?>
+                                <tr>
+                                    <td colspan="9" class="py-8 text-center text-zinc-400 text-lg font-medium">
+                                        ยังไม่มีประวัติการชำระเงิน
+                                    </td>
+                                </tr>
+                            <?php else: ?>
                                 <tr class="bg-gray-50">
                                     <td colspan="3"></td>
                                     <td class="px-4 py-2 font-bold">ยอดเงินทั้งหมด</td>
-                                    <td class="px-4 py-2 text-right font-bold"><?= number_format($totalAll, 2) ?>  <span class="text-xs font-medium text-zinc-400">บาท</span></td>
+                                    <td class="px-4 py-2 text-right font-bold"><?= number_format($totalAll ?? 0, 2) ?> <span class="text-xs font-medium text-zinc-400">บาท</span></td>
                                     <td colspan="4"></td>
                                 </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
