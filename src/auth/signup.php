@@ -70,11 +70,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-    <div class="flex items-center justify-center min-h-screen bg-[radial-gradient(#d4d4d8_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]">
+    <div class="flex items-center justify-center min-h-screen bg-gray-50">
         <div class="max-w-sm w-full">
-
-            <div class=" bg-white border border-gray-200 rounded-2xl shadow-md">
-                <div class="flex items-start p-4 mb-4 md:p-5 border-b rounded-t border-gray-200">
+            <div class=" bg-white border border-gray-200 rounded-3xl shadow-md">
+                <div class="flex items-start p-4 border-b rounded-t border-gray-200">
                     <h3 class="text-xl font-semibold text-gray-900">
                         สมัครสมาชิกใหม่
                     </h3>
